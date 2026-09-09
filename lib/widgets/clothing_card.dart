@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../models/clothing.dart';
@@ -20,25 +22,7 @@ class ClothingCard extends StatelessWidget {
         CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Image.network(
-              clothing.imageUrl,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder:
-                  (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey.shade100,
-                  child: Center(
-                    child: Icon(
-                      Icons
-                          .image_not_supported_outlined,
-                      color: Colors.grey.shade400,
-                      size: 40,
-                    ),
-                  ),
-                );
-              },
-            ),
+            child: _buildImage(),
           ),
 
           Padding(
@@ -60,7 +44,10 @@ class ClothingCard extends StatelessWidget {
                 const SizedBox(height: 4),
 
                 Text(
-                  '${clothing.brand} · ${clothing.category}',
+                  clothing.brand == null ||
+                      clothing.brand!.isEmpty
+                      ? clothing.category
+                      : '${clothing.brand} · ${clothing.category}',
                   maxLines: 1,
                   overflow:
                   TextOverflow.ellipsis,
@@ -73,6 +60,44 @@ class ClothingCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildImage() {
+    if (clothing.imageType ==
+        ClothingImageType.local) {
+      return Image.file(
+        File(clothing.imagePath),
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder:
+            (context, error, stackTrace) {
+          return _buildImageError();
+        },
+      );
+    }
+
+    return Image.network(
+      clothing.imagePath,
+      width: double.infinity,
+      fit: BoxFit.cover,
+      errorBuilder:
+          (context, error, stackTrace) {
+        return _buildImageError();
+      },
+    );
+  }
+
+  Widget _buildImageError() {
+    return Container(
+      color: Colors.grey.shade100,
+      child: Center(
+        child: Icon(
+          Icons.image_not_supported_outlined,
+          color: Colors.grey.shade400,
+          size: 40,
+        ),
       ),
     );
   }
