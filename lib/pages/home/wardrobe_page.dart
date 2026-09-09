@@ -38,6 +38,10 @@ class _WardrobePageState extends State<WardrobePage> {
     final currentUser =
         AuthService.instance.currentUser;
 
+    if (currentUser == null) {
+      return [];
+    }
+
     final mine = _repository.clothes
         .where(
           (item) => item.ownerId == currentUser.id,
@@ -56,6 +60,12 @@ class _WardrobePageState extends State<WardrobePage> {
   }
 
   Future<void> _addClothing() async {
+    final currentUser = AuthService.instance.currentUser;
+
+    if (currentUser == null) {
+      return;
+    }
+
     CameraDescription? backCamera;
 
     for (final camera in cameras) {
@@ -83,8 +93,7 @@ class _WardrobePageState extends State<WardrobePage> {
       MaterialPageRoute(
         builder: (_) => AddClothingPage(
           camera: backCamera!,
-          ownerId:
-          AuthService.instance.currentUser.id,
+          ownerId: currentUser.id,
         ),
       ),
     );
