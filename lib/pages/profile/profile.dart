@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../services/auth_service.dart';
 import 'about.dart';
 import 'settings.dart';
 
 class ProfilePage extends StatefulWidget {
-  /// 当前是否为深色模式
   final bool isDarkMode;
-
-  /// 修改主题
   final ValueChanged<bool> onThemeChanged;
 
   const ProfilePage({
@@ -21,14 +19,28 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  /// 是否开启通知
-  bool notificationsEnabled = true;
+  bool _isEditingUsername = false;
+  late final TextEditingController _usernameController;
+  late final FocusNode _usernameFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _usernameController = TextEditingController();
+    _usernameFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _usernameFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
       appBar: AppBar(
         title: const Text(
           'Profile',
@@ -37,101 +49,225 @@ class _ProfilePageState extends State<ProfilePage> {
         centerTitle: true,
         elevation: 0,
       ),
+      body: AnimatedBuilder(
+        animation: AuthService.instance,
+        builder: (context, _) {
+          final user = AuthService.instance.currentUser;
 
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        children: [
-          // ============================================================
-          // Profile Header
-          // ============================================================
-          Center(
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 42,
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.surfaceContainerHighest,
-                  child: Icon(
-                    Icons.person_outline,
-                    size: 48,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+          if (user == null) {
+            return const SizedBox.shrink();
+          }
+
+          return ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            children: [
+              // Profile
+              Center(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 42,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Icons.person_outline,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Username
+                    _buildUsernameEditor(context, user.username),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      user.email,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-
-                const SizedBox(height: 14),
-
-                const Text(
-                  'User Name',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                ),
-
-                const SizedBox(height: 4),
-
-                Text(
-                  'user@email.com',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 36),
-
-          // ============================================================
-          // Settings
-          // ============================================================
-          _buildMenuItem(
-            icon: Icons.settings_outlined,
-            title: 'Settings',
-            onTap: _openSettings,
-          ),
-
-          const SizedBox(height: 12),
-
-          // ============================================================
-          // About
-          // ============================================================
-          _buildMenuItem(
-            icon: Icons.info_outline,
-            title: 'About',
-            onTap: _openAbout,
-          ),
-
-          const SizedBox(height: 32),
-
-          Divider(color: Theme.of(context).dividerColor),
-
-          const SizedBox(height: 12),
-
-          // ============================================================
-          // Log Out
-          // ============================================================
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-            leading: Icon(Icons.logout, color: Colors.red.shade400),
-            title: Text(
-              'Log Out',
-              style: TextStyle(
-                color: Colors.red.shade400,
-                fontWeight: FontWeight.w500,
               ),
-            ),
-            onTap: _showLogoutDialog,
-          ),
-        ],
+
+              const SizedBox(height: 36),
+
+              // Settings
+              _buildMenuItem(
+                context,
+                icon: Icons.settings_outlined,
+                title: 'Settings',
+                onTap: _openSettings,
+              ),
+
+              const SizedBox(height: 12),
+
+              // About
+              _buildMenuItem(
+                context,
+                icon: Icons.info_outline,
+                title: 'About',
+                onTap: _openAbout,
+              ),
+
+              const SizedBox(height: 32),
+
+              Divider(color: Theme.of(context).dividerColor),
+
+              const SizedBox(height: 12),
+
+              // Logout
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                leading: Icon(Icons.logout, color: Colors.red.shade400),
+                title: Text(
+                  'Log Out',
+                  style: TextStyle(
+                    color: Colors.red.shade400,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                onTap: () => _showLogoutDialog(context),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  // ============================================================
-  // Menu Item
-  // ============================================================
+  Widget _buildUsernameEditor(BuildContext context, String username) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-  Widget _buildMenuItem({
+    if (_isEditingUsername) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 100, maxWidth: 220),
+            child: TextField(
+              controller: _usernameController,
+              focusNode: _usernameFocusNode,
+              autofocus: true,
+              maxLength: 20,
+              textAlign: TextAlign.center,
+              textInputAction: TextInputAction.done,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              decoration: const InputDecoration(
+                isDense: true,
+                counterText: '',
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: true,
+                fillColor: Colors.transparent,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 4,
+                  vertical: 4,
+                ),
+              ),
+              onSubmitted: (_) => _saveUsername(),
+            ),
+          ),
+
+          const SizedBox(width: 2),
+
+          // Save
+          IconButton(
+            onPressed: _saveUsername,
+            tooltip: 'Save',
+            icon: Icon(Icons.check, size: 20, color: colorScheme.primary),
+            visualDensity: VisualDensity.compact,
+          ),
+
+          // Cancel
+          IconButton(
+            onPressed: _cancelUsernameEdit,
+            tooltip: 'Cancel',
+            icon: Icon(
+              Icons.close,
+              size: 20,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            visualDensity: VisualDensity.compact,
+          ),
+        ],
+      );
+    }
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: () => _startUsernameEdit(username),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              username,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              Icons.edit_outlined,
+              size: 16,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _startUsernameEdit(String username) {
+    _usernameController.text = username;
+    _usernameController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: username.length,
+    );
+
+    setState(() {
+      _isEditingUsername = true;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _usernameFocusNode.requestFocus();
+      }
+    });
+  }
+
+  void _saveUsername() {
+    try {
+      AuthService.instance.updateUsername(_usernameController.text);
+
+      setState(() {
+        _isEditingUsername = false;
+      });
+
+      FocusScope.of(context).unfocus();
+    } on AuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message), behavior: SnackBarBehavior.floating),
+      );
+    }
+  }
+
+  void _cancelUsernameEdit() {
+    setState(() {
+      _isEditingUsername = false;
+    });
+
+    FocusScope.of(context).unfocus();
+  }
+
+  Widget _buildMenuItem(
+    BuildContext context, {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
@@ -155,7 +291,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 24,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
-
               const SizedBox(width: 16),
 
               Expanded(
@@ -179,77 +314,43 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // ============================================================
-  // Open Settings
-  // ============================================================
-
   void _openSettings() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) {
-          return SettingsPage(
-            notificationsEnabled: notificationsEnabled,
-
-            // ⭐ 从 WardrobeApp 传进来的主题状态
-            darkModeEnabled: widget.isDarkMode,
-
-            // 通知开关
-            onNotificationsChanged: (value) {
-              setState(() {
-                notificationsEnabled = value;
-              });
-            },
-
-            // ⭐ Dark Mode
-            // 修改后直接通知 WardrobeApp
-            onDarkModeChanged: widget.onThemeChanged,
-          );
-        },
+        builder: (_) => SettingsPage(
+          notificationsEnabled: true,
+          darkModeEnabled: widget.isDarkMode,
+          onNotificationsChanged: (_) {},
+          onDarkModeChanged: widget.onThemeChanged,
+        ),
       ),
     );
   }
 
-  // ============================================================
-  // Open About
-  // ============================================================
-
   void _openAbout() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AboutPage()),
+      MaterialPageRoute(builder: (_) => const AboutPage()),
     );
   }
 
-  // ============================================================
-  // Log Out Dialog
-  // ============================================================
-
-  void _showLogoutDialog() {
+  void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Log Out'),
-
           content: const Text('Are you sure you want to log out?'),
-
           actions: [
-            // Cancel
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel'),
             ),
-
-            // Log Out
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
-
-                // TODO:
-                // 添加真正的退出登录逻辑
+                Navigator.pop(dialogContext);
+                AuthService.instance.logout();
               },
               child: Text(
                 'Log Out',

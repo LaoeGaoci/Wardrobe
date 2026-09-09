@@ -39,6 +39,7 @@ class AuthService extends ChangeNotifier {
     _currentUser = AppUser(
       id: account.id,
       username: account.username,
+      email: account.email,
     );
 
     notifyListeners();
@@ -76,6 +77,7 @@ class AuthService extends ChangeNotifier {
     final account = _LocalAccount(
       id: userId,
       username: username,
+      email: normalizedEmail,
       password: password,
     );
 
@@ -84,11 +86,42 @@ class AuthService extends ChangeNotifier {
     _currentUser = AppUser(
       id: account.id,
       username: account.username,
+      email: account.email,
     );
 
     notifyListeners();
 
     return _currentUser!;
+  }
+
+  /// 修改用户名
+  void updateUsername(String username) {
+    if (_currentUser == null) {
+      return;
+    }
+
+    final newUsername = username.trim();
+
+    if (newUsername.isEmpty) {
+      throw const AuthException('用户名不能为空');
+    }
+
+    if (newUsername == _currentUser!.username) {
+      return;
+    }
+
+    final currentEmail = _currentUser!.email;
+    final account = _accounts[currentEmail];
+
+    if (account != null) {
+      account.username = newUsername;
+    }
+
+    _currentUser = _currentUser!.copyWith(
+      username: newUsername,
+    );
+
+    notifyListeners();
   }
 
   /// 发送验证码
@@ -127,12 +160,14 @@ class AuthService extends ChangeNotifier {
 /// 本地账号
 class _LocalAccount {
   final String id;
-  final String username;
+  String username;
+  final String email;
   final String password;
 
-  const _LocalAccount({
+  _LocalAccount({
     required this.id,
     required this.username,
+    required this.email,
     required this.password,
   });
 }
