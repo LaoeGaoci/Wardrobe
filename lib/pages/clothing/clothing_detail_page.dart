@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../models/clothing.dart';
@@ -17,30 +19,9 @@ class ClothingDetailPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('衣物详情'),
       ),
-
       body: ListView(
         children: [
-          Image.network(
-            clothing.imageUrl,
-            height: 420,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder:
-                (context, error, stackTrace) {
-              return Container(
-                height: 420,
-                color: Colors.grey.shade100,
-                child: Center(
-                  child: Icon(
-                    Icons
-                        .image_not_supported_outlined,
-                    size: 56,
-                    color: Colors.grey.shade400,
-                  ),
-                ),
-              );
-            },
-          ),
+          _buildImage(),
 
           Padding(
             padding: const EdgeInsets.all(20),
@@ -60,7 +41,7 @@ class ClothingDetailPage extends StatelessWidget {
 
                 InfoRow(
                   title: '品牌',
-                  value: clothing.brand,
+                  value: clothing.brand ?? '未设置',
                 ),
 
                 InfoRow(
@@ -97,6 +78,47 @@ class ClothingDetailPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildImage() {
+    if (clothing.imageType ==
+        ClothingImageType.local) {
+      return Image.file(
+        File(clothing.imagePath),
+        height: 420,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder:
+            (context, error, stackTrace) {
+          return _buildImageError();
+        },
+      );
+    }
+
+    return Image.network(
+      clothing.imagePath,
+      height: 420,
+      width: double.infinity,
+      fit: BoxFit.cover,
+      errorBuilder:
+          (context, error, stackTrace) {
+        return _buildImageError();
+      },
+    );
+  }
+
+  Widget _buildImageError() {
+    return Container(
+      height: 420,
+      color: Colors.grey.shade100,
+      child: Center(
+        child: Icon(
+          Icons.image_not_supported_outlined,
+          size: 56,
+          color: Colors.grey.shade400,
+        ),
       ),
     );
   }

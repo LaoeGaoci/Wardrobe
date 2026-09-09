@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 
-import '../../data/mock_data.dart';
 import '../../models/clothing.dart';
+import '../../services/auth_service.dart';
+import '../../services/clothing_repository.dart';
 import '../../widgets/clothing_card.dart';
+import '../../main.dart';
+
+import '../clothing/add_clothing_page.dart';
 import '../clothing/clothing_detail_page.dart';
 
 class WardrobePage extends StatefulWidget {
@@ -13,6 +18,10 @@ class WardrobePage extends StatefulWidget {
 }
 
 class _WardrobePageState extends State<WardrobePage> {
+  // 衣柜数据
+  final ClothingRepository _repository =
+      ClothingRepository.instance;
+
   String selectedCategory = '全部';
 
   final List<String> categories = [
@@ -26,7 +35,10 @@ class _WardrobePageState extends State<WardrobePage> {
   ];
 
   List<Clothing> get filteredClothes {
-    final mine = clothes
+    final currentUser =
+        AuthService.instance.currentUser;
+
+    final mine = _repository.clothes
         .where(
           (item) => item.ownerId == currentUser.id,
     )
@@ -43,8 +55,49 @@ class _WardrobePageState extends State<WardrobePage> {
         .toList();
   }
 
+  Future<void> _addClothing() async {
+    CameraDescription? backCamera;
+
+    for (final camera in cameras) {
+      if (camera.lensDirection ==
+          CameraLensDirection.back) {
+        backCamera = camera;
+        break;
+      }
+    }
+
+    if (backCamera == null) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('未找到后置摄像头'),
+        ),
+      );
+
+      return;
+    }
+
+    final clothing = await Navigator.push<Clothing>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddClothingPage(
+          camera: backCamera!,
+          ownerId:
+          AuthService.instance.currentUser.id,
+        ),
+      ),
+    );
+
+    if (clothing != null && mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final clothes = filteredClothes;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -141,7 +194,7 @@ class _WardrobePageState extends State<WardrobePage> {
           // 衣物 Grid
           SliverPadding(
             padding: const EdgeInsets.all(12),
-            sliver: filteredClothes.isEmpty
+            sliver: clothes.isEmpty
                 ? const SliverToBoxAdapter(
               child: _EmptyWardrobe(),
             )
@@ -150,7 +203,7 @@ class _WardrobePageState extends State<WardrobePage> {
               SliverChildBuilderDelegate(
                     (context, index) {
                   final clothing =
-                  filteredClothes[index];
+                  clothes[index];
 
                   return GestureDetector(
                     onTap: () {
@@ -169,8 +222,7 @@ class _WardrobePageState extends State<WardrobePage> {
                     ),
                   );
                 },
-                childCount:
-                filteredClothes.length,
+                childCount: clothes.length,
               ),
               gridDelegate:
               const SliverGridDelegateWithFixedCrossAxisCount(
@@ -185,9 +237,7 @@ class _WardrobePageState extends State<WardrobePage> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: 添加衣物
-        },
+        onPressed: _addClothing,
         child: const Icon(Icons.add),
       ),
     );
