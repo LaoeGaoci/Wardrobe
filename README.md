@@ -1,107 +1,83 @@
 # Wardrobe 👕
 
-> 一个基于 Flutter 开发的智能衣柜管理 App
+一个基于 Flutter 开发的数字衣柜管理 App。
 
-Wardrobe 是一款帮助用户管理个人衣物、搭配穿搭以及整理衣柜的移动端应用。
+Wardrobe 用于管理个人/亲友衣物，并为后续的穿搭推荐等功能提供基础。
 
-项目采用 Flutter 构建，目标是提供一个简洁、美观、易用的数字化衣柜体验。
+## Features
 
----
+当前已实现：
 
-## ✨ Features
+* 衣柜主页
 
-当前已完成：
+  * 衣物分类展示
+  * 卡片式衣物 UI
+  * 衣物图片展示
 
-- 🏠 **衣柜主页**
-  
-  - 展示衣物分类
-  - 首页布局设计
-  - 卡片式 UI 展示
+* 衣物管理
 
-- 🎨 **主题系统**
-  
-  - 支持浅色 / 深色主题切换
-  - 全局 Theme 管理
+  * 拍照添加衣物
+  * 衣物名称、品牌、颜色、分类、季节、价格
+  * Private / Public 可见性设置
+  * 衣物本地图片保存
 
-- 👤 **个人中心**
-  
-  - 用户信息页面
-  - 设置入口
-  - 个性化功能入口
+* 好友系统
 
-- ⚙️ **设置页面**
-  
-  - 通知开关
-  - 主题切换控制
+  * 查找用户
+  * 发送/处理好友申请
+  * 好友备注
+  * 删除好友
+  * 查看好友资料/衣柜
 
----
+* 个人中心
 
-## 📱 Screenshots
+  * 用户信息
+  * 设置页面
+  * 主题切换
 
-> Screenshots will be added soon.
+* 主题
 
----
+  * Light / Dark 模式
 
-## 🛠 Tech Stack
+## Project Structure
 
-### Frontend
+```text
+lib/
+├── models/          # 数据模型
+├── pages/           # 页面
+├── services/        # 业务逻辑与数据仓库
+├── widgets/         # 通用 UI 组件
+└── ...
+```
 
-- Flutter
-- Dart
-- Material Design
-
-### State Management
-
-- Flutter StatefulWidget
-- （计划）Provider / Riverpod
-
-### Storage
-
-- （计划）SharedPreferences
-- （计划）本地数据库 Hive / SQLite
-
-### Platform
-
-- Android
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Requirements
 
-确保已安装：
+* Flutter SDK
+* Android Studio / VS Code
+* Android Emulator 或 Android 实体设备
 
-- Flutter SDK
-- Android Studio / VS Code
-- Android Emulator 或实体设备
-  检查 Flutter 环境：
-- ```bash
-  flutter doctor
-  ```
+检查 Flutter 环境：
 
----
+```bash
+flutter doctor
+```
 
-## 🏗 Development Roadmap
+运行项目：
 
-- [x] 项目初始化
-- [x] 衣柜主页 UI
-- [x] 主题切换
-- [x] 个人页面
-- [x] 设置页面
+```bash
+flutter pub get
+flutter run
+```
 
-Future:
+## TODO
 
-- [ ] 衣物添加功能
-- [ ] 衣物图片上传
-- [ ] AI 衣物识别
-- [ ] 穿搭推荐
-- [ ] 天气联动推荐穿搭
-- [ ] 云端同步
-- [ ] 用户账号系统
+* [ ] 好友穿搭推荐
+* [ ] AI 衣物识别
+* [ ] 天气联动
+* [ ] 云端数据同步
 
----
+## License
 
-## 📄 License
-
-This project is licensed under the MIT License.
+MIT License
