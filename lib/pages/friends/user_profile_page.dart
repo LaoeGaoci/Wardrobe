@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/app_user.dart';
 import '../../services/friend_service.dart';
 import 'friend_requests_page.dart';
+import 'friend_wardrobe_page.dart';
 
 class UserProfilePage extends StatefulWidget {
   final AppUser user;
@@ -414,12 +415,33 @@ class _UserProfilePageState extends State<UserProfilePage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            FilledButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => FriendWardrobePage(
+                      user: widget.user,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.checkroom_outlined),
+              label: const Text('查看衣柜'),
+            ),
+
+            const SizedBox(height: 12),
+
             OutlinedButton.icon(
               onPressed: _showRemarkDialog,
               icon: const Icon(Icons.edit_outlined),
-              label: Text(remark.isEmpty ? '设置备注' : '备注：$remark'),
+              label: Text(
+                remark.isEmpty ? '设置备注' : '备注：$remark',
+              ),
             ),
+
             const SizedBox(height: 12),
+
             OutlinedButton.icon(
               onPressed: _removeFriend,
               icon: const Icon(Icons.person_remove_outlined),
