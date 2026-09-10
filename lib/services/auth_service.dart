@@ -1,18 +1,21 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/app_user.dart';
+import 'user_repository.dart';
 
 class AuthService extends ChangeNotifier {
   AuthService._();
 
   static final AuthService instance = AuthService._();
 
+  final UserRepository _userRepository = UserRepository.instance;
+
   AppUser? _currentUser;
 
-  final Map<String, _LocalAccount> _accounts = {};
-
+  /// 当前登录用户
   AppUser? get currentUser => _currentUser;
 
+  /// 是否已经登录
   bool get isLoggedIn => _currentUser != null;
 
   /// 登录
@@ -20,31 +23,22 @@ class AuthService extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
 
-    final normalizedEmail = email.trim().toLowerCase();
+    try {
+      final user = _userRepository.authenticate(
+        email: email,
+        password: password,
+      );
 
-    final account = _accounts[normalizedEmail];
+      _currentUser = user;
 
-    if (account == null) {
-      throw const AuthException('该邮箱尚未注册');
+      notifyListeners();
+
+      return user;
+    } on UserRepositoryException catch (e) {
+      throw AuthException(e.message);
     }
-
-    if (account.password != password) {
-      throw const AuthException('密码错误');
-    }
-
-    _currentUser = AppUser(
-      id: account.id,
-      username: account.username,
-      email: account.email,
-    );
-
-    notifyListeners();
-
-    return _currentUser!;
   }
 
   /// 注册
@@ -53,84 +47,64 @@ class AuthService extends ChangeNotifier {
     required String verificationCode,
     required String password,
   }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
 
     final normalizedEmail = email.trim().toLowerCase();
 
-    if (_accounts.containsKey(normalizedEmail)) {
-      throw const AuthException('该邮箱已经注册');
+    if (normalizedEmail.isEmpty) {
+      throw const AuthException('请输入邮箱');
     }
 
-    // 开发阶段暂时使用固定验证码
+    if (!normalizedEmail.contains('@')) {
+      throw const AuthException('请输入有效的邮箱地址');
+    }
+
+    // 开发阶段暂时使用固定验证码。
     if (verificationCode != '123456') {
       throw const AuthException('验证码错误');
     }
 
-    final userId =
-        'user_${DateTime.now().millisecondsSinceEpoch}';
+    final username = normalizedEmail.split('@').first;
 
-    final username =
-        normalizedEmail.split('@').first;
+    try {
+      final user = _userRepository.createUser(
+        email: normalizedEmail,
+        username: username,
+        password: password,
+      );
 
-    final account = _LocalAccount(
-      id: userId,
-      username: username,
-      email: normalizedEmail,
-      password: password,
-    );
+      _currentUser = user;
 
-    _accounts[normalizedEmail] = account;
+      notifyListeners();
 
-    _currentUser = AppUser(
-      id: account.id,
-      username: account.username,
-      email: account.email,
-    );
-
-    notifyListeners();
-
-    return _currentUser!;
+      return user;
+    } on UserRepositoryException catch (e) {
+      throw AuthException(e.message);
+    }
   }
 
   /// 修改用户名
   void updateUsername(String username) {
-    if (_currentUser == null) {
-      return;
+    final user = _currentUser;
+
+    if (user == null) {
+      throw const AuthException('请先登录');
     }
 
-    final newUsername = username.trim();
+    try {
+      final updatedUser = _userRepository.updateUsername(user.id, username);
 
-    if (newUsername.isEmpty) {
-      throw const AuthException('用户名不能为空');
+      _currentUser = updatedUser;
+
+      notifyListeners();
+    } on UserRepositoryException catch (e) {
+      throw AuthException(e.message);
     }
-
-    if (newUsername == _currentUser!.username) {
-      return;
-    }
-
-    final currentEmail = _currentUser!.email;
-    final account = _accounts[currentEmail];
-
-    if (account != null) {
-      account.username = newUsername;
-    }
-
-    _currentUser = _currentUser!.copyWith(
-      username: newUsername,
-    );
-
-    notifyListeners();
   }
 
   /// 发送验证码
-  Future<void> sendVerificationCode(
-      String email,
-      ) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<void> sendVerificationCode(String email) async {
+    await Future.delayed(const Duration(milliseconds: 500));
 
     final normalizedEmail = email.trim();
 
@@ -143,7 +117,7 @@ class AuthService extends ChangeNotifier {
     }
 
     // TODO:
-    // 接入真实邮箱验证码服务
+    // 接入真实邮箱验证码服务。
     //
     // 当前开发阶段验证码固定为：
     // 123456
@@ -155,21 +129,6 @@ class AuthService extends ChangeNotifier {
 
     notifyListeners();
   }
-}
-
-/// 本地账号
-class _LocalAccount {
-  final String id;
-  String username;
-  final String email;
-  final String password;
-
-  _LocalAccount({
-    required this.id,
-    required this.username,
-    required this.email,
-    required this.password,
-  });
 }
 
 /// 认证异常
