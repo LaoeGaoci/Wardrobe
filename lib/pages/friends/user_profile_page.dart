@@ -48,34 +48,41 @@ class _UserProfilePageState extends State<UserProfilePage> {
     final result = await showDialog<String>(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('添加好友'),
-          content: TextField(
-            maxLines: 4,
-            maxLength: 200,
-            autofocus: true,
-            onChanged: (value) {
-              message = value;
-            },
-            decoration: const InputDecoration(
-              hintText: '介绍一下自己吧',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('取消'),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.pop(dialogContext, message.trim());
-              },
-              child: const Text('发送申请'),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('添加好友'),
+              content: TextField(
+                maxLines: 4,
+                maxLength: 200,
+                autofocus: true,
+                onChanged: (value) {
+                  message = value;
+                  setDialogState(() {});
+                },
+                decoration: const InputDecoration(
+                  hintText: '介绍一下自己吧',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('取消'),
+                ),
+                FilledButton(
+                  onPressed: message.trim().isEmpty
+                      ? null
+                      : () {
+                          Navigator.pop(dialogContext, message.trim());
+                        },
+                  child: const Text('发送申请'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -420,9 +427,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => FriendWardrobePage(
-                      user: widget.user,
-                    ),
+                    builder: (_) => FriendWardrobePage(user: widget.user),
                   ),
                 );
               },
@@ -435,9 +440,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             OutlinedButton.icon(
               onPressed: _showRemarkDialog,
               icon: const Icon(Icons.edit_outlined),
-              label: Text(
-                remark.isEmpty ? '设置备注' : '备注：$remark',
-              ),
+              label: Text(remark.isEmpty ? '设置备注' : '备注：$remark'),
             ),
 
             const SizedBox(height: 12),
