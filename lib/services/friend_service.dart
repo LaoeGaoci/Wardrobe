@@ -25,7 +25,7 @@ class FriendRequest {
   final AppUser fromUser;
   final AppUser toUser;
 
-  /// 申请时填写的自我介绍 / 申请文本
+  /// 申请文本
   final String message;
 
   final DateTime createdAt;
@@ -40,18 +40,6 @@ class FriendRequest {
 }
 
 /// 好友关系
-///
-/// 每一条好友关系都是独立的。
-///
-/// 例如：
-///
-/// 用户 A -> 用户 B
-/// remark = 妈妈
-///
-/// 用户 B -> 用户 A
-/// remark = sun
-///
-/// 两个备注互不影响。
 class FriendRelation {
   final String userId;
   final String friendId;
@@ -67,37 +55,41 @@ class FriendRelation {
 
 /// 好友服务
 ///
-/// 负责：
-/// - 好友列表
-/// - 搜索用户
-/// - 发送好友申请
-/// - 接受好友申请
-/// - 拒绝好友申请
-/// - 删除好友
-/// - 好友状态
-/// - 好友备注
-class FriendService extends ChangeNotifier {
+/// 注意：
+///
+/// 当前只有“搜索用户”已经连接后端。
+///
+/// 好友关系、好友申请、备注等功能
+/// 仍然暂时使用前端内存。
+class FriendService
+    extends ChangeNotifier {
   FriendService._();
 
-  static final FriendService instance = FriendService._();
+  static final FriendService instance =
+  FriendService._();
 
-  final AuthService _authService = AuthService.instance;
+  final AuthService _authService =
+      AuthService.instance;
 
-  final UserRepository _userRepository = UserRepository.instance;
+  final UserRepository _userRepository =
+      UserRepository.instance;
 
   /// 所有好友关系
   ///
   /// key:
   /// userId:friendId
-  final Map<String, FriendRelation> _relations = {};
+  final Map<String, FriendRelation>
+  _relations = {};
 
   /// 所有好友申请
-  final Map<String, FriendRequest> _requests = {};
+  final Map<String, FriendRequest>
+  _requests = {};
 
   /// 当前用户
-  AppUser? get currentUser => _authService.currentUser;
+  AppUser? get currentUser =>
+      _authService.currentUser;
 
-  /// 当前用户的好友
+  /// 当前用户好友
   List<AppUser> get friends {
     final user = currentUser;
 
@@ -105,19 +97,33 @@ class FriendService extends ChangeNotifier {
       return const [];
     }
 
-    final friendIds = _relations.values
-        .where((relation) => relation.userId == user.id)
-        .map((relation) => relation.friendId)
+    final friendIds =
+    _relations.values
+        .where(
+          (relation) =>
+      relation.userId ==
+          user.id,
+    )
+        .map(
+          (relation) =>
+      relation.friendId,
+    )
         .toSet();
 
     return friendIds
-        .map(_userRepository.getUserById)
+        .map(
+      _userRepository
+          .getUserById,
+    )
         .whereType<AppUser>()
-        .toList(growable: false);
+        .toList(
+      growable: false,
+    );
   }
 
-  /// 当前用户收到的好友申请
-  List<FriendRequest> get receivedRequests {
+  /// 收到的好友申请
+  List<FriendRequest>
+  get receivedRequests {
     final user = currentUser;
 
     if (user == null) {
@@ -125,12 +131,19 @@ class FriendService extends ChangeNotifier {
     }
 
     return _requests.values
-        .where((request) => request.toUser.id == user.id)
-        .toList(growable: false);
+        .where(
+          (request) =>
+      request.toUser.id ==
+          user.id,
+    )
+        .toList(
+      growable: false,
+    );
   }
 
-  /// 当前用户发送的好友申请
-  List<FriendRequest> get sentRequests {
+  /// 已发送的好友申请
+  List<FriendRequest>
+  get sentRequests {
     final user = currentUser;
 
     if (user == null) {
@@ -138,12 +151,19 @@ class FriendService extends ChangeNotifier {
     }
 
     return _requests.values
-        .where((request) => request.fromUser.id == user.id)
-        .toList(growable: false);
+        .where(
+          (request) =>
+      request.fromUser.id ==
+          user.id,
+    )
+        .toList(
+      growable: false,
+    );
   }
 
-  /// 当前用户收到的申请数量
-  int get receivedRequestCount => receivedRequests.length;
+  /// 收到的好友申请数量
+  int get receivedRequestCount =>
+      receivedRequests.length;
 
   // ============================================================
   // 用户搜索
@@ -151,25 +171,36 @@ class FriendService extends ChangeNotifier {
 
   /// 搜索用户
   ///
-  /// 搜索逻辑属于 UserRepository。
-  /// FriendService 只负责传入当前用户 ID，
-  /// 避免当前用户搜索到自己。
-  List<AppUser> searchUsers(String keyword) {
-    final user = currentUser;
-
-    if (user == null) {
+  /// GET /api/users/search?q=keyword
+  ///
+  /// 当前用户由 Bearer Token 决定，
+  /// 后端已经会自动排除自己。
+  Future<List<AppUser>> searchUsers(
+      String keyword,
+      ) async {
+    if (currentUser == null) {
       return const [];
     }
 
-    return _userRepository.searchUsers(keyword, excludeUserId: user.id);
+    try {
+      return await _userRepository
+          .searchUsers(
+        keyword,
+      );
+    } on UserRepositoryException catch (e) {
+      throw FriendException(
+        e.message,
+      );
+    }
   }
 
   // ============================================================
   // 好友状态
   // ============================================================
 
-  /// 获取指定用户的好友状态
-  FriendStatus getFriendStatus(String userId) {
+  FriendStatus getFriendStatus(
+      String userId,
+      ) {
     final user = currentUser;
 
     if (user == null) {
@@ -180,170 +211,277 @@ class FriendService extends ChangeNotifier {
       return FriendStatus.none;
     }
 
-    if (_hasRelation(userId: user.id, friendId: userId)) {
+    if (_hasRelation(
+      userId: user.id,
+      friendId: userId,
+    )) {
       return FriendStatus.friends;
     }
 
-    if (_hasRequest(fromUserId: user.id, toUserId: userId)) {
+    if (_hasRequest(
+      fromUserId: user.id,
+      toUserId: userId,
+    )) {
       return FriendStatus.requestSent;
     }
 
-    if (_hasRequest(fromUserId: userId, toUserId: user.id)) {
-      return FriendStatus.requestReceived;
+    if (_hasRequest(
+      fromUserId: userId,
+      toUserId: user.id,
+    )) {
+      return FriendStatus
+          .requestReceived;
     }
 
     return FriendStatus.none;
   }
 
   // ============================================================
-  // 好友申请
+  // 发送好友申请
   // ============================================================
 
-  /// 发送好友申请
-  ///
-  /// message:
-  /// 用户填写的申请文本，例如：
-  ///
-  /// "你好，我是海的妈妈。"
-  Future<FriendRequest> sendFriendRequest({
+  Future<FriendRequest>
+  sendFriendRequest({
     required String userId,
     required String message,
   }) async {
     final user = currentUser;
 
     if (user == null) {
-      throw const FriendException('请先登录');
+      throw const FriendException(
+        '请先登录',
+      );
     }
 
     if (user.id == userId) {
-      throw const FriendException('不能添加自己为好友');
+      throw const FriendException(
+        '不能添加自己为好友',
+      );
     }
 
-    final targetUser = _userRepository.getUserById(userId);
+    final targetUser =
+    _userRepository
+        .getUserById(
+      userId,
+    );
 
     if (targetUser == null) {
-      throw const FriendException('用户不存在');
+      throw const FriendException(
+        '用户不存在',
+      );
     }
 
-    final status = getFriendStatus(userId);
+    final status =
+    getFriendStatus(
+      userId,
+    );
 
-    if (status == FriendStatus.friends) {
-      throw const FriendException('对方已经是你的好友');
+    if (status ==
+        FriendStatus.friends) {
+      throw const FriendException(
+        '对方已经是你的好友',
+      );
     }
 
-    if (status == FriendStatus.requestSent) {
-      throw const FriendException('好友申请已经发送');
+    if (status ==
+        FriendStatus.requestSent) {
+      throw const FriendException(
+        '好友申请已经发送',
+      );
     }
 
-    if (status == FriendStatus.requestReceived) {
-      throw const FriendException('对方已经向你发送了好友申请，请处理该申请');
+    if (status ==
+        FriendStatus
+            .requestReceived) {
+      throw const FriendException(
+        '对方已经向你发送了好友申请，请处理该申请',
+      );
     }
 
-    final requestMessage = message.trim();
+    final requestMessage =
+    message.trim();
 
     if (requestMessage.isEmpty) {
-      throw const FriendException('请输入好友申请信息');
+      throw const FriendException(
+        '请输入好友申请信息',
+      );
     }
 
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(
+      const Duration(
+        milliseconds: 300,
+      ),
+    );
 
-    final requestId = 'request_${DateTime.now().microsecondsSinceEpoch}';
+    final requestId =
+        'request_${DateTime.now().microsecondsSinceEpoch}';
 
-    final request = FriendRequest(
+    final request =
+    FriendRequest(
       id: requestId,
       fromUser: user,
       toUser: targetUser,
-      message: requestMessage,
-      createdAt: DateTime.now(),
+      message:
+      requestMessage,
+      createdAt:
+      DateTime.now(),
     );
 
-    _requests[requestId] = request;
+    _requests[requestId] =
+        request;
 
     notifyListeners();
 
     return request;
   }
 
-  /// 接受好友申请
-  Future<void> acceptFriendRequest(String requestId) async {
+  // ============================================================
+  // 接受好友申请
+  // ============================================================
+
+  Future<void>
+  acceptFriendRequest(
+      String requestId,
+      ) async {
     final user = currentUser;
 
     if (user == null) {
-      throw const FriendException('请先登录');
+      throw const FriendException(
+        '请先登录',
+      );
     }
 
-    final request = _requests[requestId];
+    final request =
+    _requests[requestId];
 
     if (request == null) {
-      throw const FriendException('好友申请不存在');
+      throw const FriendException(
+        '好友申请不存在',
+      );
     }
 
-    if (request.toUser.id != user.id) {
-      throw const FriendException('无权处理该好友申请');
+    if (request.toUser.id !=
+        user.id) {
+      throw const FriendException(
+        '无权处理该好友申请',
+      );
     }
 
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(
+      const Duration(
+        milliseconds: 300,
+      ),
+    );
 
-    final fromUserId = request.fromUser.id;
-    final currentUserId = user.id;
+    final fromUserId =
+        request.fromUser.id;
 
-    // 建立双向好友关系。
-    _createRelation(userId: currentUserId, friendId: fromUserId);
+    final currentUserId =
+        user.id;
 
-    _createRelation(userId: fromUserId, friendId: currentUserId);
+    _createRelation(
+      userId: currentUserId,
+      friendId: fromUserId,
+    );
 
-    // 申请处理完成后删除。
-    _requests.remove(requestId);
+    _createRelation(
+      userId: fromUserId,
+      friendId: currentUserId,
+    );
+
+    _requests.remove(
+      requestId,
+    );
 
     notifyListeners();
   }
 
-  /// 拒绝好友申请
-  Future<void> rejectFriendRequest(String requestId) async {
+  // ============================================================
+  // 拒绝好友申请
+  // ============================================================
+
+  Future<void>
+  rejectFriendRequest(
+      String requestId,
+      ) async {
     final user = currentUser;
 
     if (user == null) {
-      throw const FriendException('请先登录');
+      throw const FriendException(
+        '请先登录',
+      );
     }
 
-    final request = _requests[requestId];
+    final request =
+    _requests[requestId];
 
     if (request == null) {
-      throw const FriendException('好友申请不存在');
+      throw const FriendException(
+        '好友申请不存在',
+      );
     }
 
-    if (request.toUser.id != user.id) {
-      throw const FriendException('无权处理该好友申请');
+    if (request.toUser.id !=
+        user.id) {
+      throw const FriendException(
+        '无权处理该好友申请',
+      );
     }
 
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(
+      const Duration(
+        milliseconds: 300,
+      ),
+    );
 
-    _requests.remove(requestId);
+    _requests.remove(
+      requestId,
+    );
 
     notifyListeners();
   }
 
-  /// 取消自己发送的好友申请
-  Future<void> cancelFriendRequest(String requestId) async {
+  // ============================================================
+  // 取消好友申请
+  // ============================================================
+
+  Future<void>
+  cancelFriendRequest(
+      String requestId,
+      ) async {
     final user = currentUser;
 
     if (user == null) {
-      throw const FriendException('请先登录');
+      throw const FriendException(
+        '请先登录',
+      );
     }
 
-    final request = _requests[requestId];
+    final request =
+    _requests[requestId];
 
     if (request == null) {
-      throw const FriendException('好友申请不存在');
+      throw const FriendException(
+        '好友申请不存在',
+      );
     }
 
-    if (request.fromUser.id != user.id) {
-      throw const FriendException('无权取消该好友申请');
+    if (request.fromUser.id !=
+        user.id) {
+      throw const FriendException(
+        '无权取消该好友申请',
+      );
     }
 
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(
+      const Duration(
+        milliseconds: 300,
+      ),
+    );
 
-    _requests.remove(requestId);
+    _requests.remove(
+      requestId,
+    );
 
     notifyListeners();
   }
@@ -352,24 +490,45 @@ class FriendService extends ChangeNotifier {
   // 删除好友
   // ============================================================
 
-  /// 删除好友
-  Future<void> removeFriend(String friendId) async {
+  Future<void> removeFriend(
+      String friendId,
+      ) async {
     final user = currentUser;
 
     if (user == null) {
-      throw const FriendException('请先登录');
+      throw const FriendException(
+        '请先登录',
+      );
     }
 
-    if (!_hasRelation(userId: user.id, friendId: friendId)) {
-      throw const FriendException('对方不是你的好友');
+    if (!_hasRelation(
+      userId: user.id,
+      friendId: friendId,
+    )) {
+      throw const FriendException(
+        '对方不是你的好友',
+      );
     }
 
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(
+      const Duration(
+        milliseconds: 300,
+      ),
+    );
 
-    // 删除双方关系。
-    _relations.remove(_relationKey(user.id, friendId));
+    _relations.remove(
+      _relationKey(
+        user.id,
+        friendId,
+      ),
+    );
 
-    _relations.remove(_relationKey(friendId, user.id));
+    _relations.remove(
+      _relationKey(
+        friendId,
+        user.id,
+      ),
+    );
 
     notifyListeners();
   }
@@ -378,20 +537,27 @@ class FriendService extends ChangeNotifier {
   // 好友备注
   // ============================================================
 
-  /// 获取好友备注
-  String getRemark(String friendId) {
+  String getRemark(
+      String friendId,
+      ) {
     final user = currentUser;
 
     if (user == null) {
       return '';
     }
 
-    final relation = _relations[_relationKey(user.id, friendId)];
+    final relation =
+    _relations[
+    _relationKey(
+      user.id,
+      friendId,
+    )
+    ];
 
-    return relation?.remark ?? '';
+    return relation?.remark ??
+        '';
   }
 
-  /// 设置好友备注
   Future<void> updateRemark({
     required String friendId,
     required String remark,
@@ -399,35 +565,47 @@ class FriendService extends ChangeNotifier {
     final user = currentUser;
 
     if (user == null) {
-      throw const FriendException('请先登录');
+      throw const FriendException(
+        '请先登录',
+      );
     }
 
-    if (!_hasRelation(userId: user.id, friendId: friendId)) {
-      throw const FriendException('对方不是你的好友');
+    if (!_hasRelation(
+      userId: user.id,
+      friendId: friendId,
+    )) {
+      throw const FriendException(
+        '对方不是你的好友',
+      );
     }
 
-    final relation = _relations[_relationKey(user.id, friendId)];
+    final relation =
+    _relations[
+    _relationKey(
+      user.id,
+      friendId,
+    )
+    ];
 
     if (relation == null) {
-      throw const FriendException('好友关系不存在');
+      throw const FriendException(
+        '好友关系不存在',
+      );
     }
 
-    relation.remark = remark.trim();
+    relation.remark =
+        remark.trim();
 
     notifyListeners();
   }
 
-  /// 获取好友在当前用户眼中的显示名称
-  ///
-  /// 有备注：
-  ///
-  /// 妈妈
-  ///
-  /// 没有备注：
-  ///
-  /// LaoGaoci
-  String getFriendDisplayName(AppUser friend) {
-    final remark = getRemark(friend.id);
+  String getFriendDisplayName(
+      AppUser friend,
+      ) {
+    final remark =
+    getRemark(
+      friend.id,
+    );
 
     if (remark.isNotEmpty) {
       return remark;
@@ -437,39 +615,69 @@ class FriendService extends ChangeNotifier {
   }
 
   // ============================================================
-  // 内部方法
+  // Internal
   // ============================================================
 
-  String _relationKey(String userId, String friendId) {
+  String _relationKey(
+      String userId,
+      String friendId,
+      ) {
     return '$userId:$friendId';
   }
 
-  bool _hasRelation({required String userId, required String friendId}) {
-    return _relations.containsKey(_relationKey(userId, friendId));
-  }
-
-  void _createRelation({required String userId, required String friendId}) {
-    final key = _relationKey(userId, friendId);
-
-    _relations.putIfAbsent(
-      key,
-      () => FriendRelation(userId: userId, friendId: friendId),
+  bool _hasRelation({
+    required String userId,
+    required String friendId,
+  }) {
+    return _relations.containsKey(
+      _relationKey(
+        userId,
+        friendId,
+      ),
     );
   }
 
-  bool _hasRequest({required String fromUserId, required String toUserId}) {
+  void _createRelation({
+    required String userId,
+    required String friendId,
+  }) {
+    final key =
+    _relationKey(
+      userId,
+      friendId,
+    );
+
+    _relations.putIfAbsent(
+      key,
+          () => FriendRelation(
+        userId: userId,
+        friendId: friendId,
+      ),
+    );
+  }
+
+  bool _hasRequest({
+    required String fromUserId,
+    required String toUserId,
+  }) {
     return _requests.values.any(
-      (request) =>
-          request.fromUser.id == fromUserId && request.toUser.id == toUserId,
+          (request) =>
+      request.fromUser.id ==
+          fromUserId &&
+          request.toUser.id ==
+              toUserId,
     );
   }
 }
 
-/// 好友系统异常
-class FriendException implements Exception {
+/// 好友异常
+class FriendException
+    implements Exception {
   final String message;
 
-  const FriendException(this.message);
+  const FriendException(
+      this.message,
+      );
 
   @override
   String toString() => message;
