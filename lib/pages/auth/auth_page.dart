@@ -5,18 +5,28 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 
 class AuthPage extends StatefulWidget {
-  const AuthPage({super.key});
+  const AuthPage({
+    super.key,
+  });
 
   @override
-  State<AuthPage> createState() => _AuthPageState();
+  State<AuthPage> createState() =>
+      _AuthPageState();
 }
 
-class _AuthPageState extends State<AuthPage> {
-  final _formKey = GlobalKey<FormState>();
+class _AuthPageState
+    extends State<AuthPage> {
+  final _formKey =
+  GlobalKey<FormState>();
 
-  final _emailController = TextEditingController();
-  final _codeController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController =
+  TextEditingController();
+
+  final _codeController =
+  TextEditingController();
+
+  final _passwordController =
+  TextEditingController();
 
   bool _isLogin = true;
   bool _isLoading = false;
@@ -30,14 +40,19 @@ class _AuthPageState extends State<AuthPage> {
     _emailController.dispose();
     _codeController.dispose();
     _passwordController.dispose();
+
     _timer?.cancel();
 
     super.dispose();
   }
 
-  /// 登录 / 注册
+  // ============================================================
+  // Login / Register
+  // ============================================================
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!
+        .validate()) {
       return;
     }
 
@@ -50,41 +65,55 @@ class _AuthPageState extends State<AuthPage> {
     try {
       if (_isLogin) {
         await AuthService.instance.login(
-          email: _emailController.text,
-          password: _passwordController.text,
+          email:
+          _emailController.text,
+          password:
+          _passwordController.text,
         );
       } else {
         await AuthService.instance.register(
-          email: _emailController.text,
+          email:
+          _emailController.text,
           verificationCode:
           _codeController.text,
-          password: _passwordController.text,
+          password:
+          _passwordController.text,
         );
       }
 
-      // 不需要 Navigator
+      // 不需要手动 Navigator。
       //
-      // AuthService.login/register()
-      // 会自动更新 currentUser
-      // 并通知 _AuthGate
+      // AuthService 会更新 currentUser
+      // 并 notifyListeners()。
       //
-      // _AuthGate 会自动切换到 HomePage
+      // 如果你的应用入口已有 AuthGate，
+      // 会自动切换到 HomePage。
     } on AuthException catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
         SnackBar(
           content: Text(e.message),
-          behavior: SnackBarBehavior.floating,
+          behavior:
+          SnackBarBehavior.floating,
         ),
       );
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
         const SnackBar(
-          content: Text('操作失败，请稍后重试'),
-          behavior: SnackBarBehavior.floating,
+          content: Text(
+            '操作失败，请稍后重试',
+          ),
+          behavior:
+          SnackBarBehavior.floating,
         ),
       );
     } finally {
@@ -96,15 +125,24 @@ class _AuthPageState extends State<AuthPage> {
     }
   }
 
-  /// 发送验证码
-  Future<void> _sendCode() async {
-    final email = _emailController.text.trim();
+  // ============================================================
+  // Verification Code
+  // ============================================================
 
-    if (email.isEmpty || !email.contains('@')) {
-      ScaffoldMessenger.of(context).showSnackBar(
+  Future<void> _sendCode() async {
+    final email =
+    _emailController.text.trim();
+
+    if (email.isEmpty ||
+        !email.contains('@')) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
         const SnackBar(
-          content: Text('请输入有效的邮箱地址'),
-          behavior: SnackBarBehavior.floating,
+          content: Text(
+            '请输入有效的邮箱地址',
+          ),
+          behavior:
+          SnackBarBehavior.floating,
         ),
       );
 
@@ -113,9 +151,13 @@ class _AuthPageState extends State<AuthPage> {
 
     try {
       await AuthService.instance
-          .sendVerificationCode(email);
+          .sendVerificationCode(
+        email,
+      );
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
         _countdown = 60;
@@ -146,27 +188,40 @@ class _AuthPageState extends State<AuthPage> {
         },
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
         const SnackBar(
-          content: Text('验证码已发送'),
-          behavior: SnackBarBehavior.floating,
+          content: Text(
+            '验证码已发送',
+          ),
+          behavior:
+          SnackBarBehavior.floating,
         ),
       );
     } on AuthException catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
         SnackBar(
           content: Text(e.message),
-          behavior: SnackBarBehavior.floating,
+          behavior:
+          SnackBarBehavior.floating,
         ),
       );
     }
   }
 
-  /// 切换登录 / 注册
+  // ============================================================
+  // Mode
+  // ============================================================
+
   void _switchMode(bool login) {
-    if (_isLogin == login) return;
+    if (_isLogin == login) {
+      return;
+    }
 
     setState(() {
       _isLogin = login;
@@ -176,6 +231,10 @@ class _AuthPageState extends State<AuthPage> {
     });
   }
 
+  // ============================================================
+  // UI
+  // ============================================================
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -184,42 +243,55 @@ class _AuthPageState extends State<AuthPage> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
+            padding:
+            const EdgeInsets.symmetric(
               horizontal: 28,
               vertical: 32,
             ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(
+              constraints:
+              const BoxConstraints(
                 maxWidth: 420,
               ),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  CrossAxisAlignment
+                      .start,
                   children: [
                     // Logo
                     Center(
                       child: Container(
                         width: 72,
                         height: 72,
-                        decoration: BoxDecoration(
-                          color:
-                          theme.colorScheme.primary,
+                        decoration:
+                        BoxDecoration(
+                          color: theme
+                              .colorScheme
+                              .primary,
                           borderRadius:
-                          BorderRadius.circular(22),
+                          BorderRadius
+                              .circular(
+                            22,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.checkroom_rounded,
-                          color: Colors.white,
+                        child:
+                        const Icon(
+                          Icons
+                              .checkroom_rounded,
+                          color:
+                          Colors.white,
                           size: 38,
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 28),
+                    const SizedBox(
+                      height: 28,
+                    ),
 
-                    // 标题
+                    // Title
                     Center(
                       child: Text(
                         _isLogin
@@ -230,19 +302,23 @@ class _AuthPageState extends State<AuthPage> {
                             .headlineMedium
                             ?.copyWith(
                           fontWeight:
-                          FontWeight.bold,
+                          FontWeight
+                              .bold,
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(
+                      height: 8,
+                    ),
 
                     Center(
                       child: Text(
                         _isLogin
                             ? '登录你的衣柜，继续管理你的穿搭'
                             : '创建账号，开始整理你的专属衣柜',
-                        textAlign: TextAlign.center,
+                        textAlign:
+                        TextAlign.center,
                         style: theme
                             .textTheme
                             .bodyMedium
@@ -254,68 +330,92 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                     ),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(
+                      height: 32,
+                    ),
 
-                    // 登录 / 注册切换
+                    // Login / Register mode
                     Container(
                       height: 50,
                       padding:
-                      const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme
+                      const EdgeInsets
+                          .all(4),
+                      decoration:
+                      BoxDecoration(
+                        color: theme
+                            .colorScheme
                             .surfaceContainerHighest,
                         borderRadius:
-                        BorderRadius.circular(16),
+                        BorderRadius
+                            .circular(
+                          16,
+                        ),
                       ),
                       child: Row(
                         children: [
                           _ModeButton(
                             title: '登录',
-                            selected: _isLogin,
+                            selected:
+                            _isLogin,
                             onTap: () =>
-                                _switchMode(true),
+                                _switchMode(
+                                  true,
+                                ),
                           ),
                           _ModeButton(
                             title: '注册',
-                            selected: !_isLogin,
+                            selected:
+                            !_isLogin,
                             onTap: () =>
-                                _switchMode(false),
+                                _switchMode(
+                                  false,
+                                ),
                           ),
                         ],
                       ),
                     ),
 
-                    const SizedBox(height: 28),
+                    const SizedBox(
+                      height: 28,
+                    ),
 
                     // Email
                     const _InputLabel(
                       label: '邮箱',
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(
+                      height: 8,
+                    ),
 
                     TextFormField(
                       controller:
                       _emailController,
                       keyboardType:
-                      TextInputType.emailAddress,
+                      TextInputType
+                          .emailAddress,
                       textInputAction:
-                      TextInputAction.next,
+                      TextInputAction
+                          .next,
                       decoration:
                       _inputDecoration(
                         context,
                         hintText:
                         '请输入邮箱地址',
-                        icon:
-                        Icons.email_outlined,
+                        icon: Icons
+                            .email_outlined,
                       ),
-                      validator: (value) {
+                      validator:
+                          (value) {
                         if (value == null ||
-                            value.trim().isEmpty) {
+                            value
+                                .trim()
+                                .isEmpty) {
                           return '请输入邮箱';
                         }
 
-                        if (!value.contains('@')) {
+                        if (!value
+                            .contains('@')) {
                           return '请输入有效的邮箱地址';
                         }
 
@@ -323,21 +423,26 @@ class _AuthPageState extends State<AuthPage> {
                       },
                     ),
 
-                    // 注册验证码
+                    // Verification Code
                     if (!_isLogin) ...[
-                      const SizedBox(height: 20),
+                      const SizedBox(
+                        height: 20,
+                      ),
 
                       const _InputLabel(
                         label: '验证码',
                       ),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(
+                        height: 8,
+                      ),
 
                       TextFormField(
                         controller:
                         _codeController,
                         keyboardType:
-                        TextInputType.number,
+                        TextInputType
+                            .number,
                         maxLength: 6,
                         decoration:
                         _inputDecoration(
@@ -346,13 +451,16 @@ class _AuthPageState extends State<AuthPage> {
                           '请输入验证码',
                           icon: Icons
                               .verified_outlined,
-                          suffix: TextButton(
+                          suffix:
+                          TextButton(
                             onPressed:
-                            _countdown > 0
+                            _countdown >
+                                0
                                 ? null
                                 : _sendCode,
                             child: Text(
-                              _countdown > 0
+                              _countdown >
+                                  0
                                   ? '${_countdown}s'
                                   : '获取验证码',
                             ),
@@ -360,13 +468,20 @@ class _AuthPageState extends State<AuthPage> {
                         ).copyWith(
                           counterText: '',
                         ),
-                        validator: (value) {
-                          if (value == null ||
-                              value.trim().isEmpty) {
+                        validator:
+                            (value) {
+                          if (value ==
+                              null ||
+                              value
+                                  .trim()
+                                  .isEmpty) {
                             return '请输入验证码';
                           }
 
-                          if (value.length != 6) {
+                          if (value
+                              .trim()
+                              .length !=
+                              6) {
                             return '验证码应为 6 位';
                           }
 
@@ -375,14 +490,18 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                     ],
 
-                    const SizedBox(height: 20),
+                    const SizedBox(
+                      height: 20,
+                    ),
 
-                    // 密码
+                    // Password
                     const _InputLabel(
                       label: '密码',
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(
+                      height: 8,
+                    ),
 
                     TextFormField(
                       controller:
@@ -390,15 +509,16 @@ class _AuthPageState extends State<AuthPage> {
                       obscureText:
                       _obscurePassword,
                       textInputAction:
-                      TextInputAction.done,
-                      onFieldSubmitted: (_) =>
-                          _submit(),
+                      TextInputAction
+                          .done,
+                      onFieldSubmitted:
+                          (_) => _submit(),
                       decoration:
                       _inputDecoration(
                         context,
                         hintText: _isLogin
                             ? '请输入密码'
-                            : '设置密码（至少 6 位）',
+                            : '设置密码（至少 8 位）',
                         icon: Icons
                             .lock_outline_rounded,
                         suffix: IconButton(
@@ -417,14 +537,16 @@ class _AuthPageState extends State<AuthPage> {
                           ),
                         ),
                       ),
-                      validator: (value) {
+                      validator:
+                          (value) {
                         if (value == null ||
                             value.isEmpty) {
                           return '请输入密码';
                         }
 
-                        if (value.length < 6) {
-                          return '密码至少需要 6 位';
+                        if (value.length <
+                            8) {
+                          return '密码至少需要 8 位';
                         }
 
                         return null;
@@ -432,40 +554,52 @@ class _AuthPageState extends State<AuthPage> {
                     ),
 
                     if (_isLogin) ...[
-                      const SizedBox(height: 8),
-
+                      const SizedBox(
+                        height: 8,
+                      ),
                       Align(
                         alignment:
-                        Alignment.centerRight,
-                        child: TextButton(
+                        Alignment
+                            .centerRight,
+                        child:
+                        TextButton(
                           onPressed: () {
                             // TODO:
-                            // 忘记密码
+                            // 后续实现忘记密码 API。
                           },
                           child:
-                          const Text('忘记密码？'),
+                          const Text(
+                            '忘记密码？',
+                          ),
                         ),
                       ),
                     ],
 
-                    const SizedBox(height: 20),
+                    const SizedBox(
+                      height: 20,
+                    ),
 
-                    // 主按钮
+                    // Submit
                     SizedBox(
-                      width: double.infinity,
+                      width:
+                      double.infinity,
                       height: 54,
-                      child: FilledButton(
+                      child:
+                      FilledButton(
                         onPressed:
                         _isLoading
                             ? null
                             : _submit,
                         style:
-                        FilledButton.styleFrom(
+                        FilledButton
+                            .styleFrom(
                           shape:
                           RoundedRectangleBorder(
                             borderRadius:
-                            BorderRadius.circular(
-                                16),
+                            BorderRadius
+                                .circular(
+                              16,
+                            ),
                           ),
                         ),
                         child: _isLoading
@@ -474,8 +608,10 @@ class _AuthPageState extends State<AuthPage> {
                           height: 22,
                           child:
                           CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: Colors.white,
+                            strokeWidth:
+                            2.5,
+                            color:
+                            Colors.white,
                           ),
                         )
                             : Text(
@@ -484,21 +620,26 @@ class _AuthPageState extends State<AuthPage> {
                               : '注册',
                           style:
                           const TextStyle(
-                            fontSize: 16,
+                            fontSize:
+                            16,
                             fontWeight:
-                            FontWeight.w600,
+                            FontWeight
+                                .w600,
                           ),
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(
+                      height: 24,
+                    ),
 
-                    // 切换提示
                     Center(
                       child: TextButton(
                         onPressed: () =>
-                            _switchMode(!_isLogin),
+                            _switchMode(
+                              !_isLogin,
+                            ),
                         child: Text(
                           _isLogin
                               ? '还没有账号？立即注册'
@@ -522,7 +663,8 @@ class _AuthPageState extends State<AuthPage> {
         required IconData icon,
         Widget? suffix,
       }) {
-    final theme = Theme.of(context);
+    final theme =
+    Theme.of(context);
 
     return InputDecoration(
       hintText: hintText,
@@ -532,39 +674,59 @@ class _AuthPageState extends State<AuthPage> {
       fillColor: theme
           .colorScheme
           .surfaceContainerHighest
-          .withValues(alpha: 0.45),
-      border: OutlineInputBorder(
-        borderRadius:
-        BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+          .withValues(
+        alpha: 0.45,
       ),
-      enabledBorder: OutlineInputBorder(
+      border:
+      OutlineInputBorder(
         borderRadius:
-        BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        BorderRadius.circular(
+          16,
+        ),
+        borderSide:
+        BorderSide.none,
       ),
-      focusedBorder: OutlineInputBorder(
+      enabledBorder:
+      OutlineInputBorder(
         borderRadius:
-        BorderRadius.circular(16),
+        BorderRadius.circular(
+          16,
+        ),
+        borderSide:
+        BorderSide.none,
+      ),
+      focusedBorder:
+      OutlineInputBorder(
+        borderRadius:
+        BorderRadius.circular(
+          16,
+        ),
         borderSide: BorderSide(
           color:
           theme.colorScheme.primary,
           width: 1.5,
         ),
       ),
-      errorBorder: OutlineInputBorder(
+      errorBorder:
+      OutlineInputBorder(
         borderRadius:
-        BorderRadius.circular(16),
+        BorderRadius.circular(
+          16,
+        ),
         borderSide: BorderSide(
-          color: theme.colorScheme.error,
+          color:
+          theme.colorScheme.error,
         ),
       ),
       focusedErrorBorder:
       OutlineInputBorder(
         borderRadius:
-        BorderRadius.circular(16),
+        BorderRadius.circular(
+          16,
+        ),
         borderSide: BorderSide(
-          color: theme.colorScheme.error,
+          color:
+          theme.colorScheme.error,
           width: 1.5,
         ),
       ),
@@ -572,7 +734,8 @@ class _AuthPageState extends State<AuthPage> {
   }
 }
 
-class _InputLabel extends StatelessWidget {
+class _InputLabel
+    extends StatelessWidget {
   final String label;
 
   const _InputLabel({
@@ -580,18 +743,22 @@ class _InputLabel extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Text(
       label,
       style: const TextStyle(
         fontSize: 14,
-        fontWeight: FontWeight.w600,
+        fontWeight:
+        FontWeight.w600,
       ),
     );
   }
 }
 
-class _ModeButton extends StatelessWidget {
+class _ModeButton
+    extends StatelessWidget {
   final String title;
   final bool selected;
   final VoidCallback onTap;
@@ -603,40 +770,65 @@ class _ModeButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  Widget build(
+      BuildContext context,
+      ) {
+    final theme =
+    Theme.of(context);
 
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: AnimatedContainer(
+        child:
+        AnimatedContainer(
           duration:
-          const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
+          const Duration(
+            milliseconds: 200,
+          ),
+          decoration:
+          BoxDecoration(
             color: selected
-                ? theme.colorScheme.surface
-                : Colors.transparent,
+                ? theme
+                .colorScheme
+                .surface
+                : Colors
+                .transparent,
             borderRadius:
-            BorderRadius.circular(12),
+            BorderRadius
+                .circular(
+              12,
+            ),
             boxShadow: selected
                 ? [
               BoxShadow(
-                blurRadius: 8,
+                blurRadius:
+                8,
                 offset:
-                const Offset(0, 2),
-                color: Colors.black
-                    .withValues(alpha: 0.06),
+                const Offset(
+                  0,
+                  2,
+                ),
+                color: Colors
+                    .black
+                    .withValues(
+                  alpha:
+                  0.06,
+                ),
               ),
             ]
                 : null,
           ),
-          alignment: Alignment.center,
+          alignment:
+          Alignment.center,
           child: Text(
             title,
             style: TextStyle(
-              fontWeight: selected
-                  ? FontWeight.w600
-                  : FontWeight.normal,
+              fontWeight:
+              selected
+                  ? FontWeight
+                  .w600
+                  : FontWeight
+                  .normal,
             ),
           ),
         ),
