@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/app_user.dart';
 import '../../services/friend_service.dart';
+
 import 'friend_requests_page.dart';
 import 'user_profile_page.dart';
 
@@ -27,18 +28,24 @@ class _FriendsPageState
   _searchController =
   TextEditingController();
 
-  final List<AppUser>
-  _searchResults = [];
-
+  /// 搜索防抖。
   Timer? _searchDebounce;
 
+  /// 防止旧搜索请求晚于新请求返回。
+  int _searchGeneration = 0;
+
   bool _isSearching = false;
-  bool _isLoadingSearch = false;
+
+  bool _isLoading = true;
+
+  bool _isSearchLoading = false;
+
+  String? _loadError;
 
   String? _searchError;
 
-  /// 防止旧请求覆盖新请求结果。
-  int _searchVersion = 0;
+  List<AppUser> _searchResults =
+  const [];
 
   @override
   void initState() {
@@ -46,6 +53,12 @@ class _FriendsPageState
 
     _friendService.addListener(
       _onFriendChanged,
+    );
+
+    /// 页面第一次进入，
+    /// 从服务器同步好友和好友申请。
+    Future.microtask(
+      _loadInitialData,
     );
   }
 
@@ -68,6 +81,170 @@ class _FriendsPageState
     }
   }
 
+  // ============================================================
+  // Initial data
+  // ============================================================
+
+  Future<void> _loadInitialData() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _loadError = null;
+      });
+    }
+
+    try {
+      await _friendService
+          .refreshAll();
+    } on FriendException catch (e) {
+      if (mounted) {
+        setState(() {
+          _loadError =
+              e.message;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading =
+          false;
+        });
+      }
+    }
+  }
+
+  // ============================================================
+  // Search
+  // ============================================================
+
+  void _onSearchChanged(
+      String value,
+      ) {
+    _searchDebounce?.cancel();
+
+    final keyword =
+    value.trim();
+
+    _searchGeneration++;
+
+    if (keyword.isEmpty) {
+      setState(() {
+        _isSearching =
+        false;
+
+        _isSearchLoading =
+        false;
+
+        _searchResults =
+        const [];
+
+        _searchError =
+        null;
+      });
+
+      return;
+    }
+
+    setState(() {
+      _isSearching =
+      true;
+
+      _isSearchLoading =
+      true;
+
+      _searchError =
+      null;
+    });
+
+    final generation =
+        _searchGeneration;
+
+    /// 用户停止输入 350ms 后再请求后端。
+    _searchDebounce = Timer(
+      const Duration(
+        milliseconds: 350,
+      ),
+          () {
+        _performSearch(
+          keyword,
+          generation,
+        );
+      },
+    );
+  }
+
+  Future<void> _performSearch(
+      String keyword,
+      int generation,
+      ) async {
+    try {
+      final results =
+      await _friendService
+          .searchUsers(
+        keyword,
+      );
+
+      /// 如果搜索期间用户已经输入了新关键词，
+      /// 丢弃当前旧结果。
+      if (!mounted ||
+          generation !=
+              _searchGeneration) {
+        return;
+      }
+
+      setState(() {
+        _searchResults =
+            results;
+
+        _isSearchLoading =
+        false;
+      });
+    } on FriendException catch (e) {
+      if (!mounted ||
+          generation !=
+              _searchGeneration) {
+        return;
+      }
+
+      setState(() {
+        _searchResults =
+        const [];
+
+        _searchError =
+            e.message;
+
+        _isSearchLoading =
+        false;
+      });
+    }
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+
+    _searchGeneration++;
+
+    _searchController.clear();
+
+    setState(() {
+      _isSearching =
+      false;
+
+      _isSearchLoading =
+      false;
+
+      _searchResults =
+      const [];
+
+      _searchError =
+      null;
+    });
+  }
+
+  // ============================================================
+  // Navigation
+  // ============================================================
+
   Future<void> _openUserProfile(
       AppUser user,
       ) async {
@@ -81,9 +258,18 @@ class _FriendsPageState
       ),
     );
 
-    if (mounted) {
-      setState(() {});
+    if (!mounted) {
+      return;
     }
+
+    /// 用户详情中可能执行：
+    ///
+    /// 添加好友
+    /// 删除好友
+    /// 修改备注
+    ///
+    /// 回来以后主动同步一次。
+    await _loadInitialData();
   }
 
   Future<void>
@@ -96,122 +282,15 @@ class _FriendsPageState
       ),
     );
 
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  // ============================================================
-  // Search
-  // ============================================================
-
-  void _onSearchChanged(
-      String value,
-      ) {
-    final keyword =
-    value.trim();
-
-    _searchDebounce?.cancel();
-
-    if (keyword.isEmpty) {
-      _searchVersion++;
-
-      setState(() {
-        _isSearching = false;
-        _isLoadingSearch =
-        false;
-
-        _searchError = null;
-
-        _searchResults.clear();
-      });
-
+    if (!mounted) {
       return;
     }
 
-    setState(() {
-      _isSearching = true;
-      _isLoadingSearch = true;
-      _searchError = null;
-    });
-
-    _searchDebounce =
-        Timer(
-          const Duration(
-            milliseconds: 300,
-          ),
-              () => _searchUsers(
-            keyword,
-          ),
-        );
-  }
-
-  Future<void> _searchUsers(
-      String keyword,
-      ) async {
-    final version =
-    ++_searchVersion;
-
-    try {
-      final users =
-      await _friendService
-          .searchUsers(
-        keyword,
-      );
-
-      if (!mounted ||
-          version !=
-              _searchVersion) {
-        return;
-      }
-
-      setState(() {
-        _searchResults
-          ..clear()
-          ..addAll(users);
-
-        _isLoadingSearch =
-        false;
-
-        _searchError = null;
-      });
-    } on FriendException catch (e) {
-      if (!mounted ||
-          version !=
-              _searchVersion) {
-        return;
-      }
-
-      setState(() {
-        _searchResults.clear();
-
-        _isLoadingSearch =
-        false;
-
-        _searchError =
-            e.message;
-      });
-    }
-  }
-
-  void _clearSearch() {
-    _searchDebounce?.cancel();
-
-    _searchVersion++;
-
-    _searchController.clear();
-
-    setState(() {
-      _isSearching = false;
-      _isLoadingSearch = false;
-      _searchError = null;
-
-      _searchResults.clear();
-    });
+    await _loadInitialData();
   }
 
   // ============================================================
-  // UI
+  // Build
   // ============================================================
 
   @override
@@ -227,8 +306,7 @@ class _FriendsPageState
 
     return Scaffold(
       appBar: AppBar(
-        title:
-        const Text(
+        title: const Text(
           '好友',
         ),
         actions: [
@@ -237,31 +315,30 @@ class _FriendsPageState
               IconButton(
                 tooltip:
                 '好友申请',
-                icon:
-                const Icon(
+                icon: const Icon(
                   Icons
                       .person_add_alt_1_outlined,
                 ),
                 onPressed:
                 _openFriendRequests,
               ),
+
               if (requestCount >
                   0)
                 Positioned(
                   right: 7,
                   top: 7,
-                  child:
-                  Container(
+                  child: Container(
                     padding:
                     const EdgeInsets
                         .symmetric(
-                      horizontal:
-                      5,
+                      horizontal: 5,
                       vertical: 2,
                     ),
                     decoration:
                     BoxDecoration(
-                      color: Theme.of(
+                      color:
+                      Theme.of(
                         context,
                       )
                           .colorScheme
@@ -296,10 +373,10 @@ class _FriendsPageState
       body: Column(
         children: [
           _buildSearchBar(),
+
           Expanded(
-            child: _isSearching
-                ? _buildSearchResults()
-                : _buildFriendList(
+            child:
+            _buildBody(
               friends,
             ),
           ),
@@ -307,6 +384,41 @@ class _FriendsPageState
       ),
     );
   }
+
+  Widget _buildBody(
+      List<AppUser> friends,
+      ) {
+    if (_isSearching) {
+      return _buildSearchResults();
+    }
+
+    if (_isLoading) {
+      return const Center(
+        child:
+        CircularProgressIndicator(),
+      );
+    }
+
+    if (_loadError != null) {
+      return _buildErrorState(
+        _loadError!,
+        _loadInitialData,
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh:
+      _loadInitialData,
+      child:
+      _buildFriendList(
+        friends,
+      ),
+    );
+  }
+
+  // ============================================================
+  // Search UI
+  // ============================================================
 
   Widget _buildSearchBar() {
     return Padding(
@@ -325,7 +437,8 @@ class _FriendsPageState
         _onSearchChanged,
         decoration:
         InputDecoration(
-          hintText: '搜索用户',
+          hintText:
+          '搜索用户名或邮箱',
           prefixIcon:
           const Icon(
             Icons.search,
@@ -354,61 +467,25 @@ class _FriendsPageState
     );
   }
 
-  Widget _buildFriendList(
-      List<AppUser> friends,
-      ) {
-    if (friends.isEmpty) {
-      return _buildEmptyState(
-        icon:
-        Icons.people_outline,
-        title: '还没有好友',
-        subtitle:
-        '搜索用户并添加好友吧',
-      );
-    }
-
-    return ListView.separated(
-      padding:
-      const EdgeInsets.all(
-        16,
-      ),
-      itemCount:
-      friends.length,
-      separatorBuilder:
-          (_, __) =>
-      const SizedBox(
-        height: 8,
-      ),
-      itemBuilder:
-          (context, index) {
-        final friend =
-        friends[index];
-
-        return _buildUserTile(
-          friend,
-          showRemark: true,
-        );
-      },
-    );
-  }
-
   Widget _buildSearchResults() {
-    if (_isLoadingSearch) {
+    if (_isSearchLoading) {
       return const Center(
         child:
         CircularProgressIndicator(),
       );
     }
 
-    final error =
-        _searchError;
-
-    if (error != null) {
-      return _buildEmptyState(
-        icon:
-        Icons.error_outline,
-        title: '搜索失败',
-        subtitle: error,
+    if (_searchError != null) {
+      return _buildErrorState(
+        _searchError!,
+            () async {
+          await _performSearch(
+            _searchController
+                .text
+                .trim(),
+            _searchGeneration,
+          );
+        },
       );
     }
 
@@ -416,7 +493,8 @@ class _FriendsPageState
       return _buildEmptyState(
         icon:
         Icons.search_off,
-        title: '没有找到用户',
+        title:
+        '没有找到用户',
         subtitle:
         '可以尝试搜索用户名或邮箱',
       );
@@ -437,11 +515,76 @@ class _FriendsPageState
       itemBuilder:
           (context, index) {
         final user =
-        _searchResults[index];
+        _searchResults[
+        index
+        ];
 
         return _buildUserTile(
           user,
-          showRemark: false,
+          showRemark:
+          false,
+        );
+      },
+    );
+  }
+
+  // ============================================================
+  // Friend list UI
+  // ============================================================
+
+  Widget _buildFriendList(
+      List<AppUser> friends,
+      ) {
+    if (friends.isEmpty) {
+      /// RefreshIndicator 需要可滚动 child。
+      return ListView(
+        physics:
+        const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height:
+            MediaQuery.of(
+              context,
+            ).size.height *
+                0.55,
+            child:
+            _buildEmptyState(
+              icon:
+              Icons
+                  .people_outline,
+              title:
+              '还没有好友',
+              subtitle:
+              '搜索用户并添加好友吧',
+            ),
+          ),
+        ],
+      );
+    }
+
+    return ListView.separated(
+      physics:
+      const AlwaysScrollableScrollPhysics(),
+      padding:
+      const EdgeInsets.all(
+        16,
+      ),
+      itemCount:
+      friends.length,
+      separatorBuilder:
+          (_, __) =>
+      const SizedBox(
+        height: 8,
+      ),
+      itemBuilder:
+          (context, index) {
+        final friend =
+        friends[index];
+
+        return _buildUserTile(
+          friend,
+          showRemark:
+          true,
         );
       },
     );
@@ -457,12 +600,16 @@ class _FriendsPageState
       user.id,
     );
 
+    final remark =
+    _friendService
+        .getRemark(
+      user.id,
+    );
+
     final displayName =
-    showRemark
-        ? _friendService
-        .getFriendDisplayName(
-      user,
-    )
+    showRemark &&
+        remark.isNotEmpty
+        ? remark
         : user.username;
 
     return Card(
@@ -479,12 +626,9 @@ class _FriendsPageState
             FontWeight.w600,
           ),
         ),
-        subtitle: showRemark &&
-            _friendService
-                .getRemark(
-              user.id,
-            )
-                .isNotEmpty
+        subtitle:
+        showRemark &&
+            remark.isNotEmpty
             ? Text(
           user.username,
         )
@@ -516,14 +660,12 @@ class _FriendsPageState
           '好友',
         );
 
-      case FriendStatus
-          .requestSent:
+      case FriendStatus.requestSent:
         return const Text(
           '已申请',
         );
 
-      case FriendStatus
-          .requestReceived:
+      case FriendStatus.requestReceived:
         return const Text(
           '待处理',
         );
@@ -538,8 +680,7 @@ class _FriendsPageState
   Widget _buildAvatar(
       AppUser user,
       ) {
-    if (user.avatarUrl
-        .isNotEmpty) {
+    if (user.avatarUrl.isNotEmpty) {
       return CircleAvatar(
         backgroundImage:
         NetworkImage(
@@ -552,10 +693,59 @@ class _FriendsPageState
       child: Text(
         user.username.isEmpty
             ? '?'
-            : user.username
+            : user
+            .username
             .characters
             .first
             .toUpperCase(),
+      ),
+    );
+  }
+
+  // ============================================================
+  // State widgets
+  // ============================================================
+
+  Widget _buildErrorState(
+      String message,
+      Future<void> Function()
+      retry,
+      ) {
+    return Center(
+      child: Padding(
+        padding:
+        const EdgeInsets.all(
+          32,
+        ),
+        child: Column(
+          mainAxisSize:
+          MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons
+                  .error_outline,
+              size: 56,
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            Text(
+              message,
+              textAlign:
+              TextAlign.center,
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            FilledButton(
+              onPressed: retry,
+              child:
+              const Text(
+                '重新加载',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -585,11 +775,9 @@ class _FriendsPageState
                   .colorScheme
                   .onSurfaceVariant,
             ),
-
             const SizedBox(
               height: 16,
             ),
-
             Text(
               title,
               style:
@@ -599,29 +787,13 @@ class _FriendsPageState
                   .textTheme
                   .titleMedium,
             ),
-
             const SizedBox(
               height: 8,
             ),
-
             Text(
               subtitle,
               textAlign:
               TextAlign.center,
-              style:
-              Theme.of(
-                context,
-              )
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(
-                color:
-                Theme.of(
-                  context,
-                )
-                    .colorScheme
-                    .onSurfaceVariant,
-              ),
             ),
           ],
         ),

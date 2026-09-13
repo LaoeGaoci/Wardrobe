@@ -61,6 +61,19 @@ class _WardrobePageState
     _friendService.addListener(
       _onFriendChanged,
     );
+    /// App 进入主页面后，
+    /// 主动取得收到的好友申请，
+    /// 用于更新通知数量。
+    Future.microtask(() async {
+      try {
+        await _friendService
+            .refreshReceivedRequests();
+      } on FriendException {
+        /// 首页不因为好友申请同步失败而崩溃。
+        ///
+        /// 好友页面本身会提供完整错误提示。
+      }
+    });
 
     _loadClothes();
   }
