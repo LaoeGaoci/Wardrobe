@@ -1,34 +1,30 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/app_user.dart';
+import 'clothing_repository.dart';
 import 'user_repository.dart';
 
-/// 用户认证服务
-///
-/// 负责：
-/// - 当前登录用户
-/// - 登录
-/// - 注册
-/// - 获取验证码
-/// - 修改用户名
-/// - 删除账户
-/// - 退出登录
-class AuthService extends ChangeNotifier {
+class AuthService
+    extends ChangeNotifier {
   AuthService._();
 
-  static final AuthService instance =
+  static final AuthService
+  instance =
   AuthService._();
 
-  final UserRepository _userRepository =
+  final UserRepository
+  _userRepository =
       UserRepository.instance;
+
+  final ClothingRepository
+  _clothingRepository =
+      ClothingRepository.instance;
 
   AppUser? _currentUser;
 
-  /// 当前登录用户
   AppUser? get currentUser =>
       _currentUser;
 
-  /// 是否已经登录
   bool get isLoggedIn =>
       _currentUser != null;
 
@@ -42,24 +38,32 @@ class AuthService extends ChangeNotifier {
   }) async {
     try {
       final result =
-      await _userRepository.login(
+      await _userRepository
+          .login(
         email: email,
         password: password,
       );
 
-      // 后续请求自动携带 Bearer Token。
-      _userRepository.setAccessToken(
+      _userRepository
+          .setAccessToken(
         result.token,
       );
 
-      _currentUser = result.user;
+      /// 防止显示上一个用户的衣柜缓存。
+      _clothingRepository
+          .clear();
+
+      _currentUser =
+          result.user;
 
       notifyListeners();
 
       return result.user;
     } on UserRepositoryException catch (e) {
       throw AuthException(
-        _friendlyMessage(e.message),
+        _friendlyMessage(
+          e.message,
+        ),
       );
     }
   }
@@ -70,47 +74,61 @@ class AuthService extends ChangeNotifier {
 
   Future<AppUser> register({
     required String email,
-    required String verificationCode,
+    required String
+    verificationCode,
     required String password,
   }) async {
     try {
       final result =
-      await _userRepository.register(
+      await _userRepository
+          .register(
         email: email,
         verificationCode:
         verificationCode,
         password: password,
       );
 
-      _userRepository.setAccessToken(
+      _userRepository
+          .setAccessToken(
         result.token,
       );
 
-      _currentUser = result.user;
+      _clothingRepository
+          .clear();
+
+      _currentUser =
+          result.user;
 
       notifyListeners();
 
       return result.user;
     } on UserRepositoryException catch (e) {
       throw AuthException(
-        _friendlyMessage(e.message),
+        _friendlyMessage(
+          e.message,
+        ),
       );
     }
   }
 
   // ============================================================
-  // Verification Code
+  // Verification
   // ============================================================
 
-  Future<void> sendVerificationCode(
+  Future<void>
+  sendVerificationCode(
       String email,
       ) async {
     try {
       await _userRepository
-          .sendVerificationCode(email);
+          .sendVerificationCode(
+        email,
+      );
     } on UserRepositoryException catch (e) {
       throw AuthException(
-        _friendlyMessage(e.message),
+        _friendlyMessage(
+          e.message,
+        ),
       );
     }
   }
@@ -119,11 +137,9 @@ class AuthService extends ChangeNotifier {
   // Current User
   // ============================================================
 
-  /// 根据当前 Token 从后端重新取得用户资料。
-  ///
-  /// 当前阶段 Token 只存在内存中，
-  /// 所以主要用于登录后的主动刷新。
-  Future<void> refreshCurrentUser() async {
+  Future<void>
+  refreshCurrentUser()
+  async {
     try {
       _currentUser =
       await _userRepository
@@ -131,21 +147,25 @@ class AuthService extends ChangeNotifier {
 
       notifyListeners();
     } on UserRepositoryException catch (e) {
-      if (e.statusCode == 401) {
+      if (e.statusCode ==
+          401) {
         logout();
       }
 
       throw AuthException(
-        _friendlyMessage(e.message),
+        _friendlyMessage(
+          e.message,
+        ),
       );
     }
   }
 
-  /// 修改用户名
-  Future<AppUser> updateUsername(
+  Future<AppUser>
+  updateUsername(
       String username,
       ) async {
-    if (_currentUser == null) {
+    if (_currentUser ==
+        null) {
       throw const AuthException(
         '请先登录',
       );
@@ -158,21 +178,25 @@ class AuthService extends ChangeNotifier {
         username,
       );
 
-      _currentUser = updatedUser;
+      _currentUser =
+          updatedUser;
 
       notifyListeners();
 
       return updatedUser;
     } on UserRepositoryException catch (e) {
       throw AuthException(
-        _friendlyMessage(e.message),
+        _friendlyMessage(
+          e.message,
+        ),
       );
     }
   }
 
-  /// 删除当前账户
-  Future<void> deleteAccount() async {
-    if (_currentUser == null) {
+  Future<void> deleteAccount()
+  async {
+    if (_currentUser ==
+        null) {
       throw const AuthException(
         '请先登录',
       );
@@ -182,12 +206,18 @@ class AuthService extends ChangeNotifier {
       await _userRepository
           .deleteCurrentUser();
 
-      _currentUser = null;
+      _clothingRepository
+          .clear();
+
+      _currentUser =
+      null;
 
       notifyListeners();
     } on UserRepositoryException catch (e) {
       throw AuthException(
-        _friendlyMessage(e.message),
+        _friendlyMessage(
+          e.message,
+        ),
       );
     }
   }
@@ -197,9 +227,14 @@ class AuthService extends ChangeNotifier {
   // ============================================================
 
   void logout() {
-    _userRepository.clearSession();
+    _userRepository
+        .clearSession();
 
-    _currentUser = null;
+    _clothingRepository
+        .clear();
+
+    _currentUser =
+    null;
 
     notifyListeners();
   }
@@ -252,12 +287,15 @@ class AuthService extends ChangeNotifier {
   }
 }
 
-/// 认证异常
-class AuthException implements Exception {
+class AuthException
+    implements Exception {
   final String message;
 
-  const AuthException(this.message);
+  const AuthException(
+      this.message,
+      );
 
   @override
-  String toString() => message;
+  String toString() =>
+      message;
 }

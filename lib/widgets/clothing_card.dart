@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../models/clothing.dart';
+import '../network/api_client.dart';
 
-class ClothingCard extends StatelessWidget {
+class ClothingCard
+    extends StatelessWidget {
   final Clothing clothing;
 
   const ClothingCard({
@@ -13,47 +15,73 @@ class ClothingCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Card(
-      clipBehavior: Clip.antiAlias,
-      margin: EdgeInsets.zero,
+      clipBehavior:
+      Clip.antiAlias,
+      margin:
+      EdgeInsets.zero,
       child: Column(
         crossAxisAlignment:
-        CrossAxisAlignment.start,
+        CrossAxisAlignment
+            .start,
         children: [
           Expanded(
-            child: _buildImage(),
+            child:
+            _buildImage(),
           ),
-
           Padding(
-            padding: const EdgeInsets.all(10),
+            padding:
+            const EdgeInsets
+                .all(
+              10,
+            ),
             child: Column(
               crossAxisAlignment:
-              CrossAxisAlignment.start,
+              CrossAxisAlignment
+                  .start,
               children: [
                 Text(
                   clothing.name,
                   maxLines: 1,
                   overflow:
-                  TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                  TextOverflow
+                      .ellipsis,
+                  style:
+                  const TextStyle(
+                    fontWeight:
+                    FontWeight
+                        .bold,
                   ),
                 ),
-
-                const SizedBox(height: 4),
-
+                const SizedBox(
+                  height: 4,
+                ),
                 Text(
-                  clothing.brand == null ||
-                      clothing.brand!.isEmpty
-                      ? clothing.category
-                      : '${clothing.brand} · ${clothing.category}',
+                  clothing.brand ==
+                      null ||
+                      clothing
+                          .brand!
+                          .isEmpty
+                      ? clothing
+                      .category
+                      : '${clothing.brand}'
+                      ' · '
+                      '${clothing.category}',
                   maxLines: 1,
                   overflow:
-                  TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 13,
+                  TextOverflow
+                      .ellipsis,
+                  style:
+                  TextStyle(
+                    color:
+                    Colors
+                        .grey
+                        .shade600,
+                    fontSize:
+                    13,
                   ),
                 ),
               ],
@@ -65,37 +93,97 @@ class ClothingCard extends StatelessWidget {
   }
 
   Widget _buildImage() {
+    if (clothing
+        .imagePath
+        .isEmpty) {
+      return _buildImageError();
+    }
+
     if (clothing.imageType ==
-        ClothingImageType.local) {
+        ClothingImageType
+            .local) {
       return Image.file(
-        File(clothing.imagePath),
-        width: double.infinity,
-        fit: BoxFit.cover,
+        File(
+          clothing.imagePath,
+        ),
+        width:
+        double.infinity,
+        fit:
+        BoxFit.cover,
         errorBuilder:
-            (context, error, stackTrace) {
+            (
+            context,
+            error,
+            stackTrace,
+            ) {
           return _buildImageError();
         },
       );
     }
 
+    final imageUrl =
+    _buildRemoteImageUrl();
+
     return Image.network(
-      clothing.imagePath,
-      width: double.infinity,
-      fit: BoxFit.cover,
+      imageUrl,
+      headers:
+      ApiClient
+          .instance
+          .authorizationHeaders,
+      width:
+      double.infinity,
+      fit:
+      BoxFit.cover,
       errorBuilder:
-          (context, error, stackTrace) {
+          (
+          context,
+          error,
+          stackTrace,
+          ) {
         return _buildImageError();
       },
     );
   }
 
+  /// updatedAt 加入 query，
+  /// 避免替换图片以后 Flutter
+  /// 继续命中旧的 NetworkImage 缓存。
+  String _buildRemoteImageUrl() {
+    final resolved =
+    ApiClient.instance
+        .resolveUrl(
+      clothing.imagePath,
+    );
+
+    final uri =
+    Uri.parse(
+      resolved,
+    );
+
+    return uri
+        .replace(
+      queryParameters: {
+        ...uri
+            .queryParameters,
+        'v': clothing
+            .updatedAt
+            .millisecondsSinceEpoch
+            .toString(),
+      },
+    )
+        .toString();
+  }
+
   Widget _buildImageError() {
     return Container(
-      color: Colors.grey.shade100,
+      color:
+      Colors.grey.shade100,
       child: Center(
         child: Icon(
-          Icons.image_not_supported_outlined,
-          color: Colors.grey.shade400,
+          Icons
+              .image_not_supported_outlined,
+          color:
+          Colors.grey.shade400,
           size: 40,
         ),
       ),
