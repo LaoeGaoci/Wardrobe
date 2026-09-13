@@ -8,6 +8,8 @@ import '../../services/friend_service.dart';
 import 'friend_requests_page.dart';
 import 'user_profile_page.dart';
 
+import 'recommendation_history_page.dart';
+
 class FriendsPage
     extends StatefulWidget {
   const FriendsPage({
@@ -245,6 +247,23 @@ class _FriendsPageState
   // Navigation
   // ============================================================
 
+  /// 打开推荐历史记录。
+  ///
+  /// 页面内部会分别请求：
+  ///
+  /// GET /api/recommendations/received
+  /// GET /api/recommendations/sent
+  Future<void>
+  _openRecommendationHistory() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+        const RecommendationHistoryPage(),
+      ),
+    );
+  }
+
   Future<void> _openUserProfile(
       AppUser user,
       ) async {
@@ -310,6 +329,26 @@ class _FriendsPageState
           '好友',
         ),
         actions: [
+          /// ==========================================================
+          /// 推荐历史
+          /// ==========================================================
+          IconButton(
+            tooltip:
+            '推荐记录',
+
+            icon:
+            const Icon(
+              Icons
+                  .card_giftcard_outlined,
+            ),
+
+            onPressed:
+            _openRecommendationHistory,
+          ),
+
+          /// ==========================================================
+          /// 好友申请
+          /// ==========================================================
           Stack(
             children: [
               IconButton(
