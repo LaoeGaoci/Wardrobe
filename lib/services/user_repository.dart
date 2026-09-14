@@ -21,9 +21,12 @@ class AuthResult {
 /// POST   /api/auth/code
 /// POST   /api/auth/register
 /// POST   /api/auth/login
+/// POST   /api/auth/password-reset/code
+/// POST   /api/auth/password-reset
 ///
 /// GET    /api/users/me
 /// PATCH  /api/users/me
+/// PATCH  /api/users/me/password
 /// DELETE /api/users/me
 ///
 /// GET    /api/users/search?q=
@@ -40,15 +43,10 @@ class UserRepository {
   /// 临时用户缓存。
   ///
   /// 注意：
-  /// 这里已经不是账号数据库。
   ///
-  /// 目前好友系统还没有迁移到后端，
-  /// FriendService / RecommendationService
-  /// 仍然有同步读取用户对象的逻辑，
-  /// 所以暂时缓存从服务器取得过的用户。
+  /// 这里不是账号数据库。
   final Map<String, AppUser> _userCache = {};
 
-  /// 从缓存读取用户
   AppUser? getUserById(String userId) {
     return _userCache[userId];
   }
@@ -68,7 +66,7 @@ class UserRepository {
   // Auth
   // ============================================================
 
-  /// 请求验证码
+  /// 请求注册验证码
   ///
   /// POST /api/auth/code
   Future<void> sendVerificationCode(
@@ -106,7 +104,8 @@ class UserRepository {
           email.trim().toLowerCase(),
           'verificationCode':
           verificationCode.trim(),
-          'password': password,
+          'password':
+          password,
         },
       );
 
@@ -132,11 +131,68 @@ class UserRepository {
         body: {
           'email':
           email.trim().toLowerCase(),
-          'password': password,
+          'password':
+          password,
         },
       );
 
       return _parseAuthResult(data);
+    } on ApiException catch (e) {
+      throw UserRepositoryException(
+        e.message,
+        statusCode: e.statusCode,
+      );
+    }
+  }
+
+  /// 请求忘记密码验证码
+  ///
+  /// POST /api/auth/password-reset/code
+  ///
+  /// 后端为了避免账户枚举：
+  ///
+  /// 无论邮箱是否注册，都统一返回 success。
+  Future<void> sendPasswordResetCode(
+      String email,
+      ) async {
+    try {
+      await _api.post(
+        '/api/auth/password-reset/code',
+        body: {
+          'email':
+          email.trim().toLowerCase(),
+        },
+      );
+    } on ApiException catch (e) {
+      throw UserRepositoryException(
+        e.message,
+        statusCode: e.statusCode,
+      );
+    }
+  }
+
+  /// 忘记密码后重置密码
+  ///
+  /// POST /api/auth/password-reset
+  ///
+  /// 成功以后不会自动登录。
+  Future<void> resetPassword({
+    required String email,
+    required String verificationCode,
+    required String newPassword,
+  }) async {
+    try {
+      await _api.post(
+        '/api/auth/password-reset',
+        body: {
+          'email':
+          email.trim().toLowerCase(),
+          'verificationCode':
+          verificationCode.trim(),
+          'newPassword':
+          newPassword,
+        },
+      );
     } on ApiException catch (e) {
       throw UserRepositoryException(
         e.message,
@@ -182,7 +238,8 @@ class UserRepository {
       final data = await _api.patch(
         '/api/users/me',
         body: {
-          'username': username.trim(),
+          'username':
+          username.trim(),
         },
       );
 
@@ -192,6 +249,48 @@ class UserRepository {
       _cacheUser(user);
 
       return user;
+    } on ApiException catch (e) {
+      throw UserRepositoryException(
+        e.message,
+        statusCode: e.statusCode,
+      );
+    }
+  }
+
+  /// 修改当前密码
+  ///
+  /// PATCH /api/users/me/password
+  ///
+  /// 后端会令旧 JWT 全部失效，
+  /// 并返回当前设备的新 Token。
+  Future<String> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final data = await _api.patch(
+        '/api/users/me/password',
+        body: {
+          'currentPassword':
+          currentPassword,
+          'newPassword':
+          newPassword,
+        },
+      );
+
+      final token =
+      data['token'];
+
+      if (token is! String ||
+          token.isEmpty) {
+        throw const UserRepositoryException(
+          '服务器没有返回登录令牌',
+        );
+      }
+
+      _api.setAccessToken(token);
+
+      return token;
     } on ApiException catch (e) {
       throw UserRepositoryException(
         e.message,
@@ -228,7 +327,8 @@ class UserRepository {
   Future<List<AppUser>> searchUsers(
       String keyword,
       ) async {
-    final query = keyword.trim();
+    final query =
+    keyword.trim();
 
     if (query.isEmpty) {
       return const [];
@@ -242,7 +342,8 @@ class UserRepository {
         },
       );
 
-      final rawUsers = data['users'];
+      final rawUsers =
+      data['users'];
 
       if (rawUsers is! List) {
         throw const UserRepositoryException(
@@ -252,7 +353,9 @@ class UserRepository {
 
       final users = rawUsers
           .map(_parseUser)
-          .toList(growable: false);
+          .toList(
+        growable: false,
+      );
 
       for (final user in users) {
         _cacheUser(user);
@@ -306,7 +409,8 @@ class UserRepository {
     final user =
     _parseUser(data['user']);
 
-    final token = data['token'];
+    final token =
+    data['token'];
 
     if (token is! String ||
         token.isEmpty) {
@@ -323,7 +427,9 @@ class UserRepository {
     );
   }
 
-  AppUser _parseUser(dynamic value) {
+  AppUser _parseUser(
+      dynamic value,
+      ) {
     if (value is! Map) {
       throw const UserRepositoryException(
         '服务器返回的用户数据格式不正确',
@@ -343,8 +449,11 @@ class UserRepository {
     }
   }
 
-  void _cacheUser(AppUser user) {
-    _userCache[user.id] = user;
+  void _cacheUser(
+      AppUser user,
+      ) {
+    _userCache[user.id] =
+        user;
   }
 }
 
@@ -360,5 +469,6 @@ class UserRepositoryException
       });
 
   @override
-  String toString() => message;
+  String toString() =>
+      message;
 }

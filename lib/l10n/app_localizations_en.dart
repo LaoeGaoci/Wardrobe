@@ -133,7 +133,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verificationCodeLength => 'The verification code must be 6 digits';
 
   @override
-  String get verificationCodeSent => 'Verification code sent';
+  String get verificationCodeSent =>
+      'Verification code sent. Please check your inbox';
 
   @override
   String get password => 'Password';
@@ -750,4 +751,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountEmailHint => 'Enter your account email';
+
+  @override
+  String get forgotPasswordTitle => 'Forgot Password';
+
+  @override
+  String get resetYourPassword => 'Reset your password';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'Enter your registered email and we will send you a verification code.';
+
+  @override
+  String get passwordResetCodeSent =>
+      'If this email is registered, a verification code has been sent. Please check your inbox.';
+
+  @override
+  String get newPassword => 'New password';
+
+  @override
+  String get newPasswordHint => 'Enter a new password (at least 8 characters)';
+
+  @override
+  String get newPasswordRequired => 'Please enter a new password';
+
+  @override
+  String get confirmPassword => 'Confirm new password';
+
+  @override
+  String get confirmPasswordHint => 'Enter the new password again';
+
+  @override
+  String get confirmPasswordRequired => 'Please confirm your new password';
+
+  @override
+  String get passwordsDoNotMatch => 'The passwords do not match';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get passwordResetSuccess =>
+      'Password reset successfully. Please sign in with your new password.';
+
+  @override
+  String get invalidOrExpiredVerificationCode =>
+      'The verification code is invalid or has expired';
+
+  @override
+  String get tooManyVerificationAttempts =>
+      'Too many incorrect verification attempts. Please request a new code.';
+
+  @override
+  String get verificationCodeRequestTooFrequent =>
+      'Please wait before requesting another verification code';
+
+  @override
+  String get verificationEmailSendFailed =>
+      'Failed to send the verification email. Please try again later.';
+
+  @override
+  String get newPasswordMustBeDifferent =>
+      'The new password must be different from the current password';
+
+  @override
+  String get currentPasswordIncorrect => 'The current password is incorrect';
 }
