@@ -215,5 +215,11 @@
   "recommendationNotFound": "推薦不存在或你沒有查看權限",
   "recommendationItemNotFound": "推薦中的衣物已經不存在",
   "recommendationImageNotFound": "推薦中的衣物圖片已經不存在",
-  "serverDataInvalid": "伺服器回傳的資料格式不正確"
+  "serverDataInvalid": "伺服器回傳的資料格式不正確",
+  "accountSection": "帳戶",
+  "deleteAccount": "註銷帳戶",
+  "deleteAccountSubtitle": "永久刪除帳戶及相關資料",
+  "deleteAccountDescription": "註銷後，你的個人資料、衣物、好友關係和推薦記錄將被永久刪除，且無法復原。",
+  "deleteAccountEmailPrompt": "請輸入電子郵件 {email} 以確認註銷帳戶。",
+  "deleteAccountEmailHint": "請輸入目前帳戶電子郵件"
 }

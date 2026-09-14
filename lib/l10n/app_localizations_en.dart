@@ -728,4 +728,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverDataInvalid => 'The server returned invalid data';
+
+  @override
+  String get accountSection => 'Account';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'Permanently delete your account and related data';
+
+  @override
+  String get deleteAccountDescription =>
+      'Your profile, clothing, friendships, and recommendation history will be permanently deleted. This action cannot be undone.';
+
+  @override
+  String deleteAccountEmailPrompt(String email) {
+    return 'Enter $email to confirm account deletion.';
+  }
+
+  @override
+  String get deleteAccountEmailHint => 'Enter your account email';
 }

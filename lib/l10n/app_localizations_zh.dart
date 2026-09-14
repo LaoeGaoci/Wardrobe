@@ -701,6 +701,26 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get serverDataInvalid => '服务器返回的数据格式不正确';
+
+  @override
+  String get accountSection => '账户';
+
+  @override
+  String get deleteAccount => '注销账户';
+
+  @override
+  String get deleteAccountSubtitle => '永久删除账户及相关数据';
+
+  @override
+  String get deleteAccountDescription => '注销后，你的个人资料、衣物、好友关系和推荐记录将被永久删除，且无法恢复。';
+
+  @override
+  String deleteAccountEmailPrompt(String email) {
+    return '请输入邮箱 $email 以确认注销账户。';
+  }
+
+  @override
+  String get deleteAccountEmailHint => '请输入当前账户邮箱';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1400,6 +1420,26 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get serverDataInvalid => '服务器返回的数据格式不正确';
+
+  @override
+  String get accountSection => '账户';
+
+  @override
+  String get deleteAccount => '注销账户';
+
+  @override
+  String get deleteAccountSubtitle => '永久删除账户及相关数据';
+
+  @override
+  String get deleteAccountDescription => '注销后，你的个人资料、衣物、好友关系和推荐记录将被永久删除，且无法恢复。';
+
+  @override
+  String deleteAccountEmailPrompt(String email) {
+    return '请输入邮箱 $email 以确认注销账户。';
+  }
+
+  @override
+  String get deleteAccountEmailHint => '请输入当前账户邮箱';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -2099,4 +2139,24 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get serverDataInvalid => '伺服器回傳的資料格式不正確';
+
+  @override
+  String get accountSection => '帳戶';
+
+  @override
+  String get deleteAccount => '註銷帳戶';
+
+  @override
+  String get deleteAccountSubtitle => '永久刪除帳戶及相關資料';
+
+  @override
+  String get deleteAccountDescription => '註銷後，你的個人資料、衣物、好友關係和推薦記錄將被永久刪除，且無法復原。';
+
+  @override
+  String deleteAccountEmailPrompt(String email) {
+    return '請輸入電子郵件 $email 以確認註銷帳戶。';
+  }
+
+  @override
+  String get deleteAccountEmailHint => '請輸入目前帳戶電子郵件';
 }
