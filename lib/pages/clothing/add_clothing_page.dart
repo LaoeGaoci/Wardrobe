@@ -66,6 +66,7 @@ class _AddClothingPageState
     '外套',
     '羽绒服',
     '裤子',
+    '帽子',
     '鞋子',
     '配饰',
   ];

@@ -5,12 +5,10 @@ import '../../main.dart';
 import '../../models/clothing.dart';
 import '../../services/auth_service.dart';
 import '../../services/clothing_repository.dart';
-import '../../services/friend_service.dart';
 import '../../widgets/clothing_card.dart';
 
 import '../clothing/add_clothing_page.dart';
 import '../clothing/clothing_detail_page.dart';
-import '../notification/notification.dart';
 
 class WardrobePage
     extends StatefulWidget {
@@ -30,10 +28,6 @@ class _WardrobePageState
   _repository =
       ClothingRepository.instance;
 
-  final FriendService
-  _friendService =
-      FriendService.instance;
-
   bool _isLoading = true;
 
   String? _loadError;
@@ -50,6 +44,7 @@ class _WardrobePageState
     '外套',
     '羽绒服',
     '裤子',
+    '帽子',
     '鞋子',
     '配饰',
   ];
@@ -58,32 +53,11 @@ class _WardrobePageState
   void initState() {
     super.initState();
 
-    _friendService.addListener(
-      _onFriendChanged,
-    );
-    /// App 进入主页面后，
-    /// 主动取得收到的好友申请，
-    /// 用于更新通知数量。
-    Future.microtask(() async {
-      try {
-        await _friendService
-            .refreshReceivedRequests();
-      } on FriendException {
-        /// 首页不因为好友申请同步失败而崩溃。
-        ///
-        /// 好友页面本身会提供完整错误提示。
-      }
-    });
-
     _loadClothes();
   }
 
   @override
   void dispose() {
-    _friendService.removeListener(
-      _onFriendChanged,
-    );
-
     super.dispose();
   }
 
@@ -314,100 +288,6 @@ class _WardrobePageState
   }
 
   // ============================================================
-  // Notification
-  // ============================================================
-
-  void _openNotifications() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-        const NotificationPage(),
-      ),
-    );
-  }
-
-  Widget
-  _buildNotificationButton() {
-    final unreadCount =
-        _friendService
-            .receivedRequestCount;
-
-    return Stack(
-      clipBehavior:
-      Clip.none,
-      children: [
-        IconButton(
-          onPressed:
-          _openNotifications,
-          icon:
-          const Icon(
-            Icons
-                .notifications_none,
-          ),
-        ),
-        if (unreadCount > 0)
-          Positioned(
-            right: 5,
-            top: 3,
-            child:
-            Container(
-              constraints:
-              const BoxConstraints(
-                minWidth:
-                18,
-                minHeight:
-                18,
-              ),
-              padding:
-              const EdgeInsets
-                  .symmetric(
-                horizontal:
-                4,
-                vertical:
-                2,
-              ),
-              decoration:
-              BoxDecoration(
-                color:
-                Theme.of(
-                  context,
-                )
-                    .colorScheme
-                    .error,
-                borderRadius:
-                BorderRadius
-                    .circular(
-                  10,
-                ),
-              ),
-              child: Text(
-                unreadCount >
-                    99
-                    ? '99+'
-                    : '$unreadCount',
-                textAlign:
-                TextAlign
-                    .center,
-                style:
-                const TextStyle(
-                  color:
-                  Colors
-                      .white,
-                  fontSize:
-                  10,
-                  fontWeight:
-                  FontWeight
-                      .bold,
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  // ============================================================
   // Build
   // ============================================================
 
@@ -420,17 +300,12 @@ class _WardrobePageState
 
     return Scaffold(
       appBar: AppBar(
-        title:
-        const Text(
+        title: const Text(
           '我的衣柜',
           style: TextStyle(
-            fontWeight:
-            FontWeight.bold,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          _buildNotificationButton(),
-        ],
       ),
 
       body:
