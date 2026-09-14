@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/error_localizations.dart';
+import '../../l10n/l10n.dart';
 import '../../models/app_user.dart';
 import '../../models/clothing.dart';
 import '../../services/friend_service.dart';
 import '../../services/recommendation_service.dart';
 import '../../widgets/clothing_card.dart';
 
-class FriendWardrobePage
-    extends StatefulWidget {
+class FriendWardrobePage extends StatefulWidget {
   final AppUser user;
 
   const FriendWardrobePage({
@@ -16,46 +17,25 @@ class FriendWardrobePage
   });
 
   @override
-  State<FriendWardrobePage>
-  createState() =>
-      _FriendWardrobePageState();
+  State<FriendWardrobePage> createState() => _FriendWardrobePageState();
 }
 
-class _FriendWardrobePageState
-    extends State<FriendWardrobePage> {
-  final FriendService _friendService =
-      FriendService.instance;
-
-  final RecommendationService
-  _recommendationService =
+class _FriendWardrobePageState extends State<FriendWardrobePage> {
+  final FriendService _friendService = FriendService.instance;
+  final RecommendationService _recommendationService =
       RecommendationService.instance;
 
-  /// 当前真正从好友衣柜 API
-  /// 读取到的公开衣物。
-  List<Clothing> _clothes =
-  const [];
-
+  List<Clothing> _clothes = const [];
   bool _isLoading = true;
-
   String? _loadError;
-
   bool _selecting = false;
-
-  final Set<String>
-  _selectedClothingIds = {};
+  final Set<String> _selectedClothingIds = {};
 
   @override
   void initState() {
     super.initState();
-
-    Future.microtask(
-      _loadClothes,
-    );
+    Future.microtask(_loadClothes);
   }
-
-  // ============================================================
-  // Load friend wardrobe
-  // ============================================================
 
   Future<void> _loadClothes() async {
     if (mounted) {
@@ -66,368 +46,180 @@ class _FriendWardrobePageState
     }
 
     try {
-      final clothes =
-      await _friendService
-          .fetchFriendClothing(
-        widget.user.id,
-      );
-
-      if (!mounted) {
-        return;
-      }
+      final clothes = await _friendService.fetchFriendClothing(widget.user.id);
+      if (!mounted) return;
 
       setState(() {
-        _clothes =
-            clothes;
-
-        /// 刷新后可能某件衣物已经
-        /// 不再公开，所以清掉无效选择。
-        final validIds =
-        clothes
-            .map(
-              (item) =>
-          item.id,
-        )
-            .toSet();
-
-        _selectedClothingIds
-            .removeWhere(
-              (id) =>
-          !validIds
-              .contains(
-            id,
-          ),
-        );
+        _clothes = clothes;
+        final validIds = clothes.map((item) => item.id).toSet();
+        _selectedClothingIds.removeWhere((id) => !validIds.contains(id));
       });
     } on FriendException catch (e) {
       if (mounted) {
         setState(() {
-          _loadError =
-              e.message;
+          _loadError = e.message;
         });
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading =
-          false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  // ============================================================
-  // Selection
-  // ============================================================
-
-  List<Clothing>
-  get _selectedClothes {
+  List<Clothing> get _selectedClothes {
     return _clothes
-        .where(
-          (item) =>
-          _selectedClothingIds
-              .contains(
-            item.id,
-          ),
-    )
-        .toList(
-      growable: false,
-    );
+        .where((item) => _selectedClothingIds.contains(item.id))
+        .toList(growable: false);
   }
 
-  void _toggleSelection(
-      Clothing clothing,
-      ) {
+  void _toggleSelection(Clothing clothing) {
     setState(() {
-      if (_selectedClothingIds
-          .contains(
-        clothing.id,
-      )) {
-        _selectedClothingIds.remove(
-          clothing.id,
-        );
+      if (_selectedClothingIds.contains(clothing.id)) {
+        _selectedClothingIds.remove(clothing.id);
       } else {
-        _selectedClothingIds.add(
-          clothing.id,
-        );
+        _selectedClothingIds.add(clothing.id);
       }
     });
   }
 
-  // ============================================================
-  // Recommendation
-  // ============================================================
-
-  Future<void>
-  _startRecommendation() async {
+  Future<void> _startRecommendation() async {
     try {
-      /// 推荐之前再确认双方仍是好友。
-      final status =
-      await _friendService
-          .refreshFriendStatus(
-        widget.user.id,
-      );
+      final status = await _friendService.refreshFriendStatus(widget.user.id);
+      if (!mounted) return;
 
-      if (!mounted) {
-        return;
-      }
-
-      if (status !=
-          FriendStatus.friends) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
-          const SnackBar(
-            content: Text(
-              '只有好友之间才能进行衣物推荐',
-            ),
-          ),
+      if (status != FriendStatus.friends) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.onlyFriendsCanRecommend)),
         );
-
         return;
       }
 
       setState(() {
-        _selecting =
-        true;
-
-        _selectedClothingIds
-            .clear();
+        _selecting = true;
+        _selectedClothingIds.clear();
       });
     } on FriendException catch (e) {
-      if (!mounted) {
-        return;
-      }
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
-        SnackBar(
-          content:
-          Text(e.message),
-        ),
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(localizedErrorMessage(context, e.message))),
       );
     }
   }
 
   void _cancelSelection() {
     setState(() {
-      _selecting =
-      false;
-
-      _selectedClothingIds
-          .clear();
+      _selecting = false;
+      _selectedClothingIds.clear();
     });
   }
 
-  Future<void>
-  _showRecommendationDialog() async {
+  Future<void> _showRecommendationDialog() async {
     if (_selectedClothes.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
-        const SnackBar(
-          content: Text(
-            '请至少选择一件衣物',
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.selectAtLeastOne)),
       );
-
       return;
     }
 
-    final message =
-    await showDialog<String>(
+    final message = await showDialog<String>(
       context: context,
-      builder:
-          (dialogContext) {
-        return _RecommendationMessageDialog(
-          username:
-          widget.user.username,
-          clothingCount:
-          _selectedClothes.length,
-        );
-      },
+      builder: (_) => _RecommendationMessageDialog(
+        username: widget.user.username,
+        clothingCount: _selectedClothes.length,
+      ),
     );
 
-    if (!mounted ||
-        message == null ||
-        message.isEmpty) {
-      return;
-    }
-
-    await _sendRecommendation(
-      message,
-    );
+    if (!mounted || message == null || message.isEmpty) return;
+    await _sendRecommendation(message);
   }
 
-  Future<void> _sendRecommendation(
-      String message,
-      ) async {
+  Future<void> _sendRecommendation(String message) async {
     try {
-      await _recommendationService
-          .sendRecommendation(
-        toUserId:
-        widget.user.id,
-        clothes:
-        _selectedClothes,
-        message:
-        message,
+      await _recommendationService.sendRecommendation(
+        toUserId: widget.user.id,
+        clothes: _selectedClothes,
+        message: message,
       );
 
-      if (!mounted) {
-        return;
-      }
-
+      if (!mounted) return;
       setState(() {
-        _selecting =
-        false;
-
-        _selectedClothingIds
-            .clear();
+        _selecting = false;
+        _selectedClothingIds.clear();
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
-        const SnackBar(
-          content: Text(
-            '衣物推荐已发送',
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.recommendationSent)),
       );
     } on RecommendationException catch (e) {
-      if (!mounted) {
-        return;
-      }
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
-        SnackBar(
-          content:
-          Text(e.message),
-        ),
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(localizedErrorMessage(context, e.message))),
       );
     }
   }
 
-  // ============================================================
-  // Build
-  // ============================================================
-
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '${widget.user.username}的衣柜',
-        ),
+        title: Text(l10n.friendWardrobe(widget.user.username)),
         actions: [
           if (!_selecting)
             TextButton.icon(
-              onPressed:
-              _isLoading
-                  ? null
-                  : _startRecommendation,
-              icon:
-              const Icon(
-                Icons
-                    .card_giftcard_outlined,
-              ),
-              label:
-              const Text(
-                '推荐',
-              ),
+              onPressed: _isLoading ? null : _startRecommendation,
+              icon: const Icon(Icons.card_giftcard_outlined),
+              label: Text(l10n.recommend),
             )
           else
             TextButton(
-              onPressed:
-              _cancelSelection,
-              child:
-              const Text(
-                '取消',
-              ),
+              onPressed: _cancelSelection,
+              child: Text(l10n.cancel),
             ),
         ],
       ),
       body: _buildBody(),
-      bottomNavigationBar:
-      _selecting
+      bottomNavigationBar: _selecting
           ? SafeArea(
-        child: Padding(
-          padding:
-          const EdgeInsets.all(
-            12,
-          ),
-          child:
-          FilledButton.icon(
-            onPressed:
-            _showRecommendationDialog,
-            icon:
-            const Icon(
-              Icons
-                  .send_outlined,
-            ),
-            label: Text(
-              _selectedClothes
-                  .isEmpty
-                  ? '请选择衣物'
-                  : '推荐 '
-                  '${_selectedClothes.length} '
-                  '件衣物',
-            ),
-          ),
-        ),
-      )
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: FilledButton.icon(
+                  onPressed: _showRecommendationDialog,
+                  icon: const Icon(Icons.send_outlined),
+                  label: Text(
+                    _selectedClothes.isEmpty
+                        ? l10n.selectClothing
+                        : l10n.recommendItemCount(_selectedClothes.length),
+                  ),
+                ),
+              ),
+            )
           : null,
     );
   }
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(
-        child:
-        CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_loadError != null) {
       return Center(
         child: Padding(
-          padding:
-          const EdgeInsets.all(
-            32,
-          ),
+          padding: const EdgeInsets.all(32),
           child: Column(
-            mainAxisSize:
-            MainAxisSize.min,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons
-                    .error_outline,
-                size: 56,
-              ),
-              const SizedBox(
-                height: 16,
-              ),
+              const Icon(Icons.error_outline, size: 56),
+              const SizedBox(height: 16),
               Text(
-                _loadError!,
-                textAlign:
-                TextAlign.center,
+                localizedErrorMessage(context, _loadError!),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(
-                height: 16,
-              ),
+              const SizedBox(height: 16),
               FilledButton(
-                onPressed:
-                _loadClothes,
-                child:
-                const Text(
-                  '重新加载',
-                ),
+                onPressed: _loadClothes,
+                child: Text(context.l10n.reload),
               ),
             ],
           ),
@@ -436,136 +228,65 @@ class _FriendWardrobePageState
     }
 
     return RefreshIndicator(
-      onRefresh:
-      _loadClothes,
+      onRefresh: _loadClothes,
       child: _clothes.isEmpty
           ? ListView(
-        physics:
-        const AlwaysScrollableScrollPhysics(),
-        children: [
-          SizedBox(
-            height:
-            MediaQuery.of(
-              context,
-            ).size.height *
-                0.65,
-            child:
-            _buildEmptyState(),
-          ),
-        ],
-      )
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: _buildEmptyState(),
+                ),
+              ],
+            )
           : GridView.builder(
-        physics:
-        const AlwaysScrollableScrollPhysics(),
-        padding:
-        const EdgeInsets.all(
-          12,
-        ),
-        itemCount:
-        _clothes.length,
-        gridDelegate:
-        const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing:
-          10,
-          mainAxisSpacing:
-          10,
-          childAspectRatio:
-          0.72,
-        ),
-        itemBuilder:
-            (
-            context,
-            index,
-            ) {
-          return _buildClothingItem(
-            _clothes[
-            index
-            ],
-          );
-        },
-      ),
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(12),
+              itemCount: _clothes.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.72,
+              ),
+              itemBuilder: (context, index) =>
+                  _buildClothingItem(_clothes[index]),
+            ),
     );
   }
 
-  Widget _buildClothingItem(
-      Clothing clothing,
-      ) {
-    final selected =
-    _selectedClothingIds
-        .contains(
-      clothing.id,
-    );
+  Widget _buildClothingItem(Clothing clothing) {
+    final selected = _selectedClothingIds.contains(clothing.id);
 
     return GestureDetector(
       onTap: () {
-        if (_selecting) {
-          _toggleSelection(
-            clothing,
-          );
-        }
-
-        /// 当前好友衣柜暂时只负责展示和推荐。
-        ///
-        /// 后续如果要做好友衣物详情页，
-        /// 可以在非 selecting 状态下
-        /// Navigator.push 到专用只读详情页。
+        if (_selecting) _toggleSelection(clothing);
       },
       child: Stack(
         children: [
-          Positioned.fill(
-            child:
-            ClothingCard(
-              clothing:
-              clothing,
-            ),
-          ),
-
+          Positioned.fill(child: ClothingCard(clothing: clothing)),
           if (_selecting)
             Positioned(
               top: 8,
               right: 8,
-              child:
-              AnimatedContainer(
-                duration:
-                const Duration(
-                  milliseconds:
-                  150,
-                ),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
                 width: 30,
                 height: 30,
-                decoration:
-                BoxDecoration(
+                decoration: BoxDecoration(
                   color: selected
-                      ? Theme.of(
-                    context,
-                  )
-                      .colorScheme
-                      .primary
+                      ? Theme.of(context).colorScheme.primary
                       : Colors.white,
-                  shape:
-                  BoxShape.circle,
-                  border:
-                  Border.all(
+                  shape: BoxShape.circle,
+                  border: Border.all(
                     color: selected
-                        ? Theme.of(
-                      context,
-                    )
-                        .colorScheme
-                        .primary
-                        : Colors
-                        .grey
-                        .shade400,
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey.shade400,
                     width: 2,
                   ),
                 ),
                 child: selected
-                    ? const Icon(
-                  Icons.check,
-                  size: 20,
-                  color:
-                  Colors.white,
-                )
+                    ? const Icon(Icons.check, size: 20, color: Colors.white)
                     : null,
               ),
             ),
@@ -575,46 +296,25 @@ class _FriendWardrobePageState
   }
 
   Widget _buildEmptyState() {
+    final l10n = context.l10n;
+
     return Center(
       child: Padding(
-        padding:
-        const EdgeInsets.all(
-          32,
-        ),
+        padding: const EdgeInsets.all(32),
         child: Column(
-          mainAxisSize:
-          MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons
-                  .checkroom_outlined,
-              size: 64,
-            ),
-            const SizedBox(
-              height: 16,
-            ),
+            const Icon(Icons.checkroom_outlined, size: 64),
+            const SizedBox(height: 16),
             Text(
-              '这个衣柜暂时没有公开衣物',
-              style:
-              Theme.of(
-                context,
-              )
-                  .textTheme
-                  .titleMedium,
+              l10n.noPublicClothing,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            const SizedBox(height: 8),
             Text(
-              '只有设置为 Public 的衣物才能被好友看到。',
-              textAlign:
-              TextAlign.center,
-              style:
-              Theme.of(
-                context,
-              )
-                  .textTheme
-                  .bodyMedium,
+              l10n.onlyPublicVisible,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
         ),
@@ -623,16 +323,8 @@ class _FriendWardrobePageState
   }
 }
 
-/// ============================================================
-/// 推荐留言弹窗
-/// ============================================================
-///
-/// 推荐系统目前仍然是你的原有模块，
-/// 本次只把好友关系和好友衣柜迁移到后端。
-class _RecommendationMessageDialog
-    extends StatefulWidget {
+class _RecommendationMessageDialog extends StatefulWidget {
   final String username;
-
   final int clothingCount;
 
   const _RecommendationMessageDialog({
@@ -641,120 +333,71 @@ class _RecommendationMessageDialog
   });
 
   @override
-  State<_RecommendationMessageDialog>
-  createState() =>
+  State<_RecommendationMessageDialog> createState() =>
       _RecommendationMessageDialogState();
 }
 
 class _RecommendationMessageDialogState
     extends State<_RecommendationMessageDialog> {
-  late final TextEditingController
-  _controller;
+  late final TextEditingController _controller;
 
   @override
   void initState() {
     super.initState();
-
-    _controller =
-        TextEditingController();
+    _controller = TextEditingController();
   }
 
   @override
   void dispose() {
     _controller.dispose();
-
     super.dispose();
   }
 
   void _send() {
-    final message =
-    _controller.text.trim();
-
+    final message = _controller.text.trim();
     if (message.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
-        const SnackBar(
-          content: Text(
-            '请输入推荐留言',
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.recommendationMessageRequired)),
       );
-
       return;
     }
 
-    Navigator.of(
-      context,
-    ).pop(
-      message,
-    );
+    Navigator.of(context).pop(message);
   }
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return AlertDialog(
-      title: Text(
-        '给 ${widget.username} 的推荐',
-      ),
+      title: Text(l10n.recommendationFor(widget.username)),
       content: Column(
-        mainAxisSize:
-        MainAxisSize.min,
-        crossAxisAlignment:
-        CrossAxisAlignment
-            .start,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '已选择 '
-                '${widget.clothingCount} '
-                '件衣物',
-          ),
-
-          const SizedBox(
-            height: 16,
-          ),
-
+          Text(l10n.selectedItems(widget.clothingCount)),
+          const SizedBox(height: 16),
           TextField(
-            controller:
-            _controller,
+            controller: _controller,
             maxLines: 5,
             maxLength: 200,
             autofocus: true,
-            textInputAction:
-            TextInputAction
-                .newline,
-            decoration:
-            const InputDecoration(
-              hintText:
-              '捎一句话吧，例如：这星期天气转凉了，记得穿这些衣服。',
-              border:
-              OutlineInputBorder(),
+            textInputAction: TextInputAction.newline,
+            decoration: InputDecoration(
+              hintText: l10n.recommendationMessageHint,
+              border: const OutlineInputBorder(),
             ),
           ),
         ],
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.of(
-              context,
-            ).pop();
-          },
-          child:
-          const Text(
-            '取消',
-          ),
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
         ),
-
         FilledButton(
-          onPressed:
-          _send,
-          child:
-          const Text(
-            '发送推荐',
-          ),
+          onPressed: _send,
+          child: Text(l10n.sendRecommendation),
         ),
       ],
     );

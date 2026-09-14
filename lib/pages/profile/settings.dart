@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n.dart';
+
 class SettingsPage extends StatefulWidget {
   final bool notificationsEnabled;
   final bool darkModeEnabled;
 
   final ValueChanged<bool> onNotificationsChanged;
   final ValueChanged<bool> onDarkModeChanged;
+  final ValueChanged<Locale> onLocaleChanged;
 
   const SettingsPage({
     super.key,
@@ -13,6 +16,7 @@ class SettingsPage extends StatefulWidget {
     required this.darkModeEnabled,
     required this.onNotificationsChanged,
     required this.onDarkModeChanged,
+    required this.onLocaleChanged,
   });
 
   @override
@@ -31,13 +35,104 @@ class _SettingsPageState extends State<SettingsPage> {
     darkModeEnabled = widget.darkModeEnabled;
   }
 
+  Locale _normalizedLocale(Locale locale) {
+    if (locale.languageCode == 'en') {
+      return const Locale('en');
+    }
+
+    final countryCode = locale.countryCode;
+
+    if (locale.scriptCode == 'Hant' ||
+        countryCode == 'TW' ||
+        countryCode == 'HK' ||
+        countryCode == 'MO') {
+      return const Locale.fromSubtags(
+        languageCode: 'zh',
+        scriptCode: 'Hant',
+      );
+    }
+
+    return const Locale.fromSubtags(
+      languageCode: 'zh',
+      scriptCode: 'Hans',
+    );
+  }
+
+  String _languageName(Locale locale) {
+    final normalized = _normalizedLocale(locale);
+
+    if (normalized.languageCode == 'en') {
+      return 'English';
+    }
+
+    if (normalized.scriptCode == 'Hant') {
+      return '繁體中文';
+    }
+
+    return '简体中文';
+  }
+
+  Future<void> _showLanguagePicker() async {
+    final currentLocale = _normalizedLocale(
+      Localizations.localeOf(context),
+    );
+
+    final selected = await showModalBottomSheet<Locale>(
+      context: context,
+      builder: (bottomSheetContext) {
+        return SafeArea(
+          child: RadioGroup<Locale>(
+            groupValue: currentLocale,
+            onChanged: (value) {
+              if (value != null) {
+                Navigator.pop(bottomSheetContext, value);
+              }
+            },
+            child: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<Locale>(
+                  value: Locale.fromSubtags(
+                    languageCode: 'zh',
+                    scriptCode: 'Hans',
+                  ),
+                  title: Text('简体中文'),
+                ),
+                RadioListTile<Locale>(
+                  value: Locale.fromSubtags(
+                    languageCode: 'zh',
+                    scriptCode: 'Hant',
+                  ),
+                  title: Text('繁體中文'),
+                ),
+                RadioListTile<Locale>(
+                  value: Locale('en'),
+                  title: Text('English'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selected == null || !mounted) {
+      return;
+    }
+
+    widget.onLocaleChanged(selected);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final locale = Localizations.localeOf(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Settings',
-          style: TextStyle(
+        title: Text(
+          l10n.settings,
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -46,17 +141,15 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Text(
-            'Preferences',
-            style: TextStyle(
+          Text(
+            l10n.preferences,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: Colors.grey,
             ),
           ),
-
           const SizedBox(height: 12),
-
           Card(
             elevation: 0,
             child: SwitchListTile(
@@ -66,14 +159,14 @@ class _SettingsPageState extends State<SettingsPage> {
               secondary: const Icon(
                 Icons.notifications_outlined,
               ),
-              title: const Text(
-                'Notifications',
-                style: TextStyle(
+              title: Text(
+                l10n.notifications,
+                style: const TextStyle(
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              subtitle: const Text(
-                'Receive outfit reminders',
+              subtitle: Text(
+                l10n.notificationsSubtitle,
               ),
               value: notificationsEnabled,
               onChanged: (value) {
@@ -85,9 +178,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
-
           const SizedBox(height: 12),
-
           Card(
             elevation: 0,
             child: SwitchListTile(
@@ -97,14 +188,14 @@ class _SettingsPageState extends State<SettingsPage> {
               secondary: const Icon(
                 Icons.dark_mode_outlined,
               ),
-              title: const Text(
-                'Dark Mode',
-                style: TextStyle(
+              title: Text(
+                l10n.darkMode,
+                style: const TextStyle(
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              subtitle: const Text(
-                'Use dark appearance',
+              subtitle: Text(
+                l10n.darkModeSubtitle,
               ),
               value: darkModeEnabled,
               onChanged: (value) {
@@ -116,38 +207,35 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
-
           const SizedBox(height: 32),
-
-          const Text(
-            'App',
-            style: TextStyle(
+          Text(
+            l10n.appSection,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: Colors.grey,
             ),
           ),
-
           const SizedBox(height: 12),
-
           Card(
             elevation: 0,
             child: ListTile(
               leading: const Icon(
                 Icons.language_outlined,
               ),
-              title: const Text(
-                'Language',
-                style: TextStyle(
+              title: Text(
+                l10n.language,
+                style: const TextStyle(
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              trailing: const Text(
-                'English',
-                style: TextStyle(
+              trailing: Text(
+                _languageName(locale),
+                style: const TextStyle(
                   color: Colors.grey,
                 ),
               ),
+              onTap: _showLanguagePicker,
             ),
           ),
         ],
