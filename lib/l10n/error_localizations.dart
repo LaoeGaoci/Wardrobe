@@ -153,6 +153,28 @@ String localizedErrorMessage(BuildContext context, String message) {
     case '服务器返回的未读推荐数量格式不正确':
       return l10n.serverDataInvalid;
 
+    case 'Invalid verification code':
+    case '验证码错误':
+      return l10n.invalidVerificationCode;
+
+    case 'Invalid or expired verification code':
+      return l10n.invalidOrExpiredVerificationCode;
+
+    case 'Too many verification attempts':
+      return l10n.tooManyVerificationAttempts;
+
+    case 'Please wait before requesting another verification code':
+      return l10n.verificationCodeRequestTooFrequent;
+
+    case 'Failed to send verification email':
+      return l10n.verificationEmailSendFailed;
+
+    case 'New password must be different from current password':
+      return l10n.newPasswordMustBeDifferent;
+
+    case 'Current password is incorrect':
+      return l10n.currentPasswordIncorrect;
+
     default:
       return message;
   }

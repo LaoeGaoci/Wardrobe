@@ -343,7 +343,7 @@ abstract class AppLocalizations {
   /// No description provided for @verificationCodeSent.
   ///
   /// In en, this message translates to:
-  /// **'Verification code sent'**
+  /// **'Verification code sent. Please check your inbox'**
   String get verificationCodeSent;
 
   /// No description provided for @password.
@@ -1431,6 +1431,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter your account email'**
   String get deleteAccountEmailHint;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @resetYourPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset your password'**
+  String get resetYourPassword;
+
+  /// No description provided for @forgotPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your registered email and we will send you a verification code.'**
+  String get forgotPasswordSubtitle;
+
+  /// No description provided for @passwordResetCodeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'If this email is registered, a verification code has been sent. Please check your inbox.'**
+  String get passwordResetCodeSent;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPassword;
+
+  /// No description provided for @newPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new password (at least 8 characters)'**
+  String get newPasswordHint;
+
+  /// No description provided for @newPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a new password'**
+  String get newPasswordRequired;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get confirmPassword;
+
+  /// No description provided for @confirmPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the new password again'**
+  String get confirmPasswordHint;
+
+  /// No description provided for @confirmPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your new password'**
+  String get confirmPasswordRequired;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The passwords do not match'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @resetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get resetPassword;
+
+  /// No description provided for @passwordResetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset successfully. Please sign in with your new password.'**
+  String get passwordResetSuccess;
+
+  /// No description provided for @invalidOrExpiredVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'The verification code is invalid or has expired'**
+  String get invalidOrExpiredVerificationCode;
+
+  /// No description provided for @tooManyVerificationAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many incorrect verification attempts. Please request a new code.'**
+  String get tooManyVerificationAttempts;
+
+  /// No description provided for @verificationCodeRequestTooFrequent.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait before requesting another verification code'**
+  String get verificationCodeRequestTooFrequent;
+
+  /// No description provided for @verificationEmailSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send the verification email. Please try again later.'**
+  String get verificationEmailSendFailed;
+
+  /// No description provided for @newPasswordMustBeDifferent.
+  ///
+  /// In en, this message translates to:
+  /// **'The new password must be different from the current password'**
+  String get newPasswordMustBeDifferent;
+
+  /// No description provided for @currentPasswordIncorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'The current password is incorrect'**
+  String get currentPasswordIncorrect;
 }
 
 class _AppLocalizationsDelegate

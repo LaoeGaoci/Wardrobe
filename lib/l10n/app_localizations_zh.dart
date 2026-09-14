@@ -721,6 +721,63 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteAccountEmailHint => '请输入当前账户邮箱';
+
+  @override
+  String get forgotPasswordTitle => '忘记密码';
+
+  @override
+  String get resetYourPassword => '重置密码';
+
+  @override
+  String get forgotPasswordSubtitle => '输入注册邮箱，我们会向你的邮箱发送验证码';
+
+  @override
+  String get passwordResetCodeSent => '如果该邮箱已注册，验证码已发送，请检查邮箱';
+
+  @override
+  String get newPassword => '新密码';
+
+  @override
+  String get newPasswordHint => '请输入新密码（至少 8 位）';
+
+  @override
+  String get newPasswordRequired => '请输入新密码';
+
+  @override
+  String get confirmPassword => '确认新密码';
+
+  @override
+  String get confirmPasswordHint => '请再次输入新密码';
+
+  @override
+  String get confirmPasswordRequired => '请确认新密码';
+
+  @override
+  String get passwordsDoNotMatch => '两次输入的密码不一致';
+
+  @override
+  String get resetPassword => '重置密码';
+
+  @override
+  String get passwordResetSuccess => '密码重置成功，请使用新密码登录';
+
+  @override
+  String get invalidOrExpiredVerificationCode => '验证码无效或已过期';
+
+  @override
+  String get tooManyVerificationAttempts => '验证码错误次数过多，请重新获取验证码';
+
+  @override
+  String get verificationCodeRequestTooFrequent => '请求过于频繁，请稍后再获取验证码';
+
+  @override
+  String get verificationEmailSendFailed => '验证码邮件发送失败，请稍后重试';
+
+  @override
+  String get newPasswordMustBeDifferent => '新密码不能与当前密码相同';
+
+  @override
+  String get currentPasswordIncorrect => '当前密码错误';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -850,7 +907,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get verificationCodeLength => '验证码应为 6 位';
 
   @override
-  String get verificationCodeSent => '验证码已发送';
+  String get verificationCodeSent => '验证码已发送，请检查邮箱';
 
   @override
   String get password => '密码';
@@ -1440,6 +1497,63 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get deleteAccountEmailHint => '请输入当前账户邮箱';
+
+  @override
+  String get forgotPasswordTitle => '忘记密码';
+
+  @override
+  String get resetYourPassword => '重置密码';
+
+  @override
+  String get forgotPasswordSubtitle => '输入注册邮箱，我们会向你的邮箱发送验证码';
+
+  @override
+  String get passwordResetCodeSent => '如果该邮箱已注册，验证码已发送，请检查邮箱';
+
+  @override
+  String get newPassword => '新密码';
+
+  @override
+  String get newPasswordHint => '请输入新密码（至少 8 位）';
+
+  @override
+  String get newPasswordRequired => '请输入新密码';
+
+  @override
+  String get confirmPassword => '确认新密码';
+
+  @override
+  String get confirmPasswordHint => '请再次输入新密码';
+
+  @override
+  String get confirmPasswordRequired => '请确认新密码';
+
+  @override
+  String get passwordsDoNotMatch => '两次输入的密码不一致';
+
+  @override
+  String get resetPassword => '重置密码';
+
+  @override
+  String get passwordResetSuccess => '密码重置成功，请使用新密码登录';
+
+  @override
+  String get invalidOrExpiredVerificationCode => '验证码无效或已过期';
+
+  @override
+  String get tooManyVerificationAttempts => '验证码错误次数过多，请重新获取验证码';
+
+  @override
+  String get verificationCodeRequestTooFrequent => '请求过于频繁，请稍后再获取验证码';
+
+  @override
+  String get verificationEmailSendFailed => '验证码邮件发送失败，请稍后重试';
+
+  @override
+  String get newPasswordMustBeDifferent => '新密码不能与当前密码相同';
+
+  @override
+  String get currentPasswordIncorrect => '当前密码错误';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1569,7 +1683,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get verificationCodeLength => '驗證碼應為 6 位';
 
   @override
-  String get verificationCodeSent => '驗證碼已傳送';
+  String get verificationCodeSent => '驗證碼已傳送，請檢查信箱';
 
   @override
   String get password => '密碼';
@@ -2159,4 +2273,61 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get deleteAccountEmailHint => '請輸入目前帳戶電子郵件';
+
+  @override
+  String get forgotPasswordTitle => '忘記密碼';
+
+  @override
+  String get resetYourPassword => '重設密碼';
+
+  @override
+  String get forgotPasswordSubtitle => '輸入註冊電子郵件，我們會向你的信箱傳送驗證碼';
+
+  @override
+  String get passwordResetCodeSent => '如果此電子郵件已註冊，驗證碼已傳送，請檢查信箱';
+
+  @override
+  String get newPassword => '新密碼';
+
+  @override
+  String get newPasswordHint => '請輸入新密碼（至少 8 位）';
+
+  @override
+  String get newPasswordRequired => '請輸入新密碼';
+
+  @override
+  String get confirmPassword => '確認新密碼';
+
+  @override
+  String get confirmPasswordHint => '請再次輸入新密碼';
+
+  @override
+  String get confirmPasswordRequired => '請確認新密碼';
+
+  @override
+  String get passwordsDoNotMatch => '兩次輸入的密碼不一致';
+
+  @override
+  String get resetPassword => '重設密碼';
+
+  @override
+  String get passwordResetSuccess => '密碼重設成功，請使用新密碼登入';
+
+  @override
+  String get invalidOrExpiredVerificationCode => '驗證碼無效或已過期';
+
+  @override
+  String get tooManyVerificationAttempts => '驗證碼錯誤次數過多，請重新取得驗證碼';
+
+  @override
+  String get verificationCodeRequestTooFrequent => '請求過於頻繁，請稍後再取得驗證碼';
+
+  @override
+  String get verificationEmailSendFailed => '驗證碼郵件傳送失敗，請稍後再試';
+
+  @override
+  String get newPasswordMustBeDifferent => '新密碼不能與目前密碼相同';
+
+  @override
+  String get currentPasswordIncorrect => '目前密碼錯誤';
 }

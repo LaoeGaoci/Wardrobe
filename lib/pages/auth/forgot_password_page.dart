@@ -5,121 +5,73 @@ import 'package:flutter/material.dart';
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../services/auth_service.dart';
-import 'forgot_password_page.dart';
 
-class AuthPage extends StatefulWidget {
-  const AuthPage({
+class ForgotPasswordPage
+    extends StatefulWidget {
+  final String initialEmail;
+
+  const ForgotPasswordPage({
     super.key,
+    this.initialEmail = '',
   });
 
   @override
-  State<AuthPage> createState() =>
-      _AuthPageState();
+  State<ForgotPasswordPage>
+  createState() =>
+      _ForgotPasswordPageState();
 }
 
-class _AuthPageState
-    extends State<AuthPage> {
+class _ForgotPasswordPageState
+    extends State<ForgotPasswordPage> {
   final _formKey =
   GlobalKey<FormState>();
 
-  final _emailController =
-  TextEditingController();
+  late final TextEditingController
+  _emailController;
 
   final _codeController =
   TextEditingController();
 
-  final _passwordController =
+  final _newPasswordController =
   TextEditingController();
 
-  bool _isLogin = true;
+  final _confirmPasswordController =
+  TextEditingController();
 
-  bool _isLoading = false;
-
+  bool _isSubmitting = false;
   bool _isSendingCode = false;
 
-  bool _obscurePassword = true;
+  bool _obscureNewPassword = true;
+  bool _obscureConfirmPassword = true;
 
   int _countdown = 0;
 
   Timer? _timer;
 
   @override
+  void initState() {
+    super.initState();
+
+    _emailController =
+        TextEditingController(
+          text: widget.initialEmail,
+        );
+  }
+
+  @override
   void dispose() {
+    _timer?.cancel();
+
     _emailController.dispose();
     _codeController.dispose();
-    _passwordController.dispose();
-
-    _timer?.cancel();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
 
     super.dispose();
   }
 
   // ============================================================
-  // Login / register
-  // ============================================================
-
-  Future<void> _submit() async {
-    if (!_formKey
-        .currentState!
-        .validate()) {
-      return;
-    }
-
-    FocusScope.of(context)
-        .unfocus();
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      if (_isLogin) {
-        await AuthService.instance.login(
-          email:
-          _emailController.text,
-          password:
-          _passwordController.text,
-        );
-      } else {
-        await AuthService.instance.register(
-          email:
-          _emailController.text,
-          verificationCode:
-          _codeController.text,
-          password:
-          _passwordController.text,
-        );
-      }
-    } on AuthException catch (e) {
-      if (!mounted) {
-        return;
-      }
-
-      _showMessage(
-        localizedErrorMessage(
-          context,
-          e.message,
-        ),
-      );
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-
-      _showMessage(
-        context.l10n.operationFailed,
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  // ============================================================
-  // Register code
+  // Send code
   // ============================================================
 
   Future<void> _sendCode() async {
@@ -148,7 +100,7 @@ class _AuthPageState
 
     try {
       await AuthService.instance
-          .sendVerificationCode(
+          .sendPasswordResetCode(
         email,
       );
 
@@ -158,9 +110,18 @@ class _AuthPageState
 
       _startCountdown();
 
+      /**
+       * 注意：
+       *
+       * 后端为了防止账户枚举，
+       * 即使邮箱不存在也会返回 success。
+       *
+       * 所以前端也不能显示
+       * “该邮箱已注册”之类的信息。
+       */
       _showMessage(
         context.l10n
-            .verificationCodeSent,
+            .passwordResetCodeSent,
       );
     } on AuthException catch (e) {
       if (!mounted) {
@@ -223,51 +184,76 @@ class _AuthPageState
   }
 
   // ============================================================
-  // Forgot password
+  // Reset password
   // ============================================================
 
-  Future<void> _openForgotPassword() async {
-    FocusScope.of(context).unfocus();
-
-    final email =
-    await Navigator.of(context)
-        .push<String>(
-      MaterialPageRoute(
-        builder: (_) =>
-            ForgotPasswordPage(
-              initialEmail:
-              _emailController.text.trim(),
-            ),
-      ),
-    );
-
-    if (!mounted ||
-        email == null ||
-        email.isEmpty) {
+  Future<void> _submit() async {
+    if (!_formKey
+        .currentState!
+        .validate()) {
       return;
     }
 
-    /**
-     * 密码重置完成以后：
-     *
-     * 返回登录模式；
-     * 自动填回邮箱；
-     * 清空旧密码。
-     */
+    FocusScope.of(context).unfocus();
+
     setState(() {
-      _isLogin = true;
-
-      _emailController.text =
-          email;
-
-      _passwordController.clear();
-      _codeController.clear();
+      _isSubmitting = true;
     });
-  }
 
-  // ============================================================
-  // General UI
-  // ============================================================
+    try {
+      await AuthService.instance
+          .resetPassword(
+        email:
+        _emailController.text,
+        verificationCode:
+        _codeController.text,
+        newPassword:
+        _newPasswordController.text,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      _showMessage(
+        context.l10n
+            .passwordResetSuccess,
+      );
+
+      /**
+       * 把邮箱返回登录页，
+       * 登录页自动填入。
+       */
+      Navigator.of(context).pop(
+        _emailController.text.trim(),
+      );
+    } on AuthException catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      _showMessage(
+        localizedErrorMessage(
+          context,
+          e.message,
+        ),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      _showMessage(
+        context.l10n.operationFailed,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
 
   void _showMessage(
       String message,
@@ -283,24 +269,9 @@ class _AuthPageState
     );
   }
 
-  void _switchMode(
-      bool login,
-      ) {
-    if (_isLogin == login) {
-      return;
-    }
-
-    _timer?.cancel();
-
-    setState(() {
-      _isLogin = login;
-
-      _countdown = 0;
-
-      _codeController.clear();
-      _passwordController.clear();
-    });
-  }
+  // ============================================================
+  // UI
+  // ============================================================
 
   @override
   Widget build(
@@ -313,10 +284,14 @@ class _AuthPageState
         context.l10n;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          l10n.forgotPasswordTitle,
+        ),
+      ),
       body: SafeArea(
         child: Center(
-          child:
-          SingleChildScrollView(
+          child: SingleChildScrollView(
             padding:
             const EdgeInsets.symmetric(
               horizontal: 28,
@@ -350,7 +325,7 @@ class _AuthPageState
                         ),
                         child: const Icon(
                           Icons
-                              .checkroom_rounded,
+                              .lock_reset_rounded,
                           color:
                           Colors.white,
                           size: 38,
@@ -359,17 +334,16 @@ class _AuthPageState
                     ),
 
                     const SizedBox(
-                      height: 28,
+                      height: 24,
                     ),
 
                     Center(
                       child: Text(
-                        _isLogin
-                            ? l10n.welcomeBack
-                            : l10n.createAccount,
+                        l10n
+                            .resetYourPassword,
                         style: theme
                             .textTheme
-                            .headlineMedium
+                            .headlineSmall
                             ?.copyWith(
                           fontWeight:
                           FontWeight.bold,
@@ -383,9 +357,8 @@ class _AuthPageState
 
                     Center(
                       child: Text(
-                        _isLogin
-                            ? l10n.loginSubtitle
-                            : l10n.registerSubtitle,
+                        l10n
+                            .forgotPasswordSubtitle,
                         textAlign:
                         TextAlign.center,
                         style: theme
@@ -401,53 +374,6 @@ class _AuthPageState
 
                     const SizedBox(
                       height: 32,
-                    ),
-
-                    Container(
-                      height: 50,
-                      padding:
-                      const EdgeInsets.all(
-                        4,
-                      ),
-                      decoration:
-                      BoxDecoration(
-                        color: theme
-                            .colorScheme
-                            .surfaceContainerHighest,
-                        borderRadius:
-                        BorderRadius
-                            .circular(
-                          16,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          _ModeButton(
-                            title:
-                            l10n.login,
-                            selected:
-                            _isLogin,
-                            onTap: () =>
-                                _switchMode(
-                                  true,
-                                ),
-                          ),
-                          _ModeButton(
-                            title:
-                            l10n.register,
-                            selected:
-                            !_isLogin,
-                            onTap: () =>
-                                _switchMode(
-                                  false,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 28,
                     ),
 
                     _InputLabel(
@@ -498,102 +424,13 @@ class _AuthPageState
                       },
                     ),
 
-                    if (!_isLogin) ...[
-                      const SizedBox(
-                        height: 20,
-                      ),
-
-                      _InputLabel(
-                        label: l10n
-                            .verificationCode,
-                      ),
-
-                      const SizedBox(
-                        height: 8,
-                      ),
-
-                      TextFormField(
-                        controller:
-                        _codeController,
-                        keyboardType:
-                        TextInputType.number,
-                        textInputAction:
-                        TextInputAction.next,
-                        maxLength: 6,
-                        decoration:
-                        _inputDecoration(
-                          context,
-                          hintText: l10n
-                              .verificationCodeHint,
-                          icon: Icons
-                              .verified_outlined,
-                          suffix:
-                          TextButton(
-                            onPressed:
-                            _countdown >
-                                0 ||
-                                _isSendingCode
-                                ? null
-                                : _sendCode,
-                            child:
-                            _isSendingCode
-                                ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child:
-                              CircularProgressIndicator(
-                                strokeWidth:
-                                2,
-                              ),
-                            )
-                                : Text(
-                              _countdown >
-                                  0
-                                  ? '${_countdown}s'
-                                  : l10n
-                                  .getVerificationCode,
-                            ),
-                          ),
-                        ).copyWith(
-                          counterText:
-                          '',
-                        ),
-                        validator:
-                            (value) {
-                          final code =
-                              value
-                                  ?.trim() ??
-                                  '';
-
-                          if (code
-                              .isEmpty) {
-                            return l10n
-                                .verificationCodeRequired;
-                          }
-
-                          if (code.length !=
-                              6 ||
-                              !RegExp(
-                                r'^\d{6}$',
-                              ).hasMatch(
-                                code,
-                              )) {
-                            return l10n
-                                .verificationCodeLength;
-                          }
-
-                          return null;
-                        },
-                      ),
-                    ],
-
                     const SizedBox(
                       height: 20,
                     ),
 
                     _InputLabel(
-                      label:
-                      l10n.password,
+                      label: l10n
+                          .verificationCode,
                     ),
 
                     const SizedBox(
@@ -602,33 +439,113 @@ class _AuthPageState
 
                     TextFormField(
                       controller:
-                      _passwordController,
-                      obscureText:
-                      _obscurePassword,
+                      _codeController,
+                      keyboardType:
+                      TextInputType.number,
                       textInputAction:
-                      TextInputAction.done,
-                      onFieldSubmitted:
-                          (_) => _submit(),
+                      TextInputAction.next,
+                      maxLength: 6,
                       decoration:
                       _inputDecoration(
                         context,
-                        hintText: _isLogin
-                            ? l10n
-                            .passwordHintLogin
-                            : l10n
-                            .passwordHintRegister,
+                        hintText: l10n
+                            .verificationCodeHint,
                         icon: Icons
-                            .lock_outline_rounded,
+                            .verified_outlined,
+                        suffix:
+                        TextButton(
+                          onPressed:
+                          _countdown >
+                              0 ||
+                              _isSendingCode
+                              ? null
+                              : _sendCode,
+                          child:
+                          _isSendingCode
+                              ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child:
+                            CircularProgressIndicator(
+                              strokeWidth:
+                              2,
+                            ),
+                          )
+                              : Text(
+                            _countdown >
+                                0
+                                ? '${_countdown}s'
+                                : l10n
+                                .getVerificationCode,
+                          ),
+                        ),
+                      ).copyWith(
+                        counterText: '',
+                      ),
+                      validator:
+                          (value) {
+                        final code =
+                            value?.trim() ??
+                                '';
+
+                        if (code
+                            .isEmpty) {
+                          return l10n
+                              .verificationCodeRequired;
+                        }
+
+                        if (code.length !=
+                            6 ||
+                            !RegExp(
+                              r'^\d{6}$',
+                            ).hasMatch(
+                              code,
+                            )) {
+                          return l10n
+                              .verificationCodeLength;
+                        }
+
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(
+                      height: 20,
+                    ),
+
+                    _InputLabel(
+                      label: l10n
+                          .newPassword,
+                    ),
+
+                    const SizedBox(
+                      height: 8,
+                    ),
+
+                    TextFormField(
+                      controller:
+                      _newPasswordController,
+                      obscureText:
+                      _obscureNewPassword,
+                      textInputAction:
+                      TextInputAction.next,
+                      decoration:
+                      _inputDecoration(
+                        context,
+                        hintText: l10n
+                            .newPasswordHint,
+                        icon:
+                        Icons.lock_outline,
                         suffix:
                         IconButton(
                           onPressed: () {
                             setState(() {
-                              _obscurePassword =
-                              !_obscurePassword;
+                              _obscureNewPassword =
+                              !_obscureNewPassword;
                             });
                           },
                           icon: Icon(
-                            _obscurePassword
+                            _obscureNewPassword
                                 ? Icons
                                 .visibility_outlined
                                 : Icons
@@ -642,7 +559,7 @@ class _AuthPageState
                             null ||
                             value.isEmpty) {
                           return l10n
-                              .passwordRequired;
+                              .newPasswordRequired;
                         }
 
                         if (value.length <
@@ -661,28 +578,74 @@ class _AuthPageState
                       },
                     ),
 
-                    if (_isLogin) ...[
-                      const SizedBox(
-                        height: 8,
-                      ),
+                    const SizedBox(
+                      height: 20,
+                    ),
 
-                      Align(
-                        alignment:
-                        Alignment.centerRight,
-                        child:
-                        TextButton(
-                          onPressed:
-                          _openForgotPassword,
-                          child: Text(
-                            l10n
-                                .forgotPassword,
+                    _InputLabel(
+                      label: l10n
+                          .confirmPassword,
+                    ),
+
+                    const SizedBox(
+                      height: 8,
+                    ),
+
+                    TextFormField(
+                      controller:
+                      _confirmPasswordController,
+                      obscureText:
+                      _obscureConfirmPassword,
+                      textInputAction:
+                      TextInputAction.done,
+                      onFieldSubmitted:
+                          (_) => _submit(),
+                      decoration:
+                      _inputDecoration(
+                        context,
+                        hintText: l10n
+                            .confirmPasswordHint,
+                        icon:
+                        Icons.lock_person_outlined,
+                        suffix:
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword =
+                              !_obscureConfirmPassword;
+                            });
+                          },
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons
+                                .visibility_outlined
+                                : Icons
+                                .visibility_off_outlined,
                           ),
                         ),
                       ),
-                    ],
+                      validator:
+                          (value) {
+                        if (value ==
+                            null ||
+                            value.isEmpty) {
+                          return l10n
+                              .confirmPasswordRequired;
+                        }
+
+                        if (value !=
+                            _newPasswordController
+                                .text) {
+                          return l10n
+                              .passwordsDoNotMatch;
+                        }
+
+                        return null;
+                      },
+                    ),
 
                     const SizedBox(
-                      height: 20,
+                      height: 28,
                     ),
 
                     SizedBox(
@@ -692,7 +655,7 @@ class _AuthPageState
                       child:
                       FilledButton(
                         onPressed:
-                        _isLoading
+                        _isSubmitting
                             ? null
                             : _submit,
                         style:
@@ -708,7 +671,7 @@ class _AuthPageState
                           ),
                         ),
                         child:
-                        _isLoading
+                        _isSubmitting
                             ? const SizedBox(
                           width: 22,
                           height: 22,
@@ -721,11 +684,8 @@ class _AuthPageState
                           ),
                         )
                             : Text(
-                          _isLogin
-                              ? l10n
-                              .login
-                              : l10n
-                              .register,
+                          l10n
+                              .resetPassword,
                           style:
                           const TextStyle(
                             fontSize:
@@ -733,27 +693,6 @@ class _AuthPageState
                             fontWeight:
                             FontWeight.w600,
                           ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 24,
-                    ),
-
-                    Center(
-                      child:
-                      TextButton(
-                        onPressed: () =>
-                            _switchMode(
-                              !_isLogin,
-                            ),
-                        child: Text(
-                          _isLogin
-                              ? l10n
-                              .noAccountRegister
-                              : l10n
-                              .haveAccountLogin,
                         ),
                       ),
                     ),
@@ -873,82 +812,6 @@ class _InputLabel
         fontSize: 14,
         fontWeight:
         FontWeight.w600,
-      ),
-    );
-  }
-}
-
-class _ModeButton
-    extends StatelessWidget {
-  final String title;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _ModeButton({
-    required this.title,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(
-      BuildContext context,
-      ) {
-    final theme =
-    Theme.of(context);
-
-    return Expanded(
-      child: GestureDetector(
-        onTap:
-        onTap,
-        child:
-        AnimatedContainer(
-          duration:
-          const Duration(
-            milliseconds: 200,
-          ),
-          decoration:
-          BoxDecoration(
-            color: selected
-                ? theme
-                .colorScheme
-                .surface
-                : Colors.transparent,
-            borderRadius:
-            BorderRadius
-                .circular(
-              12,
-            ),
-            boxShadow: selected
-                ? [
-              BoxShadow(
-                blurRadius: 8,
-                offset:
-                const Offset(
-                  0,
-                  2,
-                ),
-                color: Colors.black
-                    .withValues(
-                  alpha: 0.06,
-                ),
-              ),
-            ]
-                : null,
-          ),
-          alignment:
-          Alignment.center,
-          child: Text(
-            title,
-            style:
-            TextStyle(
-              fontWeight:
-              selected
-                  ? FontWeight.w600
-                  : FontWeight.normal,
-            ),
-          ),
-        ),
       ),
     );
   }

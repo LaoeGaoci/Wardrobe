@@ -40,7 +40,7 @@
   "verificationCodeRequired": "Please enter the verification code",
   "invalidVerificationCode": "Invalid verification code",
   "verificationCodeLength": "The verification code must be 6 digits",
-  "verificationCodeSent": "Verification code sent",
+  "verificationCodeSent": "Verification code sent. Please check your inbox",
   "password": "Password",
   "passwordHintLogin": "Enter your password",
   "passwordHintRegister": "Set a password (at least 8 characters)",
@@ -389,5 +389,25 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "forgotPasswordTitle": "Forgot Password",
+  "resetYourPassword": "Reset your password",
+  "forgotPasswordSubtitle": "Enter your registered email and we will send you a verification code.",
+  "passwordResetCodeSent": "If this email is registered, a verification code has been sent. Please check your inbox.",
+  "newPassword": "New password",
+  "newPasswordHint": "Enter a new password (at least 8 characters)",
+  "newPasswordRequired": "Please enter a new password",
+  "confirmPassword": "Confirm new password",
+  "confirmPasswordHint": "Enter the new password again",
+  "confirmPasswordRequired": "Please confirm your new password",
+  "passwordsDoNotMatch": "The passwords do not match",
+  "resetPassword": "Reset Password",
+  "passwordResetSuccess": "Password reset successfully. Please sign in with your new password.",
+  "invalidOrExpiredVerificationCode": "The verification code is invalid or has expired",
+  "tooManyVerificationAttempts": "Too many incorrect verification attempts. Please request a new code.",
+  "verificationCodeRequestTooFrequent": "Please wait before requesting another verification code",
+  "verificationEmailSendFailed": "Failed to send the verification email. Please try again later.",
+  "newPasswordMustBeDifferent": "The new password must be different from the current password",
+  "currentPasswordIncorrect": "The current password is incorrect"
 }
