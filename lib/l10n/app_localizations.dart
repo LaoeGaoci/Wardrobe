@@ -1395,6 +1395,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The server returned invalid data'**
   String get serverDataInvalid;
+
+  /// No description provided for @accountSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountSection;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete your account and related data'**
+  String get deleteAccountSubtitle;
+
+  /// No description provided for @deleteAccountDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile, clothing, friendships, and recommendation history will be permanently deleted. This action cannot be undone.'**
+  String get deleteAccountDescription;
+
+  /// No description provided for @deleteAccountEmailPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter {email} to confirm account deletion.'**
+  String deleteAccountEmailPrompt(String email);
+
+  /// No description provided for @deleteAccountEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your account email'**
+  String get deleteAccountEmailHint;
 }
 
 class _AppLocalizationsDelegate

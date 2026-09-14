@@ -376,5 +376,18 @@
         "type": "String"
       }
     }
+  },
+  "accountSection": "Account",
+  "deleteAccount": "Delete Account",
+  "deleteAccountSubtitle": "Permanently delete your account and related data",
+  "deleteAccountDescription": "Your profile, clothing, friendships, and recommendation history will be permanently deleted. This action cannot be undone.",
+  "deleteAccountEmailPrompt": "Enter {email} to confirm account deletion.",
+  "deleteAccountEmailHint": "Enter your account email",
+  "@deleteAccountEmailPrompt": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
   }
 }

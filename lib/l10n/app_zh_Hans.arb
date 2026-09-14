@@ -215,5 +215,11 @@
   "recommendationNotFound": "推荐不存在或你没有查看权限",
   "recommendationItemNotFound": "推荐中的衣物已经不存在",
   "recommendationImageNotFound": "推荐中的衣物图片已经不存在",
-  "serverDataInvalid": "服务器返回的数据格式不正确"
+  "serverDataInvalid": "服务器返回的数据格式不正确",
+  "accountSection": "账户",
+  "deleteAccount": "注销账户",
+  "deleteAccountSubtitle": "永久删除账户及相关数据",
+  "deleteAccountDescription": "注销后，你的个人资料、衣物、好友关系和推荐记录将被永久删除，且无法恢复。",
+  "deleteAccountEmailPrompt": "请输入邮箱 {email} 以确认注销账户。",
+  "deleteAccountEmailHint": "请输入当前账户邮箱"
 }
