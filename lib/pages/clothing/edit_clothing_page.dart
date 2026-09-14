@@ -56,6 +56,7 @@ class _EditClothingPageState
     '外套',
     '羽绒服',
     '裤子',
+    '帽子',
     '鞋子',
     '配饰',
   ];

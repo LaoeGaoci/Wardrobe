@@ -9,6 +9,8 @@ import '../profile/profile.dart';
 import 'recommendation_envelope_dialog.dart';
 import 'wardrobe_page.dart';
 
+import '../../services/friend_service.dart';
+
 class HomePage
     extends StatefulWidget {
   final ValueChanged<bool>
@@ -35,6 +37,9 @@ class _HomePageState
   _recommendationService =
       RecommendationService.instance;
 
+  final FriendService _friendService =
+      FriendService.instance;
+
   /// 防止连续点击最上面的信封，
   /// 同时打开多个 Dialog。
   bool _openingRecommendation =
@@ -52,14 +57,27 @@ class _HomePageState
       _onRecommendationChanged,
     );
 
+    _friendService.addListener(
+      _onFriendChanged,
+    );
+
     /// HomePage 建立完成以后
     /// 再访问服务器。
     WidgetsBinding.instance
         .addPostFrameCallback(
           (_) {
         _refreshUnreadRecommendations();
+        _refreshFriendRequests();
       },
     );
+  }
+
+  void _onFriendChanged() {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {});
   }
 
   @override
@@ -68,7 +86,9 @@ class _HomePageState
         .removeListener(
       _onRecommendationChanged,
     );
-
+    _friendService.removeListener(
+      _onFriendChanged,
+    );
     super.dispose();
   }
 
@@ -138,6 +158,15 @@ class _HomePageState
     }
   }
 
+  Future<void> _refreshFriendRequests() async {
+    try {
+      await _friendService
+          .refreshReceivedRequests();
+    } on FriendException {
+      // 好友申请数量同步失败
+      // 不应该阻塞主页使用。
+    }
+  }
   // ============================================================
   // Open current top envelope
   // ============================================================
@@ -226,6 +255,26 @@ class _HomePageState
     }
   }
 
+  Widget _buildFriendNavigationIcon({
+    required bool selected,
+  }) {
+    final requestCount =
+        _friendService.receivedRequestCount;
+
+    return Badge(
+      isLabelVisible: requestCount > 0,
+      label: Text(
+        requestCount > 99
+            ? '99+'
+            : '$requestCount',
+      ),
+      child: Icon(
+        selected
+            ? Icons.people
+            : Icons.people_outline,
+      ),
+    );
+  }
   // ============================================================
   // Build
   // ============================================================
@@ -294,47 +343,38 @@ class _HomePageState
         onDestinationSelected:
         _selectDestination,
 
-        destinations:
-        const [
-          NavigationDestination(
-            icon: Icon(
-              Icons
-                  .checkroom_outlined,
+          destinations: [
+            const NavigationDestination(
+              icon: Icon(
+                Icons.checkroom_outlined,
+              ),
+              selectedIcon: Icon(
+                Icons.checkroom,
+              ),
+              label: '衣柜',
             ),
-            selectedIcon:
-            Icon(
-              Icons.checkroom,
-            ),
-            label:
-            '衣柜',
-          ),
 
-          NavigationDestination(
-            icon: Icon(
-              Icons
-                  .people_outline,
+            NavigationDestination(
+              icon: _buildFriendNavigationIcon(
+                selected: false,
+              ),
+              selectedIcon:
+              _buildFriendNavigationIcon(
+                selected: true,
+              ),
+              label: '好友',
             ),
-            selectedIcon:
-            Icon(
-              Icons.people,
-            ),
-            label:
-            '好友',
-          ),
 
-          NavigationDestination(
-            icon: Icon(
-              Icons
-                  .person_outline,
+            const NavigationDestination(
+              icon: Icon(
+                Icons.person_outline,
+              ),
+              selectedIcon: Icon(
+                Icons.person,
+              ),
+              label: '我的',
             ),
-            selectedIcon:
-            Icon(
-              Icons.person,
-            ),
-            label:
-            '我的',
-          ),
-        ],
+          ],
       ),
     );
   }
