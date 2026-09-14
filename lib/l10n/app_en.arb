@@ -1,0 +1,380 @@
+{
+  "@@locale": "en",
+  "appTitle": "Wardrobe",
+  "wardrobe": "Wardrobe",
+  "friends": "Friends",
+  "profile": "Me",
+  "profileTitle": "Profile",
+  "settings": "Settings",
+  "about": "About",
+  "save": "Save",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "delete": "Delete",
+  "reload": "Reload",
+  "close": "Close",
+  "preferences": "Preferences",
+  "notifications": "Notifications",
+  "notificationsSubtitle": "Receive outfit reminders",
+  "darkMode": "Dark Mode",
+  "darkModeSubtitle": "Use dark appearance",
+  "appSection": "App",
+  "language": "Language",
+  "logout": "Log Out",
+  "logoutConfirm": "Are you sure you want to log out?",
+  "aboutDescription": "Your personal digital wardrobe.",
+  "version": "Version {version}",
+  "welcomeBack": "Welcome back",
+  "createAccount": "Create account",
+  "loginSubtitle": "Sign in to your wardrobe and keep managing your outfits.",
+  "registerSubtitle": "Create an account and start organizing your personal wardrobe.",
+  "login": "Log In",
+  "register": "Register",
+  "email": "Email",
+  "emailHint": "Enter your email address",
+  "emailRequired": "Please enter your email",
+  "invalidEmail": "Please enter a valid email address",
+  "verificationCode": "Verification code",
+  "verificationCodeHint": "Enter the verification code",
+  "getVerificationCode": "Get code",
+  "verificationCodeRequired": "Please enter the verification code",
+  "invalidVerificationCode": "Invalid verification code",
+  "verificationCodeLength": "The verification code must be 6 digits",
+  "verificationCodeSent": "Verification code sent",
+  "password": "Password",
+  "passwordHintLogin": "Enter your password",
+  "passwordHintRegister": "Set a password (at least 8 characters)",
+  "passwordRequired": "Please enter your password",
+  "passwordMinLength": "Password must be at least 8 characters",
+  "forgotPassword": "Forgot password?",
+  "noAccountRegister": "Don't have an account? Register now",
+  "haveAccountLogin": "Already have an account? Back to login",
+  "operationFailed": "Operation failed. Please try again later.",
+  "myWardrobe": "My Wardrobe",
+  "searchClothing": "Search clothes",
+  "noClothing": "No clothes yet",
+  "rearCameraNotFound": "Rear camera not found",
+  "wardrobeLoadFailed": "Failed to load wardrobe",
+  "categoryAll": "All",
+  "categoryTop": "Tops",
+  "categoryCoat": "Coats",
+  "categoryDownJacket": "Down Jackets",
+  "categoryPants": "Pants",
+  "categoryHat": "Hats",
+  "categoryShoes": "Shoes",
+  "categoryAccessories": "Accessories",
+  "seasonSpring": "Spring",
+  "seasonSummer": "Summer",
+  "seasonAutumn": "Autumn",
+  "seasonWinter": "Winter",
+  "captureClothing": "Photograph Clothing",
+  "cameraOpenFailed": "Unable to open camera: {error}",
+  "takePhotoFailed": "Failed to take photo: {error}",
+  "addClothing": "Add Clothing",
+  "name": "Name",
+  "nameExample": "e.g. White T-shirt",
+  "clothingNameRequired": "Please enter a clothing name",
+  "nameMax100": "Name cannot exceed 100 characters",
+  "brand": "Brand",
+  "optional": "Optional",
+  "leaveBlank": "Optional",
+  "brandMax100": "Brand cannot exceed 100 characters",
+  "category": "Category",
+  "color": "Color",
+  "colorExample": "e.g. White",
+  "colorRequired": "Please enter a color",
+  "season": "Season",
+  "price": "Price",
+  "validPrice": "Please enter a valid price",
+  "createClothing": "Create Clothing",
+  "retakePhoto": "Retake Photo",
+  "visibility": "Visibility",
+  "privateLabel": "Private",
+  "privateSubtitle": "Only you can see it",
+  "publicLabel": "Public",
+  "publicSubtitle": "Friends can see it",
+  "saveFailed": "Failed to save: {error}",
+  "clothingDetails": "Clothing Details",
+  "notSet": "Not set",
+  "editCard": "Edit Card",
+  "replaceClothingImage": "Replace clothing image",
+  "takePhoto": "Take Photo",
+  "chooseFromGallery": "Choose from Gallery",
+  "imageSelectFailed": "Failed to select image: {error}",
+  "saving": "Saving",
+  "saveChanges": "Save Changes",
+  "clothingImage": "Clothing Image",
+  "changeImage": "Change Image",
+  "reselectImage": "Choose Another Image",
+  "friendRequests": "Friend Requests",
+  "requestRejected": "Friend request rejected",
+  "becameFriends": "{username} is now your friend",
+  "noFriendRequests": "No friend requests",
+  "accept": "Accept",
+  "reject": "Reject",
+  "onlyFriendsCanRecommend": "Only friends can send clothing recommendations",
+  "selectAtLeastOne": "Please select at least one clothing item",
+  "recommendationSent": "Clothing recommendation sent",
+  "friendWardrobe": "{username}'s Wardrobe",
+  "recommend": "Recommend",
+  "selectClothing": "Select clothing",
+  "recommendItemCount": "Recommend {count} items",
+  "noPublicClothing": "This wardrobe has no public clothing yet",
+  "onlyPublicVisible": "Only Public clothing can be viewed by friends.",
+  "recommendationFor": "Recommendation for {username}",
+  "selectedItems": "{count} items selected",
+  "recommendationMessageHint": "Leave a note, for example: It's getting cooler this week, remember to wear these.",
+  "recommendationMessageRequired": "Please enter a recommendation message",
+  "sendRecommendation": "Send Recommendation",
+  "recommendationHistory": "Recommendation History",
+  "searchUserOrEmail": "Search username or email",
+  "noUserFound": "No users found",
+  "trySearchUserOrEmail": "Try searching by username or email",
+  "noFriends": "No friends yet",
+  "searchAndAddFriends": "Search for users and add some friends",
+  "statusFriend": "Friend",
+  "statusRequested": "Requested",
+  "statusPending": "Pending",
+  "receivedRecommendations": "Received",
+  "sentRecommendations": "Sent",
+  "noReceivedRecommendations": "No recommendations received yet",
+  "receivedRecommendationsHint": "Clothing recommendations from friends will appear here",
+  "noSentRecommendations": "No recommendations sent yet",
+  "sentRecommendationsHint": "Clothing recommendations you sent to friends will appear here",
+  "read": "Read",
+  "unread": "Unread",
+  "recipientRead": "Read by recipient",
+  "recipientUnread": "Unread by recipient",
+  "clothingCount": "{count} items",
+  "sentTo": "Sent to {username}",
+  "justNow": "Just now",
+  "minutesAgo": "{count} minutes ago",
+  "hoursAgo": "{count} hours ago",
+  "recommendationFrom": "Recommendation from {username}",
+  "recommendationTo": "Recommendation sent to {username}",
+  "recommendedClothing": "Recommended Clothing",
+  "itemCount": "{count} items",
+  "recommendationClothingMissing": "The recommended clothing no longer exists",
+  "userProfile": "User Profile",
+  "addFriend": "Add Friend",
+  "introduceYourself": "Introduce yourself",
+  "sendRequest": "Send Request",
+  "requestSentTitle": "Request Sent",
+  "requestSentBody": "Your friend request has been sent. Waiting for approval.",
+  "setRemark": "Set Remark",
+  "remarkHint": "Enter a remark for this friend",
+  "deleteFriend": "Remove Friend",
+  "deleteFriendConfirm": "Are you sure you want to remove {username}?",
+  "pendingCancelNotFound": "No pending friend request was found",
+  "alreadyFriends": "You are already friends",
+  "friendRequestSent": "Friend request sent",
+  "waitingApproval": "Waiting for approval",
+  "receivedFriendRequest": "Friend request received",
+  "friendRequestReceivedSubtitle": "This user has sent you a friend request",
+  "notFriendsYet": "Not friends yet",
+  "canSendFriendRequest": "You can send a friend request",
+  "cancelRequest": "Cancel Request",
+  "processFriendRequests": "Review Friend Requests",
+  "viewWardrobe": "View Wardrobe",
+  "remarkValue": "Remark: {remark}",
+  "removeFriend": "Remove Friend",
+  "recommendationLoadFailed": "Failed to load recommendations: {error}",
+  "recommendationLetterFrom": "Recommendation letter from {username}",
+  "tapOpenLetter": "Tap to open this recommendation",
+  "unreadRecommendations": "{count} unread recommendations",
+  "receivedClothingRecommendation": "You received a clothing recommendation",
+  "senderSentLetter": "{username} sent you a letter",
+  "openLetter": "Open Letter",
+  "storingLetter": "Saving",
+  "keepLetter": "Keep This Letter",
+  "sessionExpired": "Your session has expired. Please sign in again.",
+  "userNotFound": "User not found",
+  "emailAlreadyExists": "This email is already registered",
+  "emailOrUsernameAlreadyExists": "This email or username is already in use",
+  "invalidEmailOrPassword": "Incorrect email or password",
+  "usernameAlreadyExists": "This username is already in use",
+  "usernameRequired": "Username cannot be empty",
+  "passwordMaxLength": "Password cannot exceed 128 characters",
+  "cannotAddSelf": "You cannot add yourself as a friend",
+  "userAlreadyFriend": "This user is already your friend",
+  "friendRequestAlreadySent": "Friend request already sent",
+  "userAlreadySentRequest": "This user has already sent you a friend request. Please review it first.",
+  "friendRequestNotFound": "Friend request not found or already processed",
+  "friendNotFound": "Friend relationship not found",
+  "userNotFriend": "This user is not your friend",
+  "friendRequestMessageRequired": "Please enter a friend request message",
+  "cannotAccessSelfFriendApi": "You cannot access your own wardrobe through the friend API",
+  "friendClothingUnavailable": "Friend clothing does not exist or is not visible",
+  "clothingImageNotFound": "Clothing image not found",
+  "cannotRecommendSelf": "You cannot send a recommendation to yourself",
+  "onlyRecommendFriends": "You can only recommend clothing to friends",
+  "recommendationItemsUnavailable": "Some clothing no longer exists, is private, or does not belong to this friend",
+  "recommendationMessageTooLong": "Recommendation message cannot exceed 200 characters",
+  "onlyFriendWardrobeItems": "You can only recommend clothing from your friend's wardrobe",
+  "onlyPublicItems": "You can only recommend public clothing",
+  "recommendationNotFound": "Recommendation not found or you do not have permission to view it",
+  "recommendationItemNotFound": "A recommended clothing item no longer exists",
+  "recommendationImageNotFound": "A recommended clothing image no longer exists",
+  "serverDataInvalid": "The server returned invalid data",
+  "@version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@cameraOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@takePhotoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@saveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@imageSelectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@becameFriends": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@friendWardrobe": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@recommendItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@recommendationFor": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@selectedItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@clothingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@sentTo": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@recommendationFrom": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@recommendationTo": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@itemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@deleteFriendConfirm": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@remarkValue": {
+    "placeholders": {
+      "remark": {
+        "type": "String"
+      }
+    }
+  },
+  "@recommendationLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@recommendationLetterFrom": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@unreadRecommendations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@senderSentLetter": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  }
+}
