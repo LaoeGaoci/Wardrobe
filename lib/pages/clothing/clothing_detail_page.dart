@@ -8,8 +8,7 @@ import '../../widgets/info_row.dart';
 import '../../widgets/wardrobe_image.dart';
 import 'edit_clothing_page.dart';
 
-class ClothingDetailPage
-    extends StatefulWidget {
+class ClothingDetailPage extends StatefulWidget {
   final Clothing clothing;
 
   const ClothingDetailPage({
@@ -18,140 +17,93 @@ class ClothingDetailPage
   });
 
   @override
-  State<ClothingDetailPage>
-  createState() =>
+  State<ClothingDetailPage> createState() =>
       _ClothingDetailPageState();
 }
 
-class _ClothingDetailPageState
-    extends State<ClothingDetailPage> {
+class _ClothingDetailPageState extends State<ClothingDetailPage> {
   late Clothing _clothing;
 
-  final ClothingRepository
-  _repository =
-      ClothingRepository.instance;
+  final ClothingRepository _repository = ClothingRepository.instance;
 
   bool _deleting = false;
 
   @override
   void initState() {
     super.initState();
-
-    _clothing =
-        widget.clothing;
+    _clothing = widget.clothing;
   }
 
-  // ============================================================
-  // Edit
-  // ============================================================
-
-  Future<void> _editCard()
-  async {
-    final updated =
-    await Navigator.push<
-        Clothing>(
+  Future<void> _editCard() async {
+    final updated = await Navigator.push<Clothing>(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            EditClothingPage(
-              clothing:
-              _clothing,
-            ),
+        builder: (_) => EditClothingPage(
+          clothing: _clothing,
+        ),
       ),
     );
 
-    if (updated == null ||
-        !mounted) {
+    if (updated == null || !mounted) {
       return;
     }
 
     setState(() {
-      _clothing =
-          updated;
+      _clothing = updated;
     });
   }
 
-  // ============================================================
-  // Delete
-  // ============================================================
-
-  Future<void>
-  _deleteClothing()
-  async {
+  Future<void> _deleteClothing() async {
     if (_deleting) {
       return;
     }
 
-    final confirmed =
-    await showDialog<bool>(
+    final l10n = context.l10n;
+    final subCategory = localizedCategory(
+      context,
+      _clothing.category,
+    );
+
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (dialogContext) {
-        final colorScheme =
-            Theme.of(context)
-                .colorScheme;
+      builder: (dialogContext) {
+        final colorScheme = Theme.of(context).colorScheme;
 
         return AlertDialog(
           icon: Icon(
-            Icons
-                .delete_outline,
-            color:
-            colorScheme.error,
+            Icons.delete_outline,
+            color: colorScheme.error,
           ),
-
-          title:
-          const Text(
-            '删除衣物',
-          ),
-
+          title: Text(l10n.deleteClothing),
           content: Text(
-            '确定要删除“${_clothing.name}”吗？\n\n'
-                '删除后无法恢复。',
+            l10n.deleteClothingConfirm(
+              subCategory,
+              _clothing.location,
+            ),
           ),
-
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  false,
-                );
+                Navigator.pop(dialogContext, false);
               },
-              child:
-              const Text(
-                '取消',
-              ),
+              child: Text(l10n.cancel),
             ),
-
             FilledButton(
-              style:
-              FilledButton
-                  .styleFrom(
-                backgroundColor:
-                colorScheme
-                    .error,
-                foregroundColor:
-                colorScheme
-                    .onError,
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                foregroundColor: colorScheme.onError,
               ),
               onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  true,
-                );
+                Navigator.pop(dialogContext, true);
               },
-              child:
-              const Text(
-                '删除',
-              ),
+              child: Text(l10n.delete),
             ),
           ],
         );
       },
     );
 
-    if (confirmed != true ||
-        !mounted) {
+    if (confirmed != true || !mounted) {
       return;
     }
 
@@ -160,41 +112,28 @@ class _ClothingDetailPageState
     });
 
     try {
-      await _repository
-          .deleteClothing(
-        _clothing.id,
-      );
+      await _repository.deleteClothing(_clothing.id);
 
       if (!mounted) {
         return;
       }
 
-      Navigator.pop(
-        context,
-      );
+      Navigator.pop(context);
     } on ClothingRepositoryException catch (e) {
       if (!mounted) {
         return;
       }
 
       setState(() {
-        _deleting =
-        false;
+        _deleting = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      )
+      ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content:
-            Text(
-              e.message,
-            ),
-            behavior:
-            SnackBarBehavior
-                .floating,
+            content: Text(e.message),
+            behavior: SnackBarBehavior.floating,
           ),
         );
     } catch (_) {
@@ -203,241 +142,126 @@ class _ClothingDetailPageState
       }
 
       setState(() {
-        _deleting =
-        false;
+        _deleting = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      )
+      ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          const SnackBar(
-            content:
-            Text(
-              '删除衣物失败，请稍后重试',
-            ),
-            behavior:
-            SnackBarBehavior
-                .floating,
+          SnackBar(
+            content: Text(l10n.deleteClothingFailed),
+            behavior: SnackBarBehavior.floating,
           ),
         );
     }
   }
 
-  // ============================================================
-  // UI
-  // ============================================================
-
   @override
-  Widget build(
-      BuildContext context,
-      ) {
-    final l10n =
-        context.l10n;
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final subCategory = localizedCategory(
+      context,
+      _clothing.category,
+    );
+    final categoryPath = localizedCategoryPath(
+      context,
+      _clothing.category,
+    );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          l10n
-              .clothingDetails,
-        ),
+        title: Text(l10n.clothingDetails),
       ),
-
       body: ListView(
         children: [
           _buildImage(),
-
           Padding(
-            padding:
-            const EdgeInsets
-                .all(
-              20,
-            ),
+            padding: const EdgeInsets.all(20),
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _clothing
-                      .name,
-                  style:
-                  const TextStyle(
+                  subCategory,
+                  style: const TextStyle(
                     fontSize: 26,
-                    fontWeight:
-                    FontWeight
-                        .bold,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-
-                const SizedBox(
-                  height: 20,
-                ),
-
+                const SizedBox(height: 20),
                 InfoRow(
-                  title:
-                  l10n.brand,
-                  value:
-                  _clothing
-                      .brand ??
-                      l10n
-                          .notSet,
+                  title: l10n.storageLocation,
+                  value: _clothing.location,
                 ),
-
                 InfoRow(
-                  title:
-                  l10n
-                      .category,
-                  value:
-                  localizedCategory(
+                  title: l10n.brand,
+                  value: _clothing.brand ?? l10n.notSet,
+                ),
+                InfoRow(
+                  title: l10n.category,
+                  value: categoryPath,
+                ),
+                InfoRow(
+                  title: l10n.color,
+                  value: _clothing.color,
+                ),
+                InfoRow(
+                  title: l10n.season,
+                  value: localizedSeason(
                     context,
-                    _clothing
-                        .category,
+                    _clothing.season,
                   ),
                 ),
-
                 InfoRow(
-                  title:
-                  l10n.color,
-                  value:
-                  _clothing
-                      .color,
-                ),
-
-                InfoRow(
-                  title:
-                  l10n.season,
-                  value:
-                  localizedSeason(
-                    context,
-                    _clothing
-                        .season,
-                  ),
-                ),
-
-                InfoRow(
-                  title:
-                  l10n.price,
-                  value: _clothing
-                      .price ==
-                      null
-                      ? l10n
-                      .notSet
+                  title: l10n.price,
+                  value: _clothing.price == null
+                      ? l10n.notSet
                       : '¥${_clothing.price}',
                 ),
-
                 InfoRow(
-                  title:
-                  l10n
-                      .visibility,
-                  value:
-                  localizedVisibility(
+                  title: l10n.visibility,
+                  value: localizedVisibility(
                     context,
-                    _clothing
-                        .visibility,
+                    _clothing.visibility,
                   ),
                 ),
-
-                const SizedBox(
-                  height: 28,
-                ),
-
+                const SizedBox(height: 28),
                 SizedBox(
-                  width:
-                  double.infinity,
-                  child:
-                  FilledButton
-                      .icon(
-                    onPressed:
-                    _deleting
-                        ? null
-                        : _editCard,
-                    icon:
-                    const Icon(
-                      Icons
-                          .edit_outlined,
-                    ),
-                    label:
-                    Text(
-                      l10n
-                          .editCard,
-                    ),
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _deleting ? null : _editCard,
+                    icon: const Icon(Icons.edit_outlined),
+                    label: Text(l10n.editCard),
                   ),
                 ),
-
-                const SizedBox(
-                  height: 12,
-                ),
-
+                const SizedBox(height: 12),
                 SizedBox(
-                  width:
-                  double.infinity,
-                  child:
-                  OutlinedButton
-                      .icon(
-                    onPressed:
-                    _deleting
-                        ? null
-                        : _deleteClothing,
-
-                    style:
-                    OutlinedButton
-                        .styleFrom(
-                      foregroundColor:
-                      Theme.of(
-                        context,
-                      )
-                          .colorScheme
-                          .error,
-
-                      side:
-                      BorderSide(
-                        color:
-                        Theme.of(
-                          context,
-                        )
-                            .colorScheme
-                            .error,
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _deleting ? null : _deleteClothing,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.error,
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.error,
                       ),
                     ),
-
-                    icon:
-                    _deleting
+                    icon: _deleting
                         ? SizedBox(
-                      width:
-                      18,
-                      height:
-                      18,
-                      child:
-                      CircularProgressIndicator(
-                        strokeWidth:
-                        2,
-                        color:
-                        Theme.of(
-                          context,
-                        )
-                            .colorScheme
-                            .error,
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Theme.of(context).colorScheme.error,
                       ),
                     )
-                        : const Icon(
-                      Icons
-                          .delete_outline,
-                    ),
-
-                    label:
-                    Text(
+                        : const Icon(Icons.delete_outline),
+                    label: Text(
                       _deleting
-                          ? '正在删除...'
-                          : '删除衣物',
+                          ? l10n.deletingClothing
+                          : l10n.deleteClothing,
                     ),
                   ),
                 ),
-
-                const SizedBox(
-                  height: 32,
-                ),
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -446,18 +270,12 @@ class _ClothingDetailPageState
     );
   }
 
-  // ============================================================
-  // Image
-  // ============================================================
-
   Widget _buildImage() {
     return WardrobeClothingImage(
       clothing: _clothing,
       height: 420,
       width: double.infinity,
       fit: BoxFit.cover,
-
-      // 详情页允许更高的解码分辨率。
       memCacheWidth: 1440,
     );
   }

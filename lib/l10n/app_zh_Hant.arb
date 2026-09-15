@@ -9,8 +9,8 @@
   "about": "關於",
   "save": "儲存",
   "cancel": "取消",
-  "confirm": "确定",
-  "delete": "删除",
+  "confirm": "確定",
+  "delete": "刪除",
   "reload": "重新載入",
   "close": "關閉",
   "preferences": "偏好設定",
@@ -24,6 +24,13 @@
   "logoutConfirm": "確定要登出嗎？",
   "aboutDescription": "你的個人數位衣櫃。",
   "version": "版本 {version}",
+  "@version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "welcomeBack": "歡迎回來",
   "createAccount": "建立帳號",
   "loginSubtitle": "登入你的衣櫃，繼續管理你的穿搭",
@@ -56,44 +63,56 @@
   "rearCameraNotFound": "找不到後置相機",
   "wardrobeLoadFailed": "衣櫃載入失敗",
   "categoryAll": "全部",
-  "categoryTop": "上衣",
-  "categoryCoat": "外套",
   "categoryDownJacket": "羽絨外套",
-  "categoryPants": "褲子",
   "categoryHat": "帽子",
-  "categoryShoes": "鞋子",
-  "categoryAccessories": "配件",
   "seasonSpring": "春季",
   "seasonSummer": "夏季",
   "seasonAutumn": "秋季",
   "seasonWinter": "冬季",
   "captureClothing": "拍攝衣物",
   "cameraOpenFailed": "無法開啟相機：{error}",
+  "@cameraOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "takePhotoFailed": "拍照失敗：{error}",
+  "@takePhotoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "addClothing": "新增衣物",
-  "name": "名稱",
-  "nameExample": "例如：白色T恤",
-  "clothingNameRequired": "請輸入衣物名稱",
-  "nameMax100": "名稱不能超過100個字元",
   "brand": "品牌",
   "optional": "選填",
   "leaveBlank": "可留空",
   "brandMax100": "品牌不能超過100個字元",
-  "category": "分类",
+  "category": "分類",
   "color": "顏色",
   "colorExample": "例如：白色",
   "colorRequired": "請輸入顏色",
-  "season": "季节",
+  "season": "季節",
   "price": "價格",
   "validPrice": "請輸入有效價格",
   "createClothing": "建立衣物",
-  "retakePhoto": "重新拍摄",
+  "retakePhoto": "重新拍攝",
   "visibility": "可見性",
-  "privateLabel": "Private",
+  "privateLabel": "私密",
   "privateSubtitle": "只有你可以看到",
-  "publicLabel": "Public",
+  "publicLabel": "公開",
   "publicSubtitle": "好友可以看到",
   "saveFailed": "儲存失敗：{error}",
+  "@saveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "clothingDetails": "衣物詳情",
   "notSet": "未設定",
   "editCard": "編輯卡片",
@@ -101,28 +120,70 @@
   "takePhoto": "拍照",
   "chooseFromGallery": "從相簿選擇",
   "imageSelectFailed": "選擇圖片失敗：{error}",
+  "@imageSelectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "saving": "正在儲存",
   "saveChanges": "儲存修改",
-  "clothingImage": "衣物图片",
+  "clothingImage": "衣物圖片",
   "changeImage": "更換圖片",
   "reselectImage": "重新選擇圖片",
   "friendRequests": "好友申請",
   "requestRejected": "已拒絕好友申請",
   "becameFriends": "{username} 已成為你的好友",
+  "@becameFriends": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "noFriendRequests": "暫無好友申請",
   "accept": "同意",
-  "reject": "拒绝",
+  "reject": "拒絕",
   "onlyFriendsCanRecommend": "只有好友之間才能進行衣物推薦",
   "selectAtLeastOne": "請至少選擇一件衣物",
   "recommendationSent": "衣物推薦已傳送",
   "friendWardrobe": "{username}的衣櫃",
-  "recommend": "推荐",
+  "@friendWardrobe": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "recommend": "推薦",
   "selectClothing": "請選擇衣物",
-  "recommendItemCount": "推荐 {count} 件衣物",
+  "recommendItemCount": "推薦 {count} 件衣物",
+  "@recommendItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noPublicClothing": "這個衣櫃暫時沒有公開衣物",
-  "onlyPublicVisible": "只有設定為 Public 的衣物才能被好友看到。",
-  "recommendationFor": "给 {username} 的推荐",
-  "selectedItems": "已选择 {count} 件衣物",
+  "onlyPublicVisible": "只有設定為公開的衣物才能被好友看到。",
+  "recommendationFor": "給 {username} 的推薦",
+  "@recommendationFor": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedItems": "已選擇 {count} 件衣物",
+  "@selectedItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "recommendationMessageHint": "留一句話吧，例如：這星期天氣轉涼了，記得穿這些衣服。",
   "recommendationMessageRequired": "請輸入推薦留言",
   "sendRecommendation": "傳送推薦",
@@ -130,30 +191,79 @@
   "searchUserOrEmail": "搜尋使用者名稱或電子郵件",
   "noUserFound": "找不到使用者",
   "trySearchUserOrEmail": "可以嘗試搜尋使用者名稱或電子郵件",
-  "noFriends": "还没有好友",
+  "noFriends": "還沒有好友",
   "searchAndAddFriends": "搜尋使用者並新增好友吧",
   "statusFriend": "好友",
   "statusRequested": "已申請",
   "statusPending": "待處理",
   "receivedRecommendations": "收到的推薦",
   "sentRecommendations": "發出的推薦",
-  "noReceivedRecommendations": "还没有收到推荐",
+  "noReceivedRecommendations": "還沒有收到推薦",
   "receivedRecommendationsHint": "好友傳送給你的衣物推薦會出現在這裡",
-  "noSentRecommendations": "还没有发出推荐",
+  "noSentRecommendations": "還沒有發出推薦",
   "sentRecommendationsHint": "你傳送給好友的衣物推薦會出現在這裡",
-  "read": "已读",
-  "unread": "未读",
-  "recipientRead": "对方已读",
-  "recipientUnread": "对方未读",
+  "read": "已讀",
+  "unread": "未讀",
+  "recipientRead": "對方已讀",
+  "recipientUnread": "對方未讀",
   "clothingCount": "{count} 件衣物",
+  "@clothingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sentTo": "傳送給 {username}",
-  "justNow": "刚刚",
-  "minutesAgo": "{count} 分钟前",
-  "hoursAgo": "{count} 小时前",
+  "@sentTo": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "justNow": "剛剛",
+  "minutesAgo": "{count} 分鐘前",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count} 小時前",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "recommendationFrom": "來自 {username} 的推薦",
+  "@recommendationFrom": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "recommendationTo": "傳送給 {username} 的推薦",
-  "recommendedClothing": "推荐衣物",
+  "@recommendationTo": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "recommendedClothing": "推薦衣物",
   "itemCount": "{count} 件",
+  "@itemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "recommendationClothingMissing": "推薦的衣物已經不存在了",
   "userProfile": "使用者介紹",
   "addFriend": "新增好友",
@@ -165,25 +275,67 @@
   "remarkHint": "請輸入好友備註",
   "deleteFriend": "刪除好友",
   "deleteFriendConfirm": "確定要刪除 {username} 嗎？",
+  "@deleteFriendConfirm": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "pendingCancelNotFound": "找不到待取消的好友申請",
-  "alreadyFriends": "你们已经是好友",
+  "alreadyFriends": "你們已經是好友",
   "friendRequestSent": "好友申請已傳送",
-  "waitingApproval": "等待对方同意",
+  "waitingApproval": "等待對方同意",
   "receivedFriendRequest": "收到好友申請",
   "friendRequestReceivedSubtitle": "對方已經向你傳送好友申請",
-  "notFriendsYet": "还不是好友",
+  "notFriendsYet": "還不是好友",
   "canSendFriendRequest": "可以傳送好友申請",
   "cancelRequest": "取消申請",
   "processFriendRequests": "前往處理好友申請",
   "viewWardrobe": "查看衣櫃",
   "remarkValue": "備註：{remark}",
+  "@remarkValue": {
+    "placeholders": {
+      "remark": {
+        "type": "String"
+      }
+    }
+  },
   "removeFriend": "刪除好友",
   "recommendationLoadFailed": "推薦載入失敗：{error}",
+  "@recommendationLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "recommendationLetterFrom": "來自 {username} 的推薦信",
+  "@recommendationLetterFrom": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "tapOpenLetter": "點擊拆開這封推薦信",
   "unreadRecommendations": "還有 {count} 封未讀推薦",
+  "@unreadRecommendations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "receivedClothingRecommendation": "你收到一封衣物推薦",
   "senderSentLetter": "{username} 給你寄來了一封信",
+  "@senderSentLetter": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "openLetter": "拆開信件",
   "storingLetter": "正在收好",
   "keepLetter": "收好這封信",
@@ -194,9 +346,9 @@
   "invalidEmailOrPassword": "電子郵件或密碼錯誤",
   "usernameAlreadyExists": "此使用者名稱已被使用",
   "usernameRequired": "使用者名稱不能為空",
-  "passwordMaxLength": "密码不能超过 128 位",
+  "passwordMaxLength": "密碼不能超過 128 位",
   "cannotAddSelf": "不能將自己加為好友",
-  "userAlreadyFriend": "对方已经是你的好友",
+  "userAlreadyFriend": "對方已經是你的好友",
   "friendRequestAlreadySent": "好友申請已經傳送",
   "userAlreadySentRequest": "對方已經向你傳送好友申請，請先處理",
   "friendRequestNotFound": "好友申請不存在或已經處理",
@@ -205,7 +357,7 @@
   "friendRequestMessageRequired": "請輸入好友申請資訊",
   "cannotAccessSelfFriendApi": "不能透過好友介面存取自己的衣櫃",
   "friendClothingUnavailable": "好友衣物不存在或不可見",
-  "clothingImageNotFound": "衣物图片不存在",
+  "clothingImageNotFound": "衣物圖片不存在",
   "cannotRecommendSelf": "不能給自己傳送推薦",
   "onlyRecommendFriends": "只能給好友傳送衣物推薦",
   "recommendationItemsUnavailable": "部分衣物已經不存在、已設為私密或不屬於該好友",
@@ -216,12 +368,18 @@
   "recommendationItemNotFound": "推薦中的衣物已經不存在",
   "recommendationImageNotFound": "推薦中的衣物圖片已經不存在",
   "serverDataInvalid": "伺服器回傳的資料格式不正確",
-
   "accountSection": "帳戶",
   "deleteAccount": "註銷帳戶",
   "deleteAccountSubtitle": "永久刪除帳戶及相關資料",
   "deleteAccountDescription": "註銷後，你的個人資料、衣物、好友關係和推薦記錄將被永久刪除，且無法復原。",
   "deleteAccountEmailPrompt": "請輸入電子郵件 {email} 以確認註銷帳戶。",
+  "@deleteAccountEmailPrompt": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "deleteAccountEmailHint": "請輸入目前帳戶電子郵件",
   "forgotPasswordTitle": "忘記密碼",
   "resetYourPassword": "重設密碼",
@@ -241,5 +399,111 @@
   "verificationCodeRequestTooFrequent": "請求過於頻繁，請稍後再取得驗證碼",
   "verificationEmailSendFailed": "驗證碼郵件傳送失敗，請稍後再試",
   "newPasswordMustBeDifferent": "新密碼不能與目前密碼相同",
-  "currentPasswordIncorrect": "目前密碼錯誤"
+  "currentPasswordIncorrect": "目前密碼錯誤",
+  "storageLocation": "存放位置",
+  "storageLocationExample": "例如：家／宿舍",
+  "storageLocationRequired": "請輸入存放位置",
+  "storageLocationMax100": "存放位置不能超過100個字元",
+  "selectCategoryTitle": "選擇分類",
+  "searchCategoryHint": "搜尋分類",
+  "noCategoryResults": "沒有符合的分類",
+  "editClothing": "編輯衣物",
+  "deleteClothing": "刪除衣物",
+  "deletingClothing": "正在刪除...",
+  "deleteClothingFailed": "刪除衣物失敗，請稍後再試",
+  "deleteClothingConfirm": "確定要刪除這件「{category}」嗎？\n\n存放位置：{location}\n刪除後無法復原。",
+  "@deleteClothingConfirm": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryGroupTops": "上裝",
+  "categoryGroupBottoms": "下裝",
+  "categoryGroupOnePiece": "連身裝",
+  "categoryGroupSets": "套裝",
+  "categoryGroupUnderwear": "內衣",
+  "categoryGroupFootwear": "鞋靴",
+  "categoryGroupAccessories": "配件",
+  "categoryTshirt": "T恤",
+  "categoryShirt": "襯衫",
+  "categoryPolo": "Polo衫",
+  "categoryTank": "背心／細肩帶上衣",
+  "categorySweatshirt": "運動衫／帽T",
+  "categoryKnitwear": "毛衣／針織衫",
+  "categoryCardigan": "開襟衫",
+  "categoryVest": "背心外套",
+  "categoryBlazer": "西裝外套",
+  "categoryJacket": "夾克",
+  "categoryTrench": "風衣",
+  "categoryLongCoat": "大衣",
+  "categoryPaddedJacket": "鋪棉外套",
+  "categoryShellJacket": "機能外套",
+  "categoryLeatherJacket": "皮衣",
+  "categorySunProtective": "防曬外套",
+  "categoryOtherTops": "其他上裝",
+  "categoryJeans": "牛仔褲",
+  "categoryDressPants": "西裝褲",
+  "categoryCasualPants": "休閒褲",
+  "categoryCargoPants": "工裝褲",
+  "categorySweatpants": "運動褲",
+  "categoryLeggings": "內搭褲",
+  "categoryWideLegPants": "寬褲",
+  "categoryShorts": "短褲",
+  "categorySkirt": "半身裙",
+  "categoryCulottes": "裙褲",
+  "categoryOtherBottoms": "其他下裝",
+  "categoryDress": "連身裙",
+  "categoryGown": "禮服",
+  "categoryJumpsuit": "連身褲",
+  "categoryRomper": "連身短褲",
+  "categoryOveralls": "吊帶褲",
+  "categoryPinafore": "吊帶裙",
+  "categoryBodysuit": "連身衣",
+  "categoryOtherOnePiece": "其他連身裝",
+  "categorySuitSet": "西裝套裝",
+  "categoryCasualSet": "休閒套裝",
+  "categoryTracksuit": "運動套裝",
+  "categoryKnitSet": "針織套裝",
+  "categoryPajamaSet": "睡衣套裝",
+  "categoryLoungewear": "居家服",
+  "categorySwimwear": "泳裝",
+  "categoryOtherSets": "其他套裝",
+  "categoryBra": "胸罩",
+  "categoryBriefs": "內褲",
+  "categoryUndershirt": "內衣上衣",
+  "categoryBaseLayerTop": "內搭上衣",
+  "categoryBaseLayerBottom": "內搭褲",
+  "categoryShapewear": "塑身衣",
+  "categorySocks": "襪子",
+  "categoryTights": "褲襪",
+  "categoryStockings": "長筒襪",
+  "categoryOtherUnderwear": "其他內衣",
+  "categorySneakers": "運動鞋",
+  "categoryCasualShoes": "休閒鞋",
+  "categoryCanvasShoes": "帆布鞋",
+  "categoryDressShoes": "正裝鞋",
+  "categoryLoafers": "樂福鞋",
+  "categoryHeels": "高跟鞋",
+  "categoryFlats": "平底鞋",
+  "categorySandals": "涼鞋",
+  "categorySlippers": "拖鞋",
+  "categoryAnkleBoots": "短靴",
+  "categoryTallBoots": "長靴",
+  "categoryRainBoots": "雨靴",
+  "categoryHikingShoes": "登山鞋",
+  "categoryOtherFootwear": "其他鞋靴",
+  "categoryHeadwear": "頭飾",
+  "categoryScarf": "圍巾",
+  "categoryShawl": "披肩",
+  "categoryGloves": "手套",
+  "categoryBelt": "腰帶",
+  "categoryTie": "領帶",
+  "categoryBowTie": "領結",
+  "categorySleeve": "袖套",
+  "categoryOtherAccessories": "其他配件"
 }

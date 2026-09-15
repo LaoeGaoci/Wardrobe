@@ -182,25 +182,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryAll => 'All';
 
   @override
-  String get categoryTop => 'Tops';
-
-  @override
-  String get categoryCoat => 'Coats';
-
-  @override
   String get categoryDownJacket => 'Down Jackets';
 
   @override
-  String get categoryPants => 'Pants';
-
-  @override
   String get categoryHat => 'Hats';
-
-  @override
-  String get categoryShoes => 'Shoes';
-
-  @override
-  String get categoryAccessories => 'Accessories';
 
   @override
   String get seasonSpring => 'Spring';
@@ -229,18 +214,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addClothing => 'Add Clothing';
-
-  @override
-  String get name => 'Name';
-
-  @override
-  String get nameExample => 'e.g. White T-shirt';
-
-  @override
-  String get clothingNameRequired => 'Please enter a clothing name';
-
-  @override
-  String get nameMax100 => 'Name cannot exceed 100 characters';
 
   @override
   String get brand => 'Brand';
@@ -816,4 +789,296 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currentPasswordIncorrect => 'The current password is incorrect';
+
+  @override
+  String get storageLocation => 'Storage location';
+
+  @override
+  String get storageLocationExample => 'e.g. home, dormitory';
+
+  @override
+  String get storageLocationRequired => 'Please enter a storage location';
+
+  @override
+  String get storageLocationMax100 =>
+      'Storage location cannot exceed 100 characters';
+
+  @override
+  String get selectCategoryTitle => 'Select Category';
+
+  @override
+  String get searchCategoryHint => 'Search categories';
+
+  @override
+  String get noCategoryResults => 'No matching categories';
+
+  @override
+  String get editClothing => 'Edit Clothing';
+
+  @override
+  String get deleteClothing => 'Delete Clothing';
+
+  @override
+  String get deletingClothing => 'Deleting...';
+
+  @override
+  String get deleteClothingFailed =>
+      'Failed to delete clothing. Please try again later.';
+
+  @override
+  String deleteClothingConfirm(String category, String location) {
+    return 'Delete this $category?\n\nStorage location: $location\nThis action cannot be undone.';
+  }
+
+  @override
+  String get categoryGroupTops => 'Tops';
+
+  @override
+  String get categoryGroupBottoms => 'Bottoms';
+
+  @override
+  String get categoryGroupOnePiece => 'One-piece';
+
+  @override
+  String get categoryGroupSets => 'Sets';
+
+  @override
+  String get categoryGroupUnderwear => 'Underwear';
+
+  @override
+  String get categoryGroupFootwear => 'Footwear';
+
+  @override
+  String get categoryGroupAccessories => 'Accessories';
+
+  @override
+  String get categoryTshirt => 'T-Shirt';
+
+  @override
+  String get categoryShirt => 'Shirt';
+
+  @override
+  String get categoryPolo => 'Polo Shirt';
+
+  @override
+  String get categoryTank => 'Tank Top / Camisole';
+
+  @override
+  String get categorySweatshirt => 'Sweatshirt / Hoodie';
+
+  @override
+  String get categoryKnitwear => 'Sweater / Knitwear';
+
+  @override
+  String get categoryCardigan => 'Cardigan';
+
+  @override
+  String get categoryVest => 'Vest';
+
+  @override
+  String get categoryBlazer => 'Blazer';
+
+  @override
+  String get categoryJacket => 'Jacket';
+
+  @override
+  String get categoryTrench => 'Trench Coat';
+
+  @override
+  String get categoryLongCoat => 'Coat';
+
+  @override
+  String get categoryPaddedJacket => 'Padded Jacket';
+
+  @override
+  String get categoryShellJacket => 'Shell Jacket';
+
+  @override
+  String get categoryLeatherJacket => 'Leather Jacket';
+
+  @override
+  String get categorySunProtective => 'Sun-protective Jacket';
+
+  @override
+  String get categoryOtherTops => 'Other Tops';
+
+  @override
+  String get categoryJeans => 'Jeans';
+
+  @override
+  String get categoryDressPants => 'Dress Pants';
+
+  @override
+  String get categoryCasualPants => 'Casual Pants';
+
+  @override
+  String get categoryCargoPants => 'Cargo Pants';
+
+  @override
+  String get categorySweatpants => 'Sweatpants';
+
+  @override
+  String get categoryLeggings => 'Leggings';
+
+  @override
+  String get categoryWideLegPants => 'Wide-leg Pants';
+
+  @override
+  String get categoryShorts => 'Shorts';
+
+  @override
+  String get categorySkirt => 'Skirt';
+
+  @override
+  String get categoryCulottes => 'Culottes / Skort';
+
+  @override
+  String get categoryOtherBottoms => 'Other Bottoms';
+
+  @override
+  String get categoryDress => 'Dress';
+
+  @override
+  String get categoryGown => 'Formal Gown';
+
+  @override
+  String get categoryJumpsuit => 'Jumpsuit';
+
+  @override
+  String get categoryRomper => 'Romper';
+
+  @override
+  String get categoryOveralls => 'Overalls';
+
+  @override
+  String get categoryPinafore => 'Pinafore Dress';
+
+  @override
+  String get categoryBodysuit => 'Bodysuit';
+
+  @override
+  String get categoryOtherOnePiece => 'Other One-piece';
+
+  @override
+  String get categorySuitSet => 'Suit Set';
+
+  @override
+  String get categoryCasualSet => 'Casual Set';
+
+  @override
+  String get categoryTracksuit => 'Tracksuit';
+
+  @override
+  String get categoryKnitSet => 'Knit Set';
+
+  @override
+  String get categoryPajamaSet => 'Pajama Set';
+
+  @override
+  String get categoryLoungewear => 'Loungewear';
+
+  @override
+  String get categorySwimwear => 'Swimwear';
+
+  @override
+  String get categoryOtherSets => 'Other Sets';
+
+  @override
+  String get categoryBra => 'Bra';
+
+  @override
+  String get categoryBriefs => 'Underwear';
+
+  @override
+  String get categoryUndershirt => 'Undershirt';
+
+  @override
+  String get categoryBaseLayerTop => 'Base-layer Top';
+
+  @override
+  String get categoryBaseLayerBottom => 'Base-layer Bottom';
+
+  @override
+  String get categoryShapewear => 'Shapewear';
+
+  @override
+  String get categorySocks => 'Socks';
+
+  @override
+  String get categoryTights => 'Tights';
+
+  @override
+  String get categoryStockings => 'Stockings';
+
+  @override
+  String get categoryOtherUnderwear => 'Other Underwear';
+
+  @override
+  String get categorySneakers => 'Sneakers';
+
+  @override
+  String get categoryCasualShoes => 'Casual Shoes';
+
+  @override
+  String get categoryCanvasShoes => 'Canvas Shoes';
+
+  @override
+  String get categoryDressShoes => 'Dress Shoes';
+
+  @override
+  String get categoryLoafers => 'Loafers';
+
+  @override
+  String get categoryHeels => 'Heels';
+
+  @override
+  String get categoryFlats => 'Flats';
+
+  @override
+  String get categorySandals => 'Sandals';
+
+  @override
+  String get categorySlippers => 'Slippers';
+
+  @override
+  String get categoryAnkleBoots => 'Ankle Boots';
+
+  @override
+  String get categoryTallBoots => 'Tall Boots';
+
+  @override
+  String get categoryRainBoots => 'Rain Boots';
+
+  @override
+  String get categoryHikingShoes => 'Hiking Shoes';
+
+  @override
+  String get categoryOtherFootwear => 'Other Footwear';
+
+  @override
+  String get categoryHeadwear => 'Headwear';
+
+  @override
+  String get categoryScarf => 'Scarf';
+
+  @override
+  String get categoryShawl => 'Shawl';
+
+  @override
+  String get categoryGloves => 'Gloves';
+
+  @override
+  String get categoryBelt => 'Belt';
+
+  @override
+  String get categoryTie => 'Tie';
+
+  @override
+  String get categoryBowTie => 'Bow Tie';
+
+  @override
+  String get categorySleeve => 'Sleeve / Arm Cover';
+
+  @override
+  String get categoryOtherAccessories => 'Other Accessories';
 }

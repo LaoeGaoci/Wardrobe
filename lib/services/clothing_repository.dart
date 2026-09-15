@@ -15,7 +15,7 @@ class ClothingRepository {
   ClothingRepository._();
 
   static final ClothingRepository instance =
-  ClothingRepository._();
+      ClothingRepository._();
 
   final ApiClient _api =
       ApiClient.instance;
@@ -40,7 +40,7 @@ class ClothingRepository {
       );
 
       final rawClothes =
-      data['clothes'];
+          data['clothes'];
 
       if (rawClothes is! List) {
         throw const ClothingRepositoryException(
@@ -51,8 +51,8 @@ class ClothingRepository {
       final fetched = rawClothes
           .map(_parseClothing)
           .toList(
-        growable: false,
-      );
+            growable: false,
+          );
 
       _clothes
         ..clear()
@@ -74,8 +74,8 @@ class ClothingRepository {
   // ============================================================
 
   Clothing? getById(
-      String id,
-      ) {
+    String id,
+  ) {
     for (final clothing in _clothes) {
       if (clothing.id == id) {
         return clothing;
@@ -104,13 +104,13 @@ class ClothingRepository {
   /// 图片不会在这里上传。
   /// 创建成功后再调用 uploadClothingImage。
   Future<Clothing> addClothing(
-      Clothing clothing,
-      ) async {
+    Clothing clothing,
+  ) async {
     try {
       final data = await _api.post(
         '/api/clothing',
         body: {
-          'name': clothing.name,
+          'location': clothing.location,
           'brand': clothing.brand,
           'category': clothing.category,
           'color': clothing.color,
@@ -123,13 +123,13 @@ class ClothingRepository {
       );
 
       final created =
-      _parseClothing(
+          _parseClothing(
         data['clothing'],
       );
 
       _clothes.removeWhere(
-            (item) =>
-        item.id == created.id,
+        (item) =>
+            item.id == created.id,
       );
 
       _clothes.insert(
@@ -154,8 +154,8 @@ class ClothingRepository {
   ///
   /// PATCH /api/clothing/:id
   Future<Clothing> updateClothing(
-      Clothing clothing,
-      ) async {
+    Clothing clothing,
+  ) async {
     if (clothing.id.trim().isEmpty) {
       throw const ClothingRepositoryException(
         '衣物 ID 不能为空',
@@ -164,10 +164,10 @@ class ClothingRepository {
 
     try {
       final data =
-      await _api.patch(
+          await _api.patch(
         '/api/clothing/${clothing.id}',
         body: {
-          'name': clothing.name,
+          'location': clothing.location,
           'brand': clothing.brand,
           'category': clothing.category,
           'color': clothing.color,
@@ -180,7 +180,7 @@ class ClothingRepository {
       );
 
       final updated =
-      _parseClothing(
+          _parseClothing(
         data['clothing'],
       );
 
@@ -225,14 +225,14 @@ class ClothingRepository {
 
     try {
       final data =
-      await _api.putMultipartFile(
+          await _api.putMultipartFile(
         '/api/clothing/$clothingId/image',
         fieldName: 'image',
         filePath: imagePath,
       );
 
       final updated =
-      _parseClothing(
+          _parseClothing(
         data['clothing'],
       );
 
@@ -261,17 +261,11 @@ class ClothingRepository {
   ///
   /// 1. 删除 D1 clothing row
   /// 2. 删除对应 R2 图片
-  ///
-  /// Response:
-  ///
-  /// {
-  ///   "success": true
-  /// }
   Future<void> deleteClothing(
-      String clothingId,
-      ) async {
+    String clothingId,
+  ) async {
     final id =
-    clothingId.trim();
+        clothingId.trim();
 
     if (id.isEmpty) {
       throw const ClothingRepositoryException(
@@ -281,12 +275,12 @@ class ClothingRepository {
 
     try {
       final data =
-      await _api.delete(
+          await _api.delete(
         '/api/clothing/$id',
       );
 
       final success =
-      data['success'];
+          data['success'];
 
       if (success != true) {
         throw const ClothingRepositoryException(
@@ -294,11 +288,9 @@ class ClothingRepository {
         );
       }
 
-      // 服务端删除成功后，
-      // 同步清理 Flutter 本地缓存。
       _clothes.removeWhere(
-            (item) =>
-        item.id == id,
+        (item) =>
+            item.id == id,
       );
     } on ApiException catch (e) {
       throw ClothingRepositoryException(
@@ -315,12 +307,12 @@ class ClothingRepository {
   // ============================================================
 
   void _replaceCachedClothing(
-      Clothing clothing,
-      ) {
+    Clothing clothing,
+  ) {
     final index =
-    _clothes.indexWhere(
-          (item) =>
-      item.id == clothing.id,
+        _clothes.indexWhere(
+      (item) =>
+          item.id == clothing.id,
     );
 
     if (index == -1) {
@@ -341,8 +333,8 @@ class ClothingRepository {
   // ============================================================
 
   Clothing _parseClothing(
-      dynamic value,
-      ) {
+    dynamic value,
+  ) {
     if (value is! Map) {
       throw const ClothingRepositoryException(
         '服务器返回的衣物数据格式不正确',
@@ -350,40 +342,40 @@ class ClothingRepository {
     }
 
     final json =
-    Map<String, dynamic>.from(
+        Map<String, dynamic>.from(
       value,
     );
 
     final id =
-    json['id'];
+        json['id'];
 
     final ownerId =
-    json['ownerId'];
+        json['ownerId'];
 
-    final name =
-    json['name'];
+    final location =
+        json['location'];
 
     final category =
-    json['category'];
+        json['category'];
 
     final color =
-    json['color'];
+        json['color'];
 
     final season =
-    json['season'];
+        json['season'];
 
     final visibilityRaw =
-    json['visibility'];
+        json['visibility'];
 
     final createdAtRaw =
-    json['createdAt'];
+        json['createdAt'];
 
     final updatedAtRaw =
-    json['updatedAt'];
+        json['updatedAt'];
 
     if (id is! String ||
         ownerId is! String ||
-        name is! String ||
+        location is! String ||
         category is! String ||
         color is! String ||
         season is! String ||
@@ -396,12 +388,12 @@ class ClothingRepository {
     }
 
     final createdAt =
-    DateTime.tryParse(
+        DateTime.tryParse(
       createdAtRaw,
     );
 
     final updatedAt =
-    DateTime.tryParse(
+        DateTime.tryParse(
       updatedAtRaw,
     );
 
@@ -413,7 +405,7 @@ class ClothingRepository {
     }
 
     final priceRaw =
-    json['price'];
+        json['price'];
 
     double? price;
 
@@ -429,7 +421,7 @@ class ClothingRepository {
     }
 
     final brandRaw =
-    json['brand'];
+        json['brand'];
 
     String? brand;
 
@@ -445,49 +437,45 @@ class ClothingRepository {
     }
 
     final imageUrlRaw =
-    json['imageUrl'];
+        json['imageUrl'];
 
     final imageUrl =
-    imageUrlRaw is String
-        ? imageUrlRaw
-        : '';
+        imageUrlRaw is String
+            ? imageUrlRaw
+            : '';
 
     return Clothing(
       id: id,
       ownerId: ownerId,
-
-      name: name,
+      location: location,
       brand: brand,
-
       category: category,
       color: color,
       season: season,
-
       price: price,
-
       imagePath: imageUrl,
 
       // 后端返回的 imageUrl
       // 永远作为远程图片处理。
       imageType:
-      ClothingImageType.remote,
+          ClothingImageType.remote,
 
       visibility:
-      _parseVisibility(
+          _parseVisibility(
         visibilityRaw,
       ),
 
       createdAt:
-      createdAt,
+          createdAt,
 
       updatedAt:
-      updatedAt,
+          updatedAt,
     );
   }
 
   ClothingVisibility _parseVisibility(
-      String value,
-      ) {
+    String value,
+  ) {
     switch (value) {
       case 'public':
         return ClothingVisibility.public;
@@ -503,8 +491,8 @@ class ClothingRepository {
   }
 
   String _visibilityToApi(
-      ClothingVisibility visibility,
-      ) {
+    ClothingVisibility visibility,
+  ) {
     switch (visibility) {
       case ClothingVisibility.public:
         return 'public';
@@ -519,8 +507,8 @@ class ClothingRepository {
   // ============================================================
 
   String _mapDeleteError(
-      String message,
-      ) {
+    String message,
+  ) {
     switch (message) {
       case 'Clothing not found':
         return '衣物不存在或已经被删除';
@@ -541,9 +529,9 @@ class ClothingRepositoryException
   final int? statusCode;
 
   const ClothingRepositoryException(
-      this.message, {
-        this.statusCode,
-      });
+    this.message, {
+    this.statusCode,
+  });
 
   @override
   String toString() =>
