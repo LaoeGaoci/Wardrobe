@@ -28,6 +28,7 @@ class _AddClothingPageState extends State<AddClothingPage> {
   late Future<void> _cameraInitialization;
 
   final _formKey = GlobalKey<FormState>();
+
   final _nameController = TextEditingController();
   final _brandController = TextEditingController();
   final _colorController = TextEditingController();
@@ -35,8 +36,11 @@ class _AddClothingPageState extends State<AddClothingPage> {
 
   String _selectedCategory = '上衣';
   String _selectedSeason = '春季';
+
   ClothingVisibility _visibility = ClothingVisibility.private;
+
   XFile? _capturedImage;
+
   bool _saving = false;
 
   final List<String> _categories = [
@@ -59,143 +63,270 @@ class _AddClothingPageState extends State<AddClothingPage> {
   @override
   void initState() {
     super.initState();
+
     _cameraController = CameraController(
       widget.camera,
       ResolutionPreset.high,
       enableAudio: false,
     );
-    _cameraInitialization = _cameraController.initialize();
+
+    _cameraInitialization =
+        _cameraController.initialize();
   }
 
   @override
   void dispose() {
     _cameraController.dispose();
+
     _nameController.dispose();
     _brandController.dispose();
     _colorController.dispose();
     _priceController.dispose();
+
     super.dispose();
   }
+
+  // ============================================================
+  // Camera
+  // ============================================================
 
   Future<void> _takePicture() async {
     try {
       await _cameraInitialization;
-      if (_cameraController.value.isTakingPicture) return;
 
-      final image = await _cameraController.takePicture();
-      if (!mounted) return;
+      if (_cameraController.value.isTakingPicture) {
+        return;
+      }
 
-      setState(() => _capturedImage = image);
+      final image =
+      await _cameraController.takePicture();
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _capturedImage = image;
+      });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.takePhotoFailed(e.toString()))),
+        SnackBar(
+          content: Text(
+            context.l10n.takePhotoFailed(
+              e.toString(),
+            ),
+          ),
+        ),
       );
     }
   }
 
   void _retakePicture() {
-    setState(() => _capturedImage = null);
+    setState(() {
+      _capturedImage = null;
+    });
   }
+
+  // ============================================================
+  // Save
+  // ============================================================
 
   Future<void> _saveClothing() async {
     final capturedImage = _capturedImage;
-    if (capturedImage == null) return;
-    if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _saving = true);
+    if (capturedImage == null) {
+      return;
+    }
 
-    final repository = ClothingRepository.instance;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+
+    setState(() {
+      _saving = true;
+    });
+
+    final repository =
+        ClothingRepository.instance;
+
     Clothing? created;
 
     try {
       final now = DateTime.now();
-      final rawPrice = _priceController.text.trim();
-      final price = rawPrice.isEmpty ? null : double.parse(rawPrice);
+
+      final rawPrice =
+      _priceController.text.trim();
+
+      final price = rawPrice.isEmpty
+          ? null
+          : double.parse(rawPrice);
 
       final draft = Clothing(
         id: '',
         ownerId: widget.ownerId,
+
         name: _nameController.text.trim(),
-        brand: _brandController.text.trim().isEmpty
+
+        brand:
+        _brandController.text.trim().isEmpty
             ? null
             : _brandController.text.trim(),
+
         imagePath: capturedImage.path,
+
         imageType: ClothingImageType.local,
+
         category: _selectedCategory,
+
         color: _colorController.text.trim(),
+
         season: _selectedSeason,
+
         price: price,
+
         visibility: _visibility,
+
         createdAt: now,
         updatedAt: now,
       );
 
-      created = await repository.addClothing(draft);
-      final completed = await repository.uploadClothingImage(
+      created =
+      await repository.addClothing(draft);
+
+      final completed =
+      await repository.uploadClothingImage(
         clothingId: created.id,
         imagePath: capturedImage.path,
       );
 
-      if (!mounted) return;
-      Navigator.pop(context, completed);
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.pop(
+        context,
+        completed,
+      );
     } catch (e) {
       if (created != null) {
         try {
-          await repository.deleteClothing(created.id);
+          await repository.deleteClothing(
+            created.id,
+          );
         } catch (_) {}
       }
 
-      if (!mounted) return;
-      setState(() => _saving = false);
+      if (!mounted) {
+        return;
+      }
 
-      final reason = localizedErrorMessage(context, e.toString());
+      setState(() {
+        _saving = false;
+      });
+
+      final reason =
+      localizedErrorMessage(
+        context,
+        e.toString(),
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.saveFailed(reason))),
+        SnackBar(
+          content: Text(
+            context.l10n.saveFailed(reason),
+          ),
+        ),
       );
     }
   }
 
+  // ============================================================
+  // Build
+  // ============================================================
+
   @override
   Widget build(BuildContext context) {
-    return _capturedImage != null ? _buildFormPage() : _buildCameraPage();
+    if (_capturedImage == null) {
+      return _buildCameraPage();
+    }
+
+    return _buildFormPage();
   }
+
+  // ============================================================
+  // Camera Page
+  // ============================================================
 
   Widget _buildCameraPage() {
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.captureClothing)),
+      appBar: AppBar(
+        title: Text(
+          l10n.captureClothing,
+        ),
+      ),
+
       body: FutureBuilder<void>(
         future: _cameraInitialization,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
+        builder: (
+            context,
+            snapshot,
+            ) {
+          if (snapshot.connectionState ==
+              ConnectionState.done) {
             return Stack(
               fit: StackFit.expand,
               children: [
-                CameraPreview(_cameraController),
+                CameraPreview(
+                  _cameraController,
+                ),
+
+                // 拍照按钮
                 Positioned(
-                  bottom: 32,
                   left: 0,
                   right: 0,
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: _takePicture,
-                      child: Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          border: Border.all(
-                            width: 5,
-                            color: Colors.grey.shade300,
+                  bottom: 0,
+                  child: SafeArea(
+                    minimum:
+                    const EdgeInsets.only(
+                      bottom: 24,
+                    ),
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: _takePicture,
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            border: Border.all(
+                              width: 5,
+                              color:
+                              Colors.grey.shade300,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 12,
+                                color: Colors.black
+                                    .withValues(
+                                  alpha: 0.18,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          size: 32,
-                          color: Colors.black,
+                          child: const Icon(
+                            Icons.camera_alt_rounded,
+                            size: 32,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -207,153 +338,440 @@ class _AddClothingPageState extends State<AddClothingPage> {
 
           if (snapshot.hasError) {
             return Center(
-              child: Text(l10n.cameraOpenFailed('${snapshot.error}')),
+              child: Text(
+                l10n.cameraOpenFailed(
+                  '${snapshot.error}',
+                ),
+              ),
             );
           }
 
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child:
+            CircularProgressIndicator(),
+          );
         },
       ),
     );
   }
+
+  // ============================================================
+  // Form Page
+  // ============================================================
 
   Widget _buildFormPage() {
     final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.addClothing),
-        actions: [
-          TextButton(
-            onPressed: _saving ? null : _saveClothing,
-            child: Text(l10n.save),
-          ),
-        ],
+        title: Text(
+          l10n.addClothing,
+        ),
+
+        // 不再放右上角保存按钮
+        actions: const [],
       ),
+
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          keyboardDismissBehavior:
+          ScrollViewKeyboardDismissBehavior
+              .onDrag,
+
+          padding:
+          const EdgeInsets.fromLTRB(
+            16,
+            12,
+            16,
+
+            // 给固定底部按钮留空间
+            14,
+          ),
+
           children: [
+            // 图片
             _buildImagePreview(),
+
             const SizedBox(height: 20),
+
+            // 名称
             TextFormField(
               controller: _nameController,
-              decoration: InputDecoration(
-                labelText: l10n.name,
-                hintText: l10n.nameExample,
-                border: const OutlineInputBorder(),
+              textInputAction:
+              TextInputAction.next,
+              decoration:
+              _buildInputDecoration(
+                label: l10n.name,
+                hint: l10n.nameExample,
+                icon:
+                Icons.checkroom_outlined,
               ),
               validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.clothingNameRequired;
+                if (value == null ||
+                    value.trim().isEmpty) {
+                  return l10n
+                      .clothingNameRequired;
                 }
-                if (value.trim().length > 100) {
+
+                if (value.trim().length >
+                    100) {
                   return l10n.nameMax100;
                 }
+
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 12),
+
+            // 品牌 + 颜色
+            Row(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller:
+                    _brandController,
+                    textInputAction:
+                    TextInputAction.next,
+                    decoration:
+                    _buildInputDecoration(
+                      label: l10n.brand,
+                      hint: l10n.optional,
+                      icon:
+                      Icons.sell_outlined,
+                    ),
+                    validator: (value) {
+                      if (value != null &&
+                          value
+                              .trim()
+                              .length >
+                              100) {
+                        return l10n
+                            .brandMax100;
+                      }
+
+                      return null;
+                    },
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: TextFormField(
+                    controller:
+                    _colorController,
+                    textInputAction:
+                    TextInputAction.next,
+                    decoration:
+                    _buildInputDecoration(
+                      label: l10n.color,
+                      hint:
+                      l10n.colorExample,
+                      icon:
+                      Icons.palette_outlined,
+                    ),
+                    validator: (value) {
+                      if (value == null ||
+                          value
+                              .trim()
+                              .isEmpty) {
+                        return l10n
+                            .colorRequired;
+                      }
+
+                      return null;
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // 分类 + 季节
+            Row(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child:
+                  DropdownButtonFormField<
+                      String>(
+                    initialValue:
+                    _selectedCategory,
+
+                    isExpanded: true,
+
+                    decoration:
+                    _buildInputDecoration(
+                      label: l10n.category,
+                      icon:
+                      Icons.category_outlined,
+                    ),
+
+                    items: _categories
+                        .map(
+                          (category) {
+                        return DropdownMenuItem<
+                            String>(
+                          value: category,
+                          child: Text(
+                            localizedCategory(
+                              context,
+                              category,
+                            ),
+                            overflow:
+                            TextOverflow
+                                .ellipsis,
+                          ),
+                        );
+                      },
+                    ).toList(),
+
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                      if (value ==
+                          null) {
+                        return;
+                      }
+
+                      setState(() {
+                        _selectedCategory =
+                            value;
+                      });
+                    },
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child:
+                  DropdownButtonFormField<
+                      String>(
+                    initialValue:
+                    _selectedSeason,
+
+                    isExpanded: true,
+
+                    decoration:
+                    _buildInputDecoration(
+                      label: l10n.season,
+                      icon: Icons
+                          .calendar_month_outlined,
+                    ),
+
+                    items: _seasons
+                        .map(
+                          (season) {
+                        return DropdownMenuItem<
+                            String>(
+                          value: season,
+                          child: Text(
+                            localizedSeason(
+                              context,
+                              season,
+                            ),
+                            overflow:
+                            TextOverflow
+                                .ellipsis,
+                          ),
+                        );
+                      },
+                    ).toList(),
+
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                      if (value ==
+                          null) {
+                        return;
+                      }
+
+                      setState(() {
+                        _selectedSeason =
+                            value;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // 价格
             TextFormField(
-              controller: _brandController,
-              decoration: InputDecoration(
-                labelText: l10n.brand,
-                hintText: l10n.optional,
-                border: const OutlineInputBorder(),
+              controller:
+              _priceController,
+
+              keyboardType:
+              const TextInputType
+                  .numberWithOptions(
+                decimal: true,
               ),
-              validator: (value) {
-                if (value != null && value.trim().length > 100) {
-                  return l10n.brandMax100;
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedCategory,
-              decoration: InputDecoration(
-                labelText: l10n.category,
-                border: const OutlineInputBorder(),
-              ),
-              items: _categories.map((category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(localizedCategory(context, category)),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() => _selectedCategory = value);
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _colorController,
-              decoration: InputDecoration(
-                labelText: l10n.color,
-                hintText: l10n.colorExample,
-                border: const OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.colorRequired;
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedSeason,
-              decoration: InputDecoration(
-                labelText: l10n.season,
-                border: const OutlineInputBorder(),
-              ),
-              items: _seasons.map((season) {
-                return DropdownMenuItem<String>(
-                  value: season,
-                  child: Text(localizedSeason(context, season)),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() => _selectedSeason = value);
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _priceController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                labelText: l10n.price,
-                hintText: l10n.optional,
+
+              textInputAction:
+              TextInputAction.done,
+
+              decoration:
+              _buildInputDecoration(
+                label: l10n.price,
+                hint: l10n.optional,
+                icon:
+                Icons.payments_outlined,
                 prefixText: '¥ ',
-                border: const OutlineInputBorder(),
               ),
+
               validator: (value) {
-                final text = value?.trim() ?? '';
-                if (text.isEmpty) return null;
-                final price = double.tryParse(text);
-                if (price == null || price < 0) {
+                final text =
+                    value?.trim() ?? '';
+
+                if (text.isEmpty) {
+                  return null;
+                }
+
+                final price =
+                double.tryParse(text);
+
+                if (price == null ||
+                    price < 0) {
                   return l10n.validPrice;
                 }
+
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 20),
+
             _buildVisibilitySelector(),
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _saving ? null : _saveClothing,
-              child: _saving
-                  ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-                  : Text(l10n.createClothing),
+
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+
+      // 创建衣物
+      bottomNavigationBar: SafeArea(
+        top: false,
+
+        minimum:
+        const EdgeInsets.fromLTRB(
+          16,
+          8,
+          16,
+          28,
+        ),
+
+        child: SizedBox(
+          height: 52,
+          child: FilledButton(
+            onPressed:
+            _saving
+                ? null
+                : _saveClothing,
+
+            style: FilledButton.styleFrom(
+              shape:
+              RoundedRectangleBorder(
+                borderRadius:
+                BorderRadius.circular(
+                  16,
+                ),
+              ),
+            ),
+
+            child: _saving
+                ? const SizedBox(
+              width: 22,
+              height: 22,
+              child:
+              CircularProgressIndicator(
+                strokeWidth: 2.5,
+              ),
+            )
+                : Text(
+              l10n.createClothing,
+              style:
+              const TextStyle(
+                fontSize: 16,
+                fontWeight:
+                FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // Image
+  // ============================================================
+
+  Widget _buildImagePreview() {
+    return ClipRRect(
+      borderRadius:
+      BorderRadius.circular(20),
+
+      child: SizedBox(
+        height: 300,
+
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.file(
+              File(
+                _capturedImage!.path,
+              ),
+              fit: BoxFit.cover,
+            ),
+
+            // 底部渐变，提高按钮可读性
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin:
+                    Alignment.center,
+                    end:
+                    Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black
+                          .withValues(
+                        alpha: 0.22,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // 重新拍摄
+            Positioned(
+              right: 12,
+              bottom: 12,
+              child: FilledButton.tonalIcon(
+                onPressed:
+                _saving
+                    ? null
+                    : _retakePicture,
+                icon: const Icon(
+                  Icons.camera_alt_outlined,
+                  size: 18,
+                ),
+                label: Text(
+                  context.l10n
+                      .retakePhoto,
+                ),
+              ),
             ),
           ],
         ),
@@ -361,58 +779,203 @@ class _AddClothingPageState extends State<AddClothingPage> {
     );
   }
 
-  Widget _buildImagePreview() {
+  // ============================================================
+  // Visibility
+  // ============================================================
+
+  Widget _buildVisibilitySelector() {
+    final l10n = context.l10n;
+
+    final subtitle =
+    _visibility ==
+        ClothingVisibility.private
+        ? l10n.privateSubtitle
+        : l10n.publicSubtitle;
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+      CrossAxisAlignment.start,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Image.file(
-            File(_capturedImage!.path),
-            width: double.infinity,
-            height: 360,
-            fit: BoxFit.cover,
+        Text(
+          l10n.visibility,
+          style: Theme.of(context)
+              .textTheme
+              .labelLarge
+              ?.copyWith(
+            fontWeight:
+            FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 12),
-        OutlinedButton.icon(
-          onPressed: _saving ? null : _retakePicture,
-          icon: const Icon(Icons.camera_alt),
-          label: Text(context.l10n.retakePhoto),
+
+        const SizedBox(height: 10),
+
+        SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<
+              ClothingVisibility>(
+            segments: [
+              ButtonSegment(
+                value:
+                ClothingVisibility
+                    .private,
+                icon: const Icon(
+                  Icons.lock_outline,
+                ),
+                label: Text(
+                  l10n.privateLabel,
+                ),
+              ),
+              ButtonSegment(
+                value:
+                ClothingVisibility
+                    .public,
+                icon: const Icon(
+                  Icons.people_outline,
+                ),
+                label: Text(
+                  l10n.publicLabel,
+                ),
+              ),
+            ],
+
+            selected: {
+              _visibility,
+            },
+
+            showSelectedIcon: false,
+
+            onSelectionChanged:
+            _saving
+                ? null
+                : (values) {
+              if (values.isEmpty) {
+                return;
+              }
+
+              setState(() {
+                _visibility =
+                    values.first;
+              });
+            },
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        AnimatedSwitcher(
+          duration:
+          const Duration(
+            milliseconds: 180,
+          ),
+          child: Text(
+            subtitle,
+            key: ValueKey(
+              _visibility,
+            ),
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.copyWith(
+              color:
+              Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant,
+            ),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildVisibilitySelector() {
-    final l10n = context.l10n;
+  // ============================================================
+  // Input Style
+  // ============================================================
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.visibility,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+  InputDecoration _buildInputDecoration({
+    required String label,
+    String? hint,
+    IconData? icon,
+    String? prefixText,
+  }) {
+    final theme =
+    Theme.of(context);
+
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+
+      prefixIcon:
+      icon == null
+          ? null
+          : Icon(
+        icon,
+        size: 20,
+      ),
+
+      prefixText: prefixText,
+
+      filled: true,
+
+      fillColor: theme
+          .colorScheme
+          .surfaceContainerHighest
+          .withValues(
+        alpha: 0.45,
+      ),
+
+      contentPadding:
+      const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 14,
+      ),
+
+      border:
+      OutlineInputBorder(
+        borderRadius:
+        BorderRadius.circular(14),
+        borderSide:
+        BorderSide.none,
+      ),
+
+      enabledBorder:
+      OutlineInputBorder(
+        borderRadius:
+        BorderRadius.circular(14),
+        borderSide:
+        BorderSide.none,
+      ),
+
+      focusedBorder:
+      OutlineInputBorder(
+        borderRadius:
+        BorderRadius.circular(14),
+        borderSide: BorderSide(
+          color:
+          theme.colorScheme.primary,
+          width: 1.4,
         ),
-        RadioListTile<ClothingVisibility>(
-          title: Text(l10n.privateLabel),
-          subtitle: Text(l10n.privateSubtitle),
-          value: ClothingVisibility.private,
-          groupValue: _visibility,
-          onChanged: (value) {
-            if (value != null) setState(() => _visibility = value);
-          },
+      ),
+
+      errorBorder:
+      OutlineInputBorder(
+        borderRadius:
+        BorderRadius.circular(14),
+        borderSide: BorderSide(
+          color:
+          theme.colorScheme.error,
         ),
-        RadioListTile<ClothingVisibility>(
-          title: Text(l10n.publicLabel),
-          subtitle: Text(l10n.publicSubtitle),
-          value: ClothingVisibility.public,
-          groupValue: _visibility,
-          onChanged: (value) {
-            if (value != null) setState(() => _visibility = value);
-          },
+      ),
+
+      focusedErrorBorder:
+      OutlineInputBorder(
+        borderRadius:
+        BorderRadius.circular(14),
+        borderSide: BorderSide(
+          color:
+          theme.colorScheme.error,
+          width: 1.4,
         ),
-      ],
+      ),
     );
   }
 }
