@@ -334,26 +334,13 @@ class _AuthPageState
                   CrossAxisAlignment.start,
                   children: [
                     Center(
-                      child: Container(
-                        width: 72,
-                        height: 72,
-                        decoration:
-                        BoxDecoration(
-                          color: theme
-                              .colorScheme
-                              .primary,
-                          borderRadius:
-                          BorderRadius
-                              .circular(
-                            22,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons
-                              .checkroom_rounded,
-                          color:
-                          Colors.white,
-                          size: 38,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(22),
+                        child: Image.asset(
+                          'assets/icon/app_icon.png',
+                          width: 88,
+                          height: 88,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
