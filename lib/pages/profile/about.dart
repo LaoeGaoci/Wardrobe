@@ -23,17 +23,13 @@ class AboutPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Icon(
-                  Icons.checkroom_outlined,
-                  size: 44,
-                  color: Colors.grey.shade700,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Image.asset(
+                  'assets/icon/app_icon.png',
+                  width: 88,
+                  height: 88,
+                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 20),
