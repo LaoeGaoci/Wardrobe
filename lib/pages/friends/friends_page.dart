@@ -6,6 +6,7 @@ import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../models/app_user.dart';
 import '../../services/friend_service.dart';
+import '../../widgets/wardrobe_image.dart';
 import 'friend_requests_page.dart';
 import 'recommendation_history_page.dart';
 import 'user_profile_page.dart';
@@ -318,7 +319,7 @@ class _FriendsPageState extends State<FriendsPage> {
 
     return Card(
       child: ListTile(
-        leading: _buildAvatar(user),
+        leading: WardrobeAvatar(user: user),
         title: Text(
           displayName,
           style: const TextStyle(fontWeight: FontWeight.w600),
@@ -347,20 +348,6 @@ class _FriendsPageState extends State<FriendsPage> {
       case FriendStatus.none:
         return const Icon(Icons.chevron_right);
     }
-  }
-
-  Widget _buildAvatar(AppUser user) {
-    if (user.avatarUrl.isNotEmpty) {
-      return CircleAvatar(backgroundImage: NetworkImage(user.avatarUrl));
-    }
-
-    return CircleAvatar(
-      child: Text(
-        user.username.isEmpty
-            ? '?'
-            : user.username.characters.first.toUpperCase(),
-      ),
-    );
   }
 
   Widget _buildErrorState(

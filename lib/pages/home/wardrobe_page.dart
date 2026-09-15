@@ -8,6 +8,7 @@ import '../../main.dart';
 import '../../models/clothing.dart';
 import '../../services/auth_service.dart';
 import '../../services/clothing_repository.dart';
+import '../../services/image_cache_service.dart';
 import '../../widgets/clothing_card.dart';
 import '../clothing/add_clothing_page.dart';
 import '../clothing/clothing_detail_page.dart';
@@ -26,6 +27,9 @@ class _WardrobePageState
     extends State<WardrobePage> {
   final ClothingRepository _repository =
       ClothingRepository.instance;
+
+  final ImageCacheService _imageCacheService =
+      ImageCacheService.instance;
 
   bool _isLoading =
   true;
@@ -109,6 +113,9 @@ class _WardrobePageState
         _loadError =
         null;
       });
+
+      // 首次拿到衣物列表后，先让当前屏幕正常构建。
+      // 后续 itemBuilder 会按 6 张一批继续预加载下一屏。
     } on ClothingRepositoryException catch (e) {
       // 当前 Token 已经失效。
       //
@@ -201,6 +208,31 @@ class _WardrobePageState
     return result.toList(
       growable:
       false,
+    );
+  }
+
+  // ============================================================
+  // Image Prefetch
+  // ============================================================
+
+  void _scheduleImagePrefetch(
+    List<Clothing> clothes,
+    int index,
+  ) {
+    // 双列 Grid 每次提前准备 6 张，大约是下一屏的 3 行。
+    // index == 0：尽早开始准备后面的图片。
+    // 之后每构建 6 个 item 再向前推进一批。
+    if (index != 0 &&
+        (index + 1) % 6 != 0) {
+      return;
+    }
+
+    _imageCacheService.schedulePrecacheAhead(
+      context,
+      clothes,
+      currentIndex: index,
+      count: 6,
+      maxWidth: 720,
     );
   }
 
@@ -614,6 +646,11 @@ class _WardrobePageState
                   final clothing =
                   clothes[
                   index];
+
+                  _scheduleImagePrefetch(
+                    clothes,
+                    index,
+                  );
 
                   return GestureDetector(
                     onTap: () =>

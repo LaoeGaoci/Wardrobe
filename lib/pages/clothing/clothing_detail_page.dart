@@ -1,13 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../../l10n/clothing_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../models/clothing.dart';
-import '../../network/api_client.dart';
 import '../../services/clothing_repository.dart';
 import '../../widgets/info_row.dart';
+import '../../widgets/wardrobe_image.dart';
 import 'edit_clothing_page.dart';
 
 class ClothingDetailPage
@@ -162,8 +160,6 @@ class _ClothingDetailPageState
     });
 
     try {
-      // DELETE
-      // /api/clothing/:id
       await _repository
           .deleteClothing(
         _clothing.id,
@@ -173,9 +169,6 @@ class _ClothingDetailPageState
         return;
       }
 
-      // WardrobePage 在详情页返回后
-      // 会重新调用 fetchMyClothes()，
-      // 所以这里只需要正常返回。
       Navigator.pop(
         context,
       );
@@ -350,10 +343,6 @@ class _ClothingDetailPageState
                   height: 28,
                 ),
 
-                // ==================================================
-                // Edit
-                // ==================================================
-
                 SizedBox(
                   width:
                   double.infinity,
@@ -380,10 +369,6 @@ class _ClothingDetailPageState
                 const SizedBox(
                   height: 12,
                 ),
-
-                // ==================================================
-                // Delete
-                // ==================================================
 
                 SizedBox(
                   width:
@@ -450,8 +435,6 @@ class _ClothingDetailPageState
                   ),
                 ),
 
-                // 防止部分 Android
-                // 系统导航栏与按钮太近。
                 const SizedBox(
                   height: 32,
                 ),
@@ -468,98 +451,14 @@ class _ClothingDetailPageState
   // ============================================================
 
   Widget _buildImage() {
-    if (_clothing
-        .imagePath
-        .isEmpty) {
-      return _buildImageError();
-    }
-
-    if (_clothing.imageType ==
-        ClothingImageType.local) {
-      return Image.file(
-        File(
-          _clothing.imagePath,
-        ),
-        height: 420,
-        width:
-        double.infinity,
-        fit: BoxFit.cover,
-        errorBuilder:
-            (
-            context,
-            error,
-            stackTrace,
-            ) {
-          return _buildImageError();
-        },
-      );
-    }
-
-    return Image.network(
-      _remoteImageUrl(),
-
-      headers:
-      ApiClient.instance
-          .authorizationHeaders,
-
+    return WardrobeClothingImage(
+      clothing: _clothing,
       height: 420,
-      width:
-      double.infinity,
+      width: double.infinity,
       fit: BoxFit.cover,
 
-      errorBuilder:
-          (
-          context,
-          error,
-          stackTrace,
-          ) {
-        return _buildImageError();
-      },
-    );
-  }
-
-  String _remoteImageUrl() {
-    final resolved =
-    ApiClient.instance
-        .resolveUrl(
-      _clothing.imagePath,
-    );
-
-    final uri =
-    Uri.parse(
-      resolved,
-    );
-
-    return uri
-        .replace(
-      queryParameters: {
-        ...uri
-            .queryParameters,
-
-        // 防止修改图片后仍然命中旧缓存。
-        'v': _clothing
-            .updatedAt
-            .millisecondsSinceEpoch
-            .toString(),
-      },
-    )
-        .toString();
-  }
-
-  Widget _buildImageError() {
-    return Container(
-      height: 420,
-      color:
-      Colors.grey.shade100,
-      child: Center(
-        child: Icon(
-          Icons
-              .image_not_supported_outlined,
-          size: 56,
-          color:
-          Colors.grey.shade400,
-        ),
-      ),
+      // 详情页允许更高的解码分辨率。
+      memCacheWidth: 1440,
     );
   }
 }

@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../l10n/clothing_localizations.dart';
 import '../models/clothing.dart';
-import '../network/api_client.dart';
+import 'wardrobe_image.dart';
 
 class ClothingCard extends StatelessWidget {
   final Clothing clothing;
@@ -28,7 +26,15 @@ class ClothingCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: _buildImage(),
+            child: WardrobeClothingImage(
+              clothing: clothing,
+              width: double.infinity,
+              fit: BoxFit.cover,
+
+              // Grid 缩略图无需按原始高分辨率解码进内存。
+              // 720px 对双列衣柜已经足够，同时能降低滚动时的内存压力。
+              memCacheWidth: 720,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(10),
@@ -59,63 +65,6 @@ class ClothingCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildImage() {
-    if (clothing.imagePath.isEmpty) {
-      return _buildImageError();
-    }
-
-    if (clothing.imageType == ClothingImageType.local) {
-      return Image.file(
-        File(clothing.imagePath),
-        width: double.infinity,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildImageError();
-        },
-      );
-    }
-
-    return Image.network(
-      _buildRemoteImageUrl(),
-      headers: ApiClient.instance.authorizationHeaders,
-      width: double.infinity,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        return _buildImageError();
-      },
-    );
-  }
-
-  String _buildRemoteImageUrl() {
-    final resolved = ApiClient.instance.resolveUrl(
-      clothing.imagePath,
-    );
-
-    final uri = Uri.parse(resolved);
-
-    return uri
-        .replace(
-          queryParameters: {
-            ...uri.queryParameters,
-            'v': clothing.updatedAt.millisecondsSinceEpoch.toString(),
-          },
-        )
-        .toString();
-  }
-
-  Widget _buildImageError() {
-    return Container(
-      color: Colors.grey.shade100,
-      child: Center(
-        child: Icon(
-          Icons.image_not_supported_outlined,
-          color: Colors.grey.shade400,
-          size: 40,
-        ),
       ),
     );
   }
