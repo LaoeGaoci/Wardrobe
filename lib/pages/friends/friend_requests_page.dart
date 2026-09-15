@@ -4,6 +4,7 @@ import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../models/app_user.dart';
 import '../../services/friend_service.dart';
+import '../../widgets/wardrobe_image.dart';
 import 'user_profile_page.dart';
 
 class FriendRequestsPage extends StatefulWidget {
@@ -194,7 +195,10 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               onTap: processing ? null : () => _openUserProfile(user),
               child: Row(
                 children: [
-                  _buildAvatar(user),
+                  WardrobeAvatar(
+                    user: user,
+                    radius: 28,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -255,24 +259,6 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildAvatar(AppUser user) {
-    if (user.avatarUrl.isNotEmpty) {
-      return CircleAvatar(
-        radius: 28,
-        backgroundImage: NetworkImage(user.avatarUrl),
-      );
-    }
-
-    return CircleAvatar(
-      radius: 28,
-      child: Text(
-        user.username.isEmpty
-            ? '?'
-            : user.username.characters.first.toUpperCase(),
       ),
     );
   }

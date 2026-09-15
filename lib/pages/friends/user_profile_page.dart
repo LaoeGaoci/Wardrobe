@@ -4,6 +4,7 @@ import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../models/app_user.dart';
 import '../../services/friend_service.dart';
+import '../../widgets/wardrobe_image.dart';
 import 'friend_requests_page.dart';
 import 'friend_wardrobe_page.dart';
 
@@ -292,7 +293,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   padding: const EdgeInsets.all(24),
                   children: [
                     const SizedBox(height: 20),
-                    Center(child: _buildAvatar()),
+                    Center(
+                      child: WardrobeAvatar(
+                        user: widget.user,
+                        radius: 48,
+                      ),
+                    ),
                     const SizedBox(height: 20),
                     Center(
                       child: Text(
@@ -351,25 +357,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildAvatar() {
-    if (widget.user.avatarUrl.isNotEmpty) {
-      return CircleAvatar(
-        radius: 48,
-        backgroundImage: NetworkImage(widget.user.avatarUrl),
-      );
-    }
-
-    return CircleAvatar(
-      radius: 48,
-      child: Text(
-        widget.user.username.isEmpty
-            ? '?'
-            : widget.user.username.characters.first.toUpperCase(),
-        style: const TextStyle(fontSize: 32),
       ),
     );
   }

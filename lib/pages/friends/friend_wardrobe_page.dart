@@ -5,6 +5,7 @@ import '../../l10n/l10n.dart';
 import '../../models/app_user.dart';
 import '../../models/clothing.dart';
 import '../../services/friend_service.dart';
+import '../../services/image_cache_service.dart';
 import '../../services/recommendation_service.dart';
 import '../../widgets/clothing_card.dart';
 
@@ -24,6 +25,8 @@ class _FriendWardrobePageState extends State<FriendWardrobePage> {
   final FriendService _friendService = FriendService.instance;
   final RecommendationService _recommendationService =
       RecommendationService.instance;
+  final ImageCacheService _imageCacheService =
+      ImageCacheService.instance;
 
   List<Clothing> _clothes = const [];
   bool _isLoading = true;
@@ -69,6 +72,20 @@ class _FriendWardrobePageState extends State<FriendWardrobePage> {
     return _clothes
         .where((item) => _selectedClothingIds.contains(item.id))
         .toList(growable: false);
+  }
+
+  void _scheduleImagePrefetch(int index) {
+    if (index != 0 && (index + 1) % 6 != 0) {
+      return;
+    }
+
+    _imageCacheService.schedulePrecacheAhead(
+      context,
+      _clothes,
+      currentIndex: index,
+      count: 6,
+      maxWidth: 720,
+    );
   }
 
   void _toggleSelection(Clothing clothing) {
@@ -249,8 +266,13 @@ class _FriendWardrobePageState extends State<FriendWardrobePage> {
                 mainAxisSpacing: 10,
                 childAspectRatio: 0.72,
               ),
-              itemBuilder: (context, index) =>
-                  _buildClothingItem(_clothes[index]),
+              itemBuilder: (context, index) {
+                _scheduleImagePrefetch(index);
+
+                return _buildClothingItem(
+                  _clothes[index],
+                );
+              },
             ),
     );
   }

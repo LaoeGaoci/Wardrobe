@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../models/clothing_recommendation.dart';
 import '../../services/recommendation_service.dart';
 import '../../widgets/clothing_card.dart';
+import '../../widgets/wardrobe_image.dart';
 
 class RecommendationHistoryPage extends StatefulWidget {
   const RecommendationHistoryPage({super.key});
@@ -228,7 +230,10 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
                 ),
               ),
               const SizedBox(width: 10),
-              _buildAvatar(sender.username, sender.avatarUrl),
+              WardrobeAvatar(
+                user: sender,
+                radius: 24,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -334,7 +339,10 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              _buildAvatar(receiver.username, receiver.avatarUrl),
+              WardrobeAvatar(
+                user: receiver,
+                radius: 24,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -388,22 +396,6 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAvatar(String username, String avatarUrl) {
-    if (avatarUrl.isNotEmpty) {
-      return CircleAvatar(
-        radius: 24,
-        backgroundImage: NetworkImage(avatarUrl),
-      );
-    }
-
-    return CircleAvatar(
-      radius: 24,
-      child: Text(
-        username.isEmpty ? '?' : username.characters.first.toUpperCase(),
       ),
     );
   }
@@ -632,14 +624,14 @@ class _RecommendationHistoryDetail extends StatelessWidget {
         Text(status),
         const Spacer(),
         Text(
-          _formatDetailDate(context, recommendation.createdAt),
+          _formatDetailDate(recommendation.createdAt),
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ],
     );
   }
 
-  String _formatDetailDate(BuildContext context, DateTime time) {
+  String _formatDetailDate(DateTime time) {
     final local = time.toLocal();
     final year = local.year.toString();
     final month = local.month.toString().padLeft(2, '0');
