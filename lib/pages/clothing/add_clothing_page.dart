@@ -8,6 +8,7 @@ import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../models/clothing.dart';
 import '../../services/clothing_repository.dart';
+import 'clothing_category_picker_page.dart';
 
 class AddClothingPage extends StatefulWidget {
   final CameraDescription camera;
@@ -29,12 +30,12 @@ class _AddClothingPageState extends State<AddClothingPage> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final _nameController = TextEditingController();
+  final _locationController = TextEditingController();
   final _brandController = TextEditingController();
   final _colorController = TextEditingController();
   final _priceController = TextEditingController();
 
-  String _selectedCategory = '上衣';
+  String _selectedCategory = 'tops.tshirt';
   String _selectedSeason = '春季';
 
   ClothingVisibility _visibility = ClothingVisibility.private;
@@ -43,15 +44,6 @@ class _AddClothingPageState extends State<AddClothingPage> {
 
   bool _saving = false;
 
-  final List<String> _categories = [
-    '上衣',
-    '外套',
-    '羽绒服',
-    '裤子',
-    '帽子',
-    '鞋子',
-    '配饰',
-  ];
 
   final List<String> _seasons = [
     '春季',
@@ -78,12 +70,39 @@ class _AddClothingPageState extends State<AddClothingPage> {
   void dispose() {
     _cameraController.dispose();
 
-    _nameController.dispose();
+    _locationController.dispose();
     _brandController.dispose();
     _colorController.dispose();
     _priceController.dispose();
 
     super.dispose();
+  }
+
+  // ============================================================
+  // Category
+  // ============================================================
+
+  Future<void> _selectCategory() async {
+    if (_saving) {
+      return;
+    }
+
+    final selected = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ClothingCategoryPickerPage(
+          currentCategory: _selectedCategory,
+        ),
+      ),
+    );
+
+    if (selected == null || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _selectedCategory = selected;
+    });
   }
 
   // ============================================================
@@ -171,7 +190,8 @@ class _AddClothingPageState extends State<AddClothingPage> {
         id: '',
         ownerId: widget.ownerId,
 
-        name: _nameController.text.trim(),
+        // 原“衣物名称”字段改为存放位置。
+        location: _locationController.text.trim(),
 
         brand:
         _brandController.text.trim().isEmpty
@@ -288,7 +308,6 @@ class _AddClothingPageState extends State<AddClothingPage> {
                   _cameraController,
                 ),
 
-                // 拍照按钮
                 Positioned(
                   left: 0,
                   right: 0,
@@ -347,8 +366,7 @@ class _AddClothingPageState extends State<AddClothingPage> {
           }
 
           return const Center(
-            child:
-            CircularProgressIndicator(),
+            child: CircularProgressIndicator(),
           );
         },
       ),
@@ -367,8 +385,6 @@ class _AddClothingPageState extends State<AddClothingPage> {
         title: Text(
           l10n.addClothing,
         ),
-
-        // 不再放右上角保存按钮
         actions: const [],
       ),
 
@@ -376,54 +392,20 @@ class _AddClothingPageState extends State<AddClothingPage> {
         key: _formKey,
         child: ListView(
           keyboardDismissBehavior:
-          ScrollViewKeyboardDismissBehavior
-              .onDrag,
+          ScrollViewKeyboardDismissBehavior.onDrag,
 
           padding:
           const EdgeInsets.fromLTRB(
             16,
             12,
             16,
-
-            // 给固定底部按钮留空间
             14,
           ),
 
           children: [
-            // 图片
             _buildImagePreview(),
 
             const SizedBox(height: 20),
-
-            // 名称
-            TextFormField(
-              controller: _nameController,
-              textInputAction:
-              TextInputAction.next,
-              decoration:
-              _buildInputDecoration(
-                label: l10n.name,
-                hint: l10n.nameExample,
-                icon:
-                Icons.checkroom_outlined,
-              ),
-              validator: (value) {
-                if (value == null ||
-                    value.trim().isEmpty) {
-                  return l10n
-                      .clothingNameRequired;
-                }
-
-                if (value.trim().length >
-                    100) {
-                  return l10n.nameMax100;
-                }
-
-                return null;
-              },
-            ),
-
-            const SizedBox(height: 12),
 
             // 品牌 + 颜色
             Row(
@@ -498,54 +480,7 @@ class _AddClothingPageState extends State<AddClothingPage> {
               CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child:
-                  DropdownButtonFormField<
-                      String>(
-                    initialValue:
-                    _selectedCategory,
-
-                    isExpanded: true,
-
-                    decoration:
-                    _buildInputDecoration(
-                      label: l10n.category,
-                      icon:
-                      Icons.category_outlined,
-                    ),
-
-                    items: _categories
-                        .map(
-                          (category) {
-                        return DropdownMenuItem<
-                            String>(
-                          value: category,
-                          child: Text(
-                            localizedCategory(
-                              context,
-                              category,
-                            ),
-                            overflow:
-                            TextOverflow
-                                .ellipsis,
-                          ),
-                        );
-                      },
-                    ).toList(),
-
-                    onChanged: _saving
-                        ? null
-                        : (value) {
-                      if (value ==
-                          null) {
-                        return;
-                      }
-
-                      setState(() {
-                        _selectedCategory =
-                            value;
-                      });
-                    },
-                  ),
+                  child: _buildCategorySelector(),
                 ),
 
                 const SizedBox(width: 12),
@@ -578,8 +513,7 @@ class _AddClothingPageState extends State<AddClothingPage> {
                               season,
                             ),
                             overflow:
-                            TextOverflow
-                                .ellipsis,
+                            TextOverflow.ellipsis,
                           ),
                         );
                       },
@@ -588,8 +522,7 @@ class _AddClothingPageState extends State<AddClothingPage> {
                     onChanged: _saving
                         ? null
                         : (value) {
-                      if (value ==
-                          null) {
+                      if (value == null) {
                         return;
                       }
 
@@ -603,9 +536,40 @@ class _AddClothingPageState extends State<AddClothingPage> {
               ],
             ),
 
+            // “存放位置”不再紧贴图片，
+            // 下移到类型 / 季节之后。
             const SizedBox(height: 12),
 
-            // 价格
+            TextFormField(
+              controller:
+              _locationController,
+              textInputAction:
+              TextInputAction.next,
+              decoration:
+              _buildInputDecoration(
+                label: l10n.storageLocation,
+                hint: l10n.storageLocationExample,
+                icon:
+                Icons.inventory_2_outlined,
+              ),
+              validator: (value) {
+                if (value == null ||
+                    value.trim().isEmpty) {
+                  return l10n
+                      .storageLocationRequired;
+                }
+
+                if (value.trim().length >
+                    100) {
+                  return l10n.storageLocationMax100;
+                }
+
+                return null;
+              },
+            ),
+
+            const SizedBox(height: 12),
+
             TextFormField(
               controller:
               _priceController,
@@ -657,7 +621,6 @@ class _AddClothingPageState extends State<AddClothingPage> {
         ),
       ),
 
-      // 创建衣物
       bottomNavigationBar: SafeArea(
         top: false,
 
@@ -711,6 +674,40 @@ class _AddClothingPageState extends State<AddClothingPage> {
     );
   }
 
+  Widget _buildCategorySelector() {
+    final l10n = context.l10n;
+
+    return InkWell(
+      onTap: _saving ? null : _selectCategory,
+      borderRadius: BorderRadius.circular(14),
+      child: InputDecorator(
+        decoration: _buildInputDecoration(
+          label: l10n.category,
+          icon: Icons.category_outlined,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                localizedCategoryPath(
+                  context,
+                  _selectedCategory,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ============================================================
   // Image
   // ============================================================
@@ -733,7 +730,6 @@ class _AddClothingPageState extends State<AddClothingPage> {
               fit: BoxFit.cover,
             ),
 
-            // 底部渐变，提高按钮可读性
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -754,7 +750,6 @@ class _AddClothingPageState extends State<AddClothingPage> {
               ),
             ),
 
-            // 重新拍摄
             Positioned(
               right: 12,
               bottom: 12,

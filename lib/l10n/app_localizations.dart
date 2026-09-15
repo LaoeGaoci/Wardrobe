@@ -436,47 +436,17 @@ abstract class AppLocalizations {
   /// **'All'**
   String get categoryAll;
 
-  /// No description provided for @categoryTop.
-  ///
-  /// In en, this message translates to:
-  /// **'Tops'**
-  String get categoryTop;
-
-  /// No description provided for @categoryCoat.
-  ///
-  /// In en, this message translates to:
-  /// **'Coats'**
-  String get categoryCoat;
-
   /// No description provided for @categoryDownJacket.
   ///
   /// In en, this message translates to:
   /// **'Down Jackets'**
   String get categoryDownJacket;
 
-  /// No description provided for @categoryPants.
-  ///
-  /// In en, this message translates to:
-  /// **'Pants'**
-  String get categoryPants;
-
   /// No description provided for @categoryHat.
   ///
   /// In en, this message translates to:
   /// **'Hats'**
   String get categoryHat;
-
-  /// No description provided for @categoryShoes.
-  ///
-  /// In en, this message translates to:
-  /// **'Shoes'**
-  String get categoryShoes;
-
-  /// No description provided for @categoryAccessories.
-  ///
-  /// In en, this message translates to:
-  /// **'Accessories'**
-  String get categoryAccessories;
 
   /// No description provided for @seasonSpring.
   ///
@@ -525,30 +495,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Clothing'**
   String get addClothing;
-
-  /// No description provided for @name.
-  ///
-  /// In en, this message translates to:
-  /// **'Name'**
-  String get name;
-
-  /// No description provided for @nameExample.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g. White T-shirt'**
-  String get nameExample;
-
-  /// No description provided for @clothingNameRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a clothing name'**
-  String get clothingNameRequired;
-
-  /// No description provided for @nameMax100.
-  ///
-  /// In en, this message translates to:
-  /// **'Name cannot exceed 100 characters'**
-  String get nameMax100;
 
   /// No description provided for @brand.
   ///
@@ -1545,6 +1491,582 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The current password is incorrect'**
   String get currentPasswordIncorrect;
+
+  /// No description provided for @storageLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage location'**
+  String get storageLocation;
+
+  /// No description provided for @storageLocationExample.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. home, dormitory'**
+  String get storageLocationExample;
+
+  /// No description provided for @storageLocationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a storage location'**
+  String get storageLocationRequired;
+
+  /// No description provided for @storageLocationMax100.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage location cannot exceed 100 characters'**
+  String get storageLocationMax100;
+
+  /// No description provided for @selectCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Category'**
+  String get selectCategoryTitle;
+
+  /// No description provided for @searchCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search categories'**
+  String get searchCategoryHint;
+
+  /// No description provided for @noCategoryResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching categories'**
+  String get noCategoryResults;
+
+  /// No description provided for @editClothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Clothing'**
+  String get editClothing;
+
+  /// No description provided for @deleteClothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Clothing'**
+  String get deleteClothing;
+
+  /// No description provided for @deletingClothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting...'**
+  String get deletingClothing;
+
+  /// No description provided for @deleteClothingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete clothing. Please try again later.'**
+  String get deleteClothingFailed;
+
+  /// No description provided for @deleteClothingConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this {category}?\n\nStorage location: {location}\nThis action cannot be undone.'**
+  String deleteClothingConfirm(String category, String location);
+
+  /// No description provided for @categoryGroupTops.
+  ///
+  /// In en, this message translates to:
+  /// **'Tops'**
+  String get categoryGroupTops;
+
+  /// No description provided for @categoryGroupBottoms.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottoms'**
+  String get categoryGroupBottoms;
+
+  /// No description provided for @categoryGroupOnePiece.
+  ///
+  /// In en, this message translates to:
+  /// **'One-piece'**
+  String get categoryGroupOnePiece;
+
+  /// No description provided for @categoryGroupSets.
+  ///
+  /// In en, this message translates to:
+  /// **'Sets'**
+  String get categoryGroupSets;
+
+  /// No description provided for @categoryGroupUnderwear.
+  ///
+  /// In en, this message translates to:
+  /// **'Underwear'**
+  String get categoryGroupUnderwear;
+
+  /// No description provided for @categoryGroupFootwear.
+  ///
+  /// In en, this message translates to:
+  /// **'Footwear'**
+  String get categoryGroupFootwear;
+
+  /// No description provided for @categoryGroupAccessories.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessories'**
+  String get categoryGroupAccessories;
+
+  /// No description provided for @categoryTshirt.
+  ///
+  /// In en, this message translates to:
+  /// **'T-Shirt'**
+  String get categoryTshirt;
+
+  /// No description provided for @categoryShirt.
+  ///
+  /// In en, this message translates to:
+  /// **'Shirt'**
+  String get categoryShirt;
+
+  /// No description provided for @categoryPolo.
+  ///
+  /// In en, this message translates to:
+  /// **'Polo Shirt'**
+  String get categoryPolo;
+
+  /// No description provided for @categoryTank.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank Top / Camisole'**
+  String get categoryTank;
+
+  /// No description provided for @categorySweatshirt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sweatshirt / Hoodie'**
+  String get categorySweatshirt;
+
+  /// No description provided for @categoryKnitwear.
+  ///
+  /// In en, this message translates to:
+  /// **'Sweater / Knitwear'**
+  String get categoryKnitwear;
+
+  /// No description provided for @categoryCardigan.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardigan'**
+  String get categoryCardigan;
+
+  /// No description provided for @categoryVest.
+  ///
+  /// In en, this message translates to:
+  /// **'Vest'**
+  String get categoryVest;
+
+  /// No description provided for @categoryBlazer.
+  ///
+  /// In en, this message translates to:
+  /// **'Blazer'**
+  String get categoryBlazer;
+
+  /// No description provided for @categoryJacket.
+  ///
+  /// In en, this message translates to:
+  /// **'Jacket'**
+  String get categoryJacket;
+
+  /// No description provided for @categoryTrench.
+  ///
+  /// In en, this message translates to:
+  /// **'Trench Coat'**
+  String get categoryTrench;
+
+  /// No description provided for @categoryLongCoat.
+  ///
+  /// In en, this message translates to:
+  /// **'Coat'**
+  String get categoryLongCoat;
+
+  /// No description provided for @categoryPaddedJacket.
+  ///
+  /// In en, this message translates to:
+  /// **'Padded Jacket'**
+  String get categoryPaddedJacket;
+
+  /// No description provided for @categoryShellJacket.
+  ///
+  /// In en, this message translates to:
+  /// **'Shell Jacket'**
+  String get categoryShellJacket;
+
+  /// No description provided for @categoryLeatherJacket.
+  ///
+  /// In en, this message translates to:
+  /// **'Leather Jacket'**
+  String get categoryLeatherJacket;
+
+  /// No description provided for @categorySunProtective.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun-protective Jacket'**
+  String get categorySunProtective;
+
+  /// No description provided for @categoryOtherTops.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Tops'**
+  String get categoryOtherTops;
+
+  /// No description provided for @categoryJeans.
+  ///
+  /// In en, this message translates to:
+  /// **'Jeans'**
+  String get categoryJeans;
+
+  /// No description provided for @categoryDressPants.
+  ///
+  /// In en, this message translates to:
+  /// **'Dress Pants'**
+  String get categoryDressPants;
+
+  /// No description provided for @categoryCasualPants.
+  ///
+  /// In en, this message translates to:
+  /// **'Casual Pants'**
+  String get categoryCasualPants;
+
+  /// No description provided for @categoryCargoPants.
+  ///
+  /// In en, this message translates to:
+  /// **'Cargo Pants'**
+  String get categoryCargoPants;
+
+  /// No description provided for @categorySweatpants.
+  ///
+  /// In en, this message translates to:
+  /// **'Sweatpants'**
+  String get categorySweatpants;
+
+  /// No description provided for @categoryLeggings.
+  ///
+  /// In en, this message translates to:
+  /// **'Leggings'**
+  String get categoryLeggings;
+
+  /// No description provided for @categoryWideLegPants.
+  ///
+  /// In en, this message translates to:
+  /// **'Wide-leg Pants'**
+  String get categoryWideLegPants;
+
+  /// No description provided for @categoryShorts.
+  ///
+  /// In en, this message translates to:
+  /// **'Shorts'**
+  String get categoryShorts;
+
+  /// No description provided for @categorySkirt.
+  ///
+  /// In en, this message translates to:
+  /// **'Skirt'**
+  String get categorySkirt;
+
+  /// No description provided for @categoryCulottes.
+  ///
+  /// In en, this message translates to:
+  /// **'Culottes / Skort'**
+  String get categoryCulottes;
+
+  /// No description provided for @categoryOtherBottoms.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Bottoms'**
+  String get categoryOtherBottoms;
+
+  /// No description provided for @categoryDress.
+  ///
+  /// In en, this message translates to:
+  /// **'Dress'**
+  String get categoryDress;
+
+  /// No description provided for @categoryGown.
+  ///
+  /// In en, this message translates to:
+  /// **'Formal Gown'**
+  String get categoryGown;
+
+  /// No description provided for @categoryJumpsuit.
+  ///
+  /// In en, this message translates to:
+  /// **'Jumpsuit'**
+  String get categoryJumpsuit;
+
+  /// No description provided for @categoryRomper.
+  ///
+  /// In en, this message translates to:
+  /// **'Romper'**
+  String get categoryRomper;
+
+  /// No description provided for @categoryOveralls.
+  ///
+  /// In en, this message translates to:
+  /// **'Overalls'**
+  String get categoryOveralls;
+
+  /// No description provided for @categoryPinafore.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinafore Dress'**
+  String get categoryPinafore;
+
+  /// No description provided for @categoryBodysuit.
+  ///
+  /// In en, this message translates to:
+  /// **'Bodysuit'**
+  String get categoryBodysuit;
+
+  /// No description provided for @categoryOtherOnePiece.
+  ///
+  /// In en, this message translates to:
+  /// **'Other One-piece'**
+  String get categoryOtherOnePiece;
+
+  /// No description provided for @categorySuitSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Suit Set'**
+  String get categorySuitSet;
+
+  /// No description provided for @categoryCasualSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Casual Set'**
+  String get categoryCasualSet;
+
+  /// No description provided for @categoryTracksuit.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracksuit'**
+  String get categoryTracksuit;
+
+  /// No description provided for @categoryKnitSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Knit Set'**
+  String get categoryKnitSet;
+
+  /// No description provided for @categoryPajamaSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Pajama Set'**
+  String get categoryPajamaSet;
+
+  /// No description provided for @categoryLoungewear.
+  ///
+  /// In en, this message translates to:
+  /// **'Loungewear'**
+  String get categoryLoungewear;
+
+  /// No description provided for @categorySwimwear.
+  ///
+  /// In en, this message translates to:
+  /// **'Swimwear'**
+  String get categorySwimwear;
+
+  /// No description provided for @categoryOtherSets.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Sets'**
+  String get categoryOtherSets;
+
+  /// No description provided for @categoryBra.
+  ///
+  /// In en, this message translates to:
+  /// **'Bra'**
+  String get categoryBra;
+
+  /// No description provided for @categoryBriefs.
+  ///
+  /// In en, this message translates to:
+  /// **'Underwear'**
+  String get categoryBriefs;
+
+  /// No description provided for @categoryUndershirt.
+  ///
+  /// In en, this message translates to:
+  /// **'Undershirt'**
+  String get categoryUndershirt;
+
+  /// No description provided for @categoryBaseLayerTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Base-layer Top'**
+  String get categoryBaseLayerTop;
+
+  /// No description provided for @categoryBaseLayerBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'Base-layer Bottom'**
+  String get categoryBaseLayerBottom;
+
+  /// No description provided for @categoryShapewear.
+  ///
+  /// In en, this message translates to:
+  /// **'Shapewear'**
+  String get categoryShapewear;
+
+  /// No description provided for @categorySocks.
+  ///
+  /// In en, this message translates to:
+  /// **'Socks'**
+  String get categorySocks;
+
+  /// No description provided for @categoryTights.
+  ///
+  /// In en, this message translates to:
+  /// **'Tights'**
+  String get categoryTights;
+
+  /// No description provided for @categoryStockings.
+  ///
+  /// In en, this message translates to:
+  /// **'Stockings'**
+  String get categoryStockings;
+
+  /// No description provided for @categoryOtherUnderwear.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Underwear'**
+  String get categoryOtherUnderwear;
+
+  /// No description provided for @categorySneakers.
+  ///
+  /// In en, this message translates to:
+  /// **'Sneakers'**
+  String get categorySneakers;
+
+  /// No description provided for @categoryCasualShoes.
+  ///
+  /// In en, this message translates to:
+  /// **'Casual Shoes'**
+  String get categoryCasualShoes;
+
+  /// No description provided for @categoryCanvasShoes.
+  ///
+  /// In en, this message translates to:
+  /// **'Canvas Shoes'**
+  String get categoryCanvasShoes;
+
+  /// No description provided for @categoryDressShoes.
+  ///
+  /// In en, this message translates to:
+  /// **'Dress Shoes'**
+  String get categoryDressShoes;
+
+  /// No description provided for @categoryLoafers.
+  ///
+  /// In en, this message translates to:
+  /// **'Loafers'**
+  String get categoryLoafers;
+
+  /// No description provided for @categoryHeels.
+  ///
+  /// In en, this message translates to:
+  /// **'Heels'**
+  String get categoryHeels;
+
+  /// No description provided for @categoryFlats.
+  ///
+  /// In en, this message translates to:
+  /// **'Flats'**
+  String get categoryFlats;
+
+  /// No description provided for @categorySandals.
+  ///
+  /// In en, this message translates to:
+  /// **'Sandals'**
+  String get categorySandals;
+
+  /// No description provided for @categorySlippers.
+  ///
+  /// In en, this message translates to:
+  /// **'Slippers'**
+  String get categorySlippers;
+
+  /// No description provided for @categoryAnkleBoots.
+  ///
+  /// In en, this message translates to:
+  /// **'Ankle Boots'**
+  String get categoryAnkleBoots;
+
+  /// No description provided for @categoryTallBoots.
+  ///
+  /// In en, this message translates to:
+  /// **'Tall Boots'**
+  String get categoryTallBoots;
+
+  /// No description provided for @categoryRainBoots.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain Boots'**
+  String get categoryRainBoots;
+
+  /// No description provided for @categoryHikingShoes.
+  ///
+  /// In en, this message translates to:
+  /// **'Hiking Shoes'**
+  String get categoryHikingShoes;
+
+  /// No description provided for @categoryOtherFootwear.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Footwear'**
+  String get categoryOtherFootwear;
+
+  /// No description provided for @categoryHeadwear.
+  ///
+  /// In en, this message translates to:
+  /// **'Headwear'**
+  String get categoryHeadwear;
+
+  /// No description provided for @categoryScarf.
+  ///
+  /// In en, this message translates to:
+  /// **'Scarf'**
+  String get categoryScarf;
+
+  /// No description provided for @categoryShawl.
+  ///
+  /// In en, this message translates to:
+  /// **'Shawl'**
+  String get categoryShawl;
+
+  /// No description provided for @categoryGloves.
+  ///
+  /// In en, this message translates to:
+  /// **'Gloves'**
+  String get categoryGloves;
+
+  /// No description provided for @categoryBelt.
+  ///
+  /// In en, this message translates to:
+  /// **'Belt'**
+  String get categoryBelt;
+
+  /// No description provided for @categoryTie.
+  ///
+  /// In en, this message translates to:
+  /// **'Tie'**
+  String get categoryTie;
+
+  /// No description provided for @categoryBowTie.
+  ///
+  /// In en, this message translates to:
+  /// **'Bow Tie'**
+  String get categoryBowTie;
+
+  /// No description provided for @categorySleeve.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleeve / Arm Cover'**
+  String get categorySleeve;
+
+  /// No description provided for @categoryOtherAccessories.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Accessories'**
+  String get categoryOtherAccessories;
 }
 
 class _AppLocalizationsDelegate

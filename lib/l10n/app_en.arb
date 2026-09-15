@@ -24,6 +24,13 @@
   "logoutConfirm": "Are you sure you want to log out?",
   "aboutDescription": "Your personal digital wardrobe.",
   "version": "Version {version}",
+  "@version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "welcomeBack": "Welcome back",
   "createAccount": "Create account",
   "loginSubtitle": "Sign in to your wardrobe and keep managing your outfits.",
@@ -56,25 +63,30 @@
   "rearCameraNotFound": "Rear camera not found",
   "wardrobeLoadFailed": "Failed to load wardrobe",
   "categoryAll": "All",
-  "categoryTop": "Tops",
-  "categoryCoat": "Coats",
   "categoryDownJacket": "Down Jackets",
-  "categoryPants": "Pants",
   "categoryHat": "Hats",
-  "categoryShoes": "Shoes",
-  "categoryAccessories": "Accessories",
   "seasonSpring": "Spring",
   "seasonSummer": "Summer",
   "seasonAutumn": "Autumn",
   "seasonWinter": "Winter",
   "captureClothing": "Photograph Clothing",
   "cameraOpenFailed": "Unable to open camera: {error}",
+  "@cameraOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "takePhotoFailed": "Failed to take photo: {error}",
+  "@takePhotoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "addClothing": "Add Clothing",
-  "name": "Name",
-  "nameExample": "e.g. White T-shirt",
-  "clothingNameRequired": "Please enter a clothing name",
-  "nameMax100": "Name cannot exceed 100 characters",
   "brand": "Brand",
   "optional": "Optional",
   "leaveBlank": "Optional",
@@ -94,6 +106,13 @@
   "publicLabel": "Public",
   "publicSubtitle": "Friends can see it",
   "saveFailed": "Failed to save: {error}",
+  "@saveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "clothingDetails": "Clothing Details",
   "notSet": "Not set",
   "editCard": "Edit Card",
@@ -101,6 +120,13 @@
   "takePhoto": "Take Photo",
   "chooseFromGallery": "Choose from Gallery",
   "imageSelectFailed": "Failed to select image: {error}",
+  "@imageSelectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "saving": "Saving",
   "saveChanges": "Save Changes",
   "clothingImage": "Clothing Image",
@@ -109,6 +135,13 @@
   "friendRequests": "Friend Requests",
   "requestRejected": "Friend request rejected",
   "becameFriends": "{username} is now your friend",
+  "@becameFriends": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "noFriendRequests": "No friend requests",
   "accept": "Accept",
   "reject": "Reject",
@@ -116,13 +149,41 @@
   "selectAtLeastOne": "Please select at least one clothing item",
   "recommendationSent": "Clothing recommendation sent",
   "friendWardrobe": "{username}'s Wardrobe",
+  "@friendWardrobe": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "recommend": "Recommend",
   "selectClothing": "Select clothing",
   "recommendItemCount": "Recommend {count} items",
+  "@recommendItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noPublicClothing": "This wardrobe has no public clothing yet",
   "onlyPublicVisible": "Only Public clothing can be viewed by friends.",
   "recommendationFor": "Recommendation for {username}",
+  "@recommendationFor": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "selectedItems": "{count} items selected",
+  "@selectedItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "recommendationMessageHint": "Leave a note, for example: It's getting cooler this week, remember to wear these.",
   "recommendationMessageRequired": "Please enter a recommendation message",
   "sendRecommendation": "Send Recommendation",
@@ -146,14 +207,63 @@
   "recipientRead": "Read by recipient",
   "recipientUnread": "Unread by recipient",
   "clothingCount": "{count} items",
+  "@clothingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sentTo": "Sent to {username}",
+  "@sentTo": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "justNow": "Just now",
   "minutesAgo": "{count} minutes ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "hoursAgo": "{count} hours ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "recommendationFrom": "Recommendation from {username}",
+  "@recommendationFrom": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "recommendationTo": "Recommendation sent to {username}",
+  "@recommendationTo": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "recommendedClothing": "Recommended Clothing",
   "itemCount": "{count} items",
+  "@itemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "recommendationClothingMissing": "The recommended clothing no longer exists",
   "userProfile": "User Profile",
   "addFriend": "Add Friend",
@@ -165,6 +275,13 @@
   "remarkHint": "Enter a remark for this friend",
   "deleteFriend": "Remove Friend",
   "deleteFriendConfirm": "Are you sure you want to remove {username}?",
+  "@deleteFriendConfirm": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "pendingCancelNotFound": "No pending friend request was found",
   "alreadyFriends": "You are already friends",
   "friendRequestSent": "Friend request sent",
@@ -177,13 +294,48 @@
   "processFriendRequests": "Review Friend Requests",
   "viewWardrobe": "View Wardrobe",
   "remarkValue": "Remark: {remark}",
+  "@remarkValue": {
+    "placeholders": {
+      "remark": {
+        "type": "String"
+      }
+    }
+  },
   "removeFriend": "Remove Friend",
   "recommendationLoadFailed": "Failed to load recommendations: {error}",
+  "@recommendationLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "recommendationLetterFrom": "Recommendation letter from {username}",
+  "@recommendationLetterFrom": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "tapOpenLetter": "Tap to open this recommendation",
   "unreadRecommendations": "{count} unread recommendations",
+  "@unreadRecommendations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "receivedClothingRecommendation": "You received a clothing recommendation",
   "senderSentLetter": "{username} sent you a letter",
+  "@senderSentLetter": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "openLetter": "Open Letter",
   "storingLetter": "Saving",
   "keepLetter": "Keep This Letter",
@@ -216,173 +368,11 @@
   "recommendationItemNotFound": "A recommended clothing item no longer exists",
   "recommendationImageNotFound": "A recommended clothing image no longer exists",
   "serverDataInvalid": "The server returned invalid data",
-  "@version": {
-    "placeholders": {
-      "version": {
-        "type": "String"
-      }
-    }
-  },
-  "@cameraOpenFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "@takePhotoFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "@saveFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "@imageSelectFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "@becameFriends": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "@friendWardrobe": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "@recommendItemCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@recommendationFor": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "@selectedItems": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@clothingCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@sentTo": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "@minutesAgo": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@hoursAgo": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@recommendationFrom": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "@recommendationTo": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "@itemCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@deleteFriendConfirm": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "@remarkValue": {
-    "placeholders": {
-      "remark": {
-        "type": "String"
-      }
-    }
-  },
-  "@recommendationLoadFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "@recommendationLetterFrom": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-  "@unreadRecommendations": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@senderSentLetter": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
   "accountSection": "Account",
   "deleteAccount": "Delete Account",
   "deleteAccountSubtitle": "Permanently delete your account and related data",
   "deleteAccountDescription": "Your profile, clothing, friendships, and recommendation history will be permanently deleted. This action cannot be undone.",
   "deleteAccountEmailPrompt": "Enter {email} to confirm account deletion.",
-  "deleteAccountEmailHint": "Enter your account email",
   "@deleteAccountEmailPrompt": {
     "placeholders": {
       "email": {
@@ -390,7 +380,7 @@
       }
     }
   },
-
+  "deleteAccountEmailHint": "Enter your account email",
   "forgotPasswordTitle": "Forgot Password",
   "resetYourPassword": "Reset your password",
   "forgotPasswordSubtitle": "Enter your registered email and we will send you a verification code.",
@@ -409,5 +399,111 @@
   "verificationCodeRequestTooFrequent": "Please wait before requesting another verification code",
   "verificationEmailSendFailed": "Failed to send the verification email. Please try again later.",
   "newPasswordMustBeDifferent": "The new password must be different from the current password",
-  "currentPasswordIncorrect": "The current password is incorrect"
+  "currentPasswordIncorrect": "The current password is incorrect",
+  "storageLocation": "Storage location",
+  "storageLocationExample": "e.g. home, dormitory",
+  "storageLocationRequired": "Please enter a storage location",
+  "storageLocationMax100": "Storage location cannot exceed 100 characters",
+  "selectCategoryTitle": "Select Category",
+  "searchCategoryHint": "Search categories",
+  "noCategoryResults": "No matching categories",
+  "editClothing": "Edit Clothing",
+  "deleteClothing": "Delete Clothing",
+  "deletingClothing": "Deleting...",
+  "deleteClothingFailed": "Failed to delete clothing. Please try again later.",
+  "deleteClothingConfirm": "Delete this {category}?\n\nStorage location: {location}\nThis action cannot be undone.",
+  "@deleteClothingConfirm": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryGroupTops": "Tops",
+  "categoryGroupBottoms": "Bottoms",
+  "categoryGroupOnePiece": "One-piece",
+  "categoryGroupSets": "Sets",
+  "categoryGroupUnderwear": "Underwear",
+  "categoryGroupFootwear": "Footwear",
+  "categoryGroupAccessories": "Accessories",
+  "categoryTshirt": "T-Shirt",
+  "categoryShirt": "Shirt",
+  "categoryPolo": "Polo Shirt",
+  "categoryTank": "Tank Top / Camisole",
+  "categorySweatshirt": "Sweatshirt / Hoodie",
+  "categoryKnitwear": "Sweater / Knitwear",
+  "categoryCardigan": "Cardigan",
+  "categoryVest": "Vest",
+  "categoryBlazer": "Blazer",
+  "categoryJacket": "Jacket",
+  "categoryTrench": "Trench Coat",
+  "categoryLongCoat": "Coat",
+  "categoryPaddedJacket": "Padded Jacket",
+  "categoryShellJacket": "Shell Jacket",
+  "categoryLeatherJacket": "Leather Jacket",
+  "categorySunProtective": "Sun-protective Jacket",
+  "categoryOtherTops": "Other Tops",
+  "categoryJeans": "Jeans",
+  "categoryDressPants": "Dress Pants",
+  "categoryCasualPants": "Casual Pants",
+  "categoryCargoPants": "Cargo Pants",
+  "categorySweatpants": "Sweatpants",
+  "categoryLeggings": "Leggings",
+  "categoryWideLegPants": "Wide-leg Pants",
+  "categoryShorts": "Shorts",
+  "categorySkirt": "Skirt",
+  "categoryCulottes": "Culottes / Skort",
+  "categoryOtherBottoms": "Other Bottoms",
+  "categoryDress": "Dress",
+  "categoryGown": "Formal Gown",
+  "categoryJumpsuit": "Jumpsuit",
+  "categoryRomper": "Romper",
+  "categoryOveralls": "Overalls",
+  "categoryPinafore": "Pinafore Dress",
+  "categoryBodysuit": "Bodysuit",
+  "categoryOtherOnePiece": "Other One-piece",
+  "categorySuitSet": "Suit Set",
+  "categoryCasualSet": "Casual Set",
+  "categoryTracksuit": "Tracksuit",
+  "categoryKnitSet": "Knit Set",
+  "categoryPajamaSet": "Pajama Set",
+  "categoryLoungewear": "Loungewear",
+  "categorySwimwear": "Swimwear",
+  "categoryOtherSets": "Other Sets",
+  "categoryBra": "Bra",
+  "categoryBriefs": "Underwear",
+  "categoryUndershirt": "Undershirt",
+  "categoryBaseLayerTop": "Base-layer Top",
+  "categoryBaseLayerBottom": "Base-layer Bottom",
+  "categoryShapewear": "Shapewear",
+  "categorySocks": "Socks",
+  "categoryTights": "Tights",
+  "categoryStockings": "Stockings",
+  "categoryOtherUnderwear": "Other Underwear",
+  "categorySneakers": "Sneakers",
+  "categoryCasualShoes": "Casual Shoes",
+  "categoryCanvasShoes": "Canvas Shoes",
+  "categoryDressShoes": "Dress Shoes",
+  "categoryLoafers": "Loafers",
+  "categoryHeels": "Heels",
+  "categoryFlats": "Flats",
+  "categorySandals": "Sandals",
+  "categorySlippers": "Slippers",
+  "categoryAnkleBoots": "Ankle Boots",
+  "categoryTallBoots": "Tall Boots",
+  "categoryRainBoots": "Rain Boots",
+  "categoryHikingShoes": "Hiking Shoes",
+  "categoryOtherFootwear": "Other Footwear",
+  "categoryHeadwear": "Headwear",
+  "categoryScarf": "Scarf",
+  "categoryShawl": "Shawl",
+  "categoryGloves": "Gloves",
+  "categoryBelt": "Belt",
+  "categoryTie": "Tie",
+  "categoryBowTie": "Bow Tie",
+  "categorySleeve": "Sleeve / Arm Cover",
+  "categoryOtherAccessories": "Other Accessories"
 }

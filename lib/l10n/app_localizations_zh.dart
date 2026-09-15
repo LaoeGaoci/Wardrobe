@@ -179,25 +179,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get categoryAll => '全部';
 
   @override
-  String get categoryTop => '上衣';
-
-  @override
-  String get categoryCoat => '外套';
-
-  @override
   String get categoryDownJacket => '羽绒服';
 
   @override
-  String get categoryPants => '裤子';
-
-  @override
   String get categoryHat => '帽子';
-
-  @override
-  String get categoryShoes => '鞋子';
-
-  @override
-  String get categoryAccessories => '配饰';
 
   @override
   String get seasonSpring => '春季';
@@ -226,18 +211,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get addClothing => '添加衣物';
-
-  @override
-  String get name => '名称';
-
-  @override
-  String get nameExample => '例如：白色T恤';
-
-  @override
-  String get clothingNameRequired => '请输入衣物名称';
-
-  @override
-  String get nameMax100 => '名称不能超过100个字符';
 
   @override
   String get brand => '品牌';
@@ -282,13 +255,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get visibility => '可见性';
 
   @override
-  String get privateLabel => 'Private';
+  String get privateLabel => '私密';
 
   @override
   String get privateSubtitle => '只有你可以看到';
 
   @override
-  String get publicLabel => 'Public';
+  String get publicLabel => '公开';
 
   @override
   String get publicSubtitle => '好友可以看到';
@@ -385,7 +358,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noPublicClothing => '这个衣柜暂时没有公开衣物';
 
   @override
-  String get onlyPublicVisible => '只有设置为 Public 的衣物才能被好友看到。';
+  String get onlyPublicVisible => '只有设置为公开的衣物才能被好友看到。';
 
   @override
   String recommendationFor(String username) {
@@ -778,6 +751,296 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get currentPasswordIncorrect => '当前密码错误';
+
+  @override
+  String get storageLocation => '存放位置';
+
+  @override
+  String get storageLocationExample => '例如：家/宿舍';
+
+  @override
+  String get storageLocationRequired => '请输入存放位置';
+
+  @override
+  String get storageLocationMax100 => '存放位置不能超过100个字符';
+
+  @override
+  String get selectCategoryTitle => '选择类别';
+
+  @override
+  String get searchCategoryHint => '搜索类别';
+
+  @override
+  String get noCategoryResults => '没有匹配的类别';
+
+  @override
+  String get editClothing => '编辑衣物';
+
+  @override
+  String get deleteClothing => '删除衣物';
+
+  @override
+  String get deletingClothing => '正在删除...';
+
+  @override
+  String get deleteClothingFailed => '删除衣物失败，请稍后重试';
+
+  @override
+  String deleteClothingConfirm(String category, String location) {
+    return '确定要删除这件“$category”吗？\n\n存放位置：$location\n删除后无法恢复。';
+  }
+
+  @override
+  String get categoryGroupTops => '上装';
+
+  @override
+  String get categoryGroupBottoms => '下装';
+
+  @override
+  String get categoryGroupOnePiece => '连体装';
+
+  @override
+  String get categoryGroupSets => '套装';
+
+  @override
+  String get categoryGroupUnderwear => '内衣';
+
+  @override
+  String get categoryGroupFootwear => '鞋靴';
+
+  @override
+  String get categoryGroupAccessories => '配饰';
+
+  @override
+  String get categoryTshirt => 'T恤';
+
+  @override
+  String get categoryShirt => '衬衫';
+
+  @override
+  String get categoryPolo => 'Polo衫';
+
+  @override
+  String get categoryTank => '背心/吊带';
+
+  @override
+  String get categorySweatshirt => '卫衣';
+
+  @override
+  String get categoryKnitwear => '毛衣/针织衫';
+
+  @override
+  String get categoryCardigan => '开衫';
+
+  @override
+  String get categoryVest => '马甲';
+
+  @override
+  String get categoryBlazer => '西装外套';
+
+  @override
+  String get categoryJacket => '夹克';
+
+  @override
+  String get categoryTrench => '风衣';
+
+  @override
+  String get categoryLongCoat => '大衣';
+
+  @override
+  String get categoryPaddedJacket => '棉服';
+
+  @override
+  String get categoryShellJacket => '冲锋衣';
+
+  @override
+  String get categoryLeatherJacket => '皮衣';
+
+  @override
+  String get categorySunProtective => '防晒衣';
+
+  @override
+  String get categoryOtherTops => '其他上装';
+
+  @override
+  String get categoryJeans => '牛仔裤';
+
+  @override
+  String get categoryDressPants => '西裤';
+
+  @override
+  String get categoryCasualPants => '休闲裤';
+
+  @override
+  String get categoryCargoPants => '工装裤';
+
+  @override
+  String get categorySweatpants => '运动裤';
+
+  @override
+  String get categoryLeggings => '打底裤';
+
+  @override
+  String get categoryWideLegPants => '阔腿裤';
+
+  @override
+  String get categoryShorts => '短裤';
+
+  @override
+  String get categorySkirt => '半身裙';
+
+  @override
+  String get categoryCulottes => '裙裤';
+
+  @override
+  String get categoryOtherBottoms => '其他下装';
+
+  @override
+  String get categoryDress => '连衣裙';
+
+  @override
+  String get categoryGown => '礼服';
+
+  @override
+  String get categoryJumpsuit => '连体裤';
+
+  @override
+  String get categoryRomper => '连体短裤';
+
+  @override
+  String get categoryOveralls => '背带裤';
+
+  @override
+  String get categoryPinafore => '背带裙';
+
+  @override
+  String get categoryBodysuit => '连体衣';
+
+  @override
+  String get categoryOtherOnePiece => '其他连体装';
+
+  @override
+  String get categorySuitSet => '西装套装';
+
+  @override
+  String get categoryCasualSet => '休闲套装';
+
+  @override
+  String get categoryTracksuit => '运动套装';
+
+  @override
+  String get categoryKnitSet => '针织套装';
+
+  @override
+  String get categoryPajamaSet => '睡衣套装';
+
+  @override
+  String get categoryLoungewear => '居家服';
+
+  @override
+  String get categorySwimwear => '泳装';
+
+  @override
+  String get categoryOtherSets => '其他套装';
+
+  @override
+  String get categoryBra => '文胸';
+
+  @override
+  String get categoryBriefs => '内裤';
+
+  @override
+  String get categoryUndershirt => '内衣上衣';
+
+  @override
+  String get categoryBaseLayerTop => '打底上衣';
+
+  @override
+  String get categoryBaseLayerBottom => '打底裤';
+
+  @override
+  String get categoryShapewear => '塑身衣';
+
+  @override
+  String get categorySocks => '袜子';
+
+  @override
+  String get categoryTights => '连裤袜';
+
+  @override
+  String get categoryStockings => '长筒袜';
+
+  @override
+  String get categoryOtherUnderwear => '其他内衣';
+
+  @override
+  String get categorySneakers => '运动鞋';
+
+  @override
+  String get categoryCasualShoes => '休闲鞋';
+
+  @override
+  String get categoryCanvasShoes => '帆布鞋';
+
+  @override
+  String get categoryDressShoes => '正装鞋';
+
+  @override
+  String get categoryLoafers => '乐福鞋';
+
+  @override
+  String get categoryHeels => '高跟鞋';
+
+  @override
+  String get categoryFlats => '平底鞋';
+
+  @override
+  String get categorySandals => '凉鞋';
+
+  @override
+  String get categorySlippers => '拖鞋';
+
+  @override
+  String get categoryAnkleBoots => '短靴';
+
+  @override
+  String get categoryTallBoots => '长靴';
+
+  @override
+  String get categoryRainBoots => '雨靴';
+
+  @override
+  String get categoryHikingShoes => '登山鞋';
+
+  @override
+  String get categoryOtherFootwear => '其他鞋靴';
+
+  @override
+  String get categoryHeadwear => '头饰';
+
+  @override
+  String get categoryScarf => '围巾';
+
+  @override
+  String get categoryShawl => '披肩';
+
+  @override
+  String get categoryGloves => '手套';
+
+  @override
+  String get categoryBelt => '腰带';
+
+  @override
+  String get categoryTie => '领带';
+
+  @override
+  String get categoryBowTie => '领结';
+
+  @override
+  String get categorySleeve => '袖套';
+
+  @override
+  String get categoryOtherAccessories => '其他配饰';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -907,7 +1170,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get verificationCodeLength => '验证码应为 6 位';
 
   @override
-  String get verificationCodeSent => '验证码已发送，请检查邮箱';
+  String get verificationCodeSent => '验证码已发送';
 
   @override
   String get password => '密码';
@@ -955,25 +1218,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get categoryAll => '全部';
 
   @override
-  String get categoryTop => '上衣';
-
-  @override
-  String get categoryCoat => '外套';
-
-  @override
   String get categoryDownJacket => '羽绒服';
 
   @override
-  String get categoryPants => '裤子';
-
-  @override
   String get categoryHat => '帽子';
-
-  @override
-  String get categoryShoes => '鞋子';
-
-  @override
-  String get categoryAccessories => '配饰';
 
   @override
   String get seasonSpring => '春季';
@@ -1002,18 +1250,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get addClothing => '添加衣物';
-
-  @override
-  String get name => '名称';
-
-  @override
-  String get nameExample => '例如：白色T恤';
-
-  @override
-  String get clothingNameRequired => '请输入衣物名称';
-
-  @override
-  String get nameMax100 => '名称不能超过100个字符';
 
   @override
   String get brand => '品牌';
@@ -1058,13 +1294,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get visibility => '可见性';
 
   @override
-  String get privateLabel => 'Private';
+  String get privateLabel => '私密';
 
   @override
   String get privateSubtitle => '只有你可以看到';
 
   @override
-  String get publicLabel => 'Public';
+  String get publicLabel => '公开';
 
   @override
   String get publicSubtitle => '好友可以看到';
@@ -1161,7 +1397,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get noPublicClothing => '这个衣柜暂时没有公开衣物';
 
   @override
-  String get onlyPublicVisible => '只有设置为 Public 的衣物才能被好友看到。';
+  String get onlyPublicVisible => '只有设置为公开的衣物才能被好友看到。';
 
   @override
   String recommendationFor(String username) {
@@ -1554,6 +1790,296 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get currentPasswordIncorrect => '当前密码错误';
+
+  @override
+  String get storageLocation => '存放位置';
+
+  @override
+  String get storageLocationExample => '例如：家/宿舍';
+
+  @override
+  String get storageLocationRequired => '请输入存放位置';
+
+  @override
+  String get storageLocationMax100 => '存放位置不能超过100个字符';
+
+  @override
+  String get selectCategoryTitle => '选择类别';
+
+  @override
+  String get searchCategoryHint => '搜索类别';
+
+  @override
+  String get noCategoryResults => '没有匹配的类别';
+
+  @override
+  String get editClothing => '编辑衣物';
+
+  @override
+  String get deleteClothing => '删除衣物';
+
+  @override
+  String get deletingClothing => '正在删除...';
+
+  @override
+  String get deleteClothingFailed => '删除衣物失败，请稍后重试';
+
+  @override
+  String deleteClothingConfirm(String category, String location) {
+    return '确定要删除这件“$category”吗？\n\n存放位置：$location\n删除后无法恢复。';
+  }
+
+  @override
+  String get categoryGroupTops => '上装';
+
+  @override
+  String get categoryGroupBottoms => '下装';
+
+  @override
+  String get categoryGroupOnePiece => '连体装';
+
+  @override
+  String get categoryGroupSets => '套装';
+
+  @override
+  String get categoryGroupUnderwear => '内衣';
+
+  @override
+  String get categoryGroupFootwear => '鞋靴';
+
+  @override
+  String get categoryGroupAccessories => '配饰';
+
+  @override
+  String get categoryTshirt => 'T恤';
+
+  @override
+  String get categoryShirt => '衬衫';
+
+  @override
+  String get categoryPolo => 'Polo衫';
+
+  @override
+  String get categoryTank => '背心/吊带';
+
+  @override
+  String get categorySweatshirt => '卫衣';
+
+  @override
+  String get categoryKnitwear => '毛衣/针织衫';
+
+  @override
+  String get categoryCardigan => '开衫';
+
+  @override
+  String get categoryVest => '马甲';
+
+  @override
+  String get categoryBlazer => '西装外套';
+
+  @override
+  String get categoryJacket => '夹克';
+
+  @override
+  String get categoryTrench => '风衣';
+
+  @override
+  String get categoryLongCoat => '大衣';
+
+  @override
+  String get categoryPaddedJacket => '棉服';
+
+  @override
+  String get categoryShellJacket => '冲锋衣';
+
+  @override
+  String get categoryLeatherJacket => '皮衣';
+
+  @override
+  String get categorySunProtective => '防晒衣';
+
+  @override
+  String get categoryOtherTops => '其他上装';
+
+  @override
+  String get categoryJeans => '牛仔裤';
+
+  @override
+  String get categoryDressPants => '西裤';
+
+  @override
+  String get categoryCasualPants => '休闲裤';
+
+  @override
+  String get categoryCargoPants => '工装裤';
+
+  @override
+  String get categorySweatpants => '运动裤';
+
+  @override
+  String get categoryLeggings => '打底裤';
+
+  @override
+  String get categoryWideLegPants => '阔腿裤';
+
+  @override
+  String get categoryShorts => '短裤';
+
+  @override
+  String get categorySkirt => '半身裙';
+
+  @override
+  String get categoryCulottes => '裙裤';
+
+  @override
+  String get categoryOtherBottoms => '其他下装';
+
+  @override
+  String get categoryDress => '连衣裙';
+
+  @override
+  String get categoryGown => '礼服';
+
+  @override
+  String get categoryJumpsuit => '连体裤';
+
+  @override
+  String get categoryRomper => '连体短裤';
+
+  @override
+  String get categoryOveralls => '背带裤';
+
+  @override
+  String get categoryPinafore => '背带裙';
+
+  @override
+  String get categoryBodysuit => '连体衣';
+
+  @override
+  String get categoryOtherOnePiece => '其他连体装';
+
+  @override
+  String get categorySuitSet => '西装套装';
+
+  @override
+  String get categoryCasualSet => '休闲套装';
+
+  @override
+  String get categoryTracksuit => '运动套装';
+
+  @override
+  String get categoryKnitSet => '针织套装';
+
+  @override
+  String get categoryPajamaSet => '睡衣套装';
+
+  @override
+  String get categoryLoungewear => '居家服';
+
+  @override
+  String get categorySwimwear => '泳装';
+
+  @override
+  String get categoryOtherSets => '其他套装';
+
+  @override
+  String get categoryBra => '文胸';
+
+  @override
+  String get categoryBriefs => '内裤';
+
+  @override
+  String get categoryUndershirt => '内衣上衣';
+
+  @override
+  String get categoryBaseLayerTop => '打底上衣';
+
+  @override
+  String get categoryBaseLayerBottom => '打底裤';
+
+  @override
+  String get categoryShapewear => '塑身衣';
+
+  @override
+  String get categorySocks => '袜子';
+
+  @override
+  String get categoryTights => '连裤袜';
+
+  @override
+  String get categoryStockings => '长筒袜';
+
+  @override
+  String get categoryOtherUnderwear => '其他内衣';
+
+  @override
+  String get categorySneakers => '运动鞋';
+
+  @override
+  String get categoryCasualShoes => '休闲鞋';
+
+  @override
+  String get categoryCanvasShoes => '帆布鞋';
+
+  @override
+  String get categoryDressShoes => '正装鞋';
+
+  @override
+  String get categoryLoafers => '乐福鞋';
+
+  @override
+  String get categoryHeels => '高跟鞋';
+
+  @override
+  String get categoryFlats => '平底鞋';
+
+  @override
+  String get categorySandals => '凉鞋';
+
+  @override
+  String get categorySlippers => '拖鞋';
+
+  @override
+  String get categoryAnkleBoots => '短靴';
+
+  @override
+  String get categoryTallBoots => '长靴';
+
+  @override
+  String get categoryRainBoots => '雨靴';
+
+  @override
+  String get categoryHikingShoes => '登山鞋';
+
+  @override
+  String get categoryOtherFootwear => '其他鞋靴';
+
+  @override
+  String get categoryHeadwear => '头饰';
+
+  @override
+  String get categoryScarf => '围巾';
+
+  @override
+  String get categoryShawl => '披肩';
+
+  @override
+  String get categoryGloves => '手套';
+
+  @override
+  String get categoryBelt => '腰带';
+
+  @override
+  String get categoryTie => '领带';
+
+  @override
+  String get categoryBowTie => '领结';
+
+  @override
+  String get categorySleeve => '袖套';
+
+  @override
+  String get categoryOtherAccessories => '其他配饰';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1588,10 +2114,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get cancel => '取消';
 
   @override
-  String get confirm => '确定';
+  String get confirm => '確定';
 
   @override
-  String get delete => '删除';
+  String get delete => '刪除';
 
   @override
   String get reload => '重新載入';
@@ -1731,25 +2257,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get categoryAll => '全部';
 
   @override
-  String get categoryTop => '上衣';
-
-  @override
-  String get categoryCoat => '外套';
-
-  @override
   String get categoryDownJacket => '羽絨外套';
 
   @override
-  String get categoryPants => '褲子';
-
-  @override
   String get categoryHat => '帽子';
-
-  @override
-  String get categoryShoes => '鞋子';
-
-  @override
-  String get categoryAccessories => '配件';
 
   @override
   String get seasonSpring => '春季';
@@ -1780,18 +2291,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get addClothing => '新增衣物';
 
   @override
-  String get name => '名稱';
-
-  @override
-  String get nameExample => '例如：白色T恤';
-
-  @override
-  String get clothingNameRequired => '請輸入衣物名稱';
-
-  @override
-  String get nameMax100 => '名稱不能超過100個字元';
-
-  @override
   String get brand => '品牌';
 
   @override
@@ -1804,7 +2303,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get brandMax100 => '品牌不能超過100個字元';
 
   @override
-  String get category => '分类';
+  String get category => '分類';
 
   @override
   String get color => '顏色';
@@ -1816,7 +2315,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get colorRequired => '請輸入顏色';
 
   @override
-  String get season => '季节';
+  String get season => '季節';
 
   @override
   String get price => '價格';
@@ -1828,19 +2327,19 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get createClothing => '建立衣物';
 
   @override
-  String get retakePhoto => '重新拍摄';
+  String get retakePhoto => '重新拍攝';
 
   @override
   String get visibility => '可見性';
 
   @override
-  String get privateLabel => 'Private';
+  String get privateLabel => '私密';
 
   @override
   String get privateSubtitle => '只有你可以看到';
 
   @override
-  String get publicLabel => 'Public';
+  String get publicLabel => '公開';
 
   @override
   String get publicSubtitle => '好友可以看到';
@@ -1880,7 +2379,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get saveChanges => '儲存修改';
 
   @override
-  String get clothingImage => '衣物图片';
+  String get clothingImage => '衣物圖片';
 
   @override
   String get changeImage => '更換圖片';
@@ -1906,7 +2405,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get accept => '同意';
 
   @override
-  String get reject => '拒绝';
+  String get reject => '拒絕';
 
   @override
   String get onlyFriendsCanRecommend => '只有好友之間才能進行衣物推薦';
@@ -1923,30 +2422,30 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get recommend => '推荐';
+  String get recommend => '推薦';
 
   @override
   String get selectClothing => '請選擇衣物';
 
   @override
   String recommendItemCount(int count) {
-    return '推荐 $count 件衣物';
+    return '推薦 $count 件衣物';
   }
 
   @override
   String get noPublicClothing => '這個衣櫃暫時沒有公開衣物';
 
   @override
-  String get onlyPublicVisible => '只有設定為 Public 的衣物才能被好友看到。';
+  String get onlyPublicVisible => '只有設定為公開的衣物才能被好友看到。';
 
   @override
   String recommendationFor(String username) {
-    return '给 $username 的推荐';
+    return '給 $username 的推薦';
   }
 
   @override
   String selectedItems(int count) {
-    return '已选择 $count 件衣物';
+    return '已選擇 $count 件衣物';
   }
 
   @override
@@ -1971,7 +2470,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get trySearchUserOrEmail => '可以嘗試搜尋使用者名稱或電子郵件';
 
   @override
-  String get noFriends => '还没有好友';
+  String get noFriends => '還沒有好友';
 
   @override
   String get searchAndAddFriends => '搜尋使用者並新增好友吧';
@@ -1992,28 +2491,28 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get sentRecommendations => '發出的推薦';
 
   @override
-  String get noReceivedRecommendations => '还没有收到推荐';
+  String get noReceivedRecommendations => '還沒有收到推薦';
 
   @override
   String get receivedRecommendationsHint => '好友傳送給你的衣物推薦會出現在這裡';
 
   @override
-  String get noSentRecommendations => '还没有发出推荐';
+  String get noSentRecommendations => '還沒有發出推薦';
 
   @override
   String get sentRecommendationsHint => '你傳送給好友的衣物推薦會出現在這裡';
 
   @override
-  String get read => '已读';
+  String get read => '已讀';
 
   @override
-  String get unread => '未读';
+  String get unread => '未讀';
 
   @override
-  String get recipientRead => '对方已读';
+  String get recipientRead => '對方已讀';
 
   @override
-  String get recipientUnread => '对方未读';
+  String get recipientUnread => '對方未讀';
 
   @override
   String clothingCount(int count) {
@@ -2026,16 +2525,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get justNow => '刚刚';
+  String get justNow => '剛剛';
 
   @override
   String minutesAgo(int count) {
-    return '$count 分钟前';
+    return '$count 分鐘前';
   }
 
   @override
   String hoursAgo(int count) {
-    return '$count 小时前';
+    return '$count 小時前';
   }
 
   @override
@@ -2049,7 +2548,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get recommendedClothing => '推荐衣物';
+  String get recommendedClothing => '推薦衣物';
 
   @override
   String itemCount(int count) {
@@ -2095,13 +2594,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get pendingCancelNotFound => '找不到待取消的好友申請';
 
   @override
-  String get alreadyFriends => '你们已经是好友';
+  String get alreadyFriends => '你們已經是好友';
 
   @override
   String get friendRequestSent => '好友申請已傳送';
 
   @override
-  String get waitingApproval => '等待对方同意';
+  String get waitingApproval => '等待對方同意';
 
   @override
   String get receivedFriendRequest => '收到好友申請';
@@ -2110,7 +2609,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get friendRequestReceivedSubtitle => '對方已經向你傳送好友申請';
 
   @override
-  String get notFriendsYet => '还不是好友';
+  String get notFriendsYet => '還不是好友';
 
   @override
   String get canSendFriendRequest => '可以傳送好友申請';
@@ -2189,13 +2688,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get usernameRequired => '使用者名稱不能為空';
 
   @override
-  String get passwordMaxLength => '密码不能超过 128 位';
+  String get passwordMaxLength => '密碼不能超過 128 位';
 
   @override
   String get cannotAddSelf => '不能將自己加為好友';
 
   @override
-  String get userAlreadyFriend => '对方已经是你的好友';
+  String get userAlreadyFriend => '對方已經是你的好友';
 
   @override
   String get friendRequestAlreadySent => '好友申請已經傳送';
@@ -2222,7 +2721,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get friendClothingUnavailable => '好友衣物不存在或不可見';
 
   @override
-  String get clothingImageNotFound => '衣物图片不存在';
+  String get clothingImageNotFound => '衣物圖片不存在';
 
   @override
   String get cannotRecommendSelf => '不能給自己傳送推薦';
@@ -2330,4 +2829,294 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get currentPasswordIncorrect => '目前密碼錯誤';
+
+  @override
+  String get storageLocation => '存放位置';
+
+  @override
+  String get storageLocationExample => '例如：家／宿舍';
+
+  @override
+  String get storageLocationRequired => '請輸入存放位置';
+
+  @override
+  String get storageLocationMax100 => '存放位置不能超過100個字元';
+
+  @override
+  String get selectCategoryTitle => '選擇分類';
+
+  @override
+  String get searchCategoryHint => '搜尋分類';
+
+  @override
+  String get noCategoryResults => '沒有符合的分類';
+
+  @override
+  String get editClothing => '編輯衣物';
+
+  @override
+  String get deleteClothing => '刪除衣物';
+
+  @override
+  String get deletingClothing => '正在刪除...';
+
+  @override
+  String get deleteClothingFailed => '刪除衣物失敗，請稍後再試';
+
+  @override
+  String deleteClothingConfirm(String category, String location) {
+    return '確定要刪除這件「$category」嗎？\n\n存放位置：$location\n刪除後無法復原。';
+  }
+
+  @override
+  String get categoryGroupTops => '上裝';
+
+  @override
+  String get categoryGroupBottoms => '下裝';
+
+  @override
+  String get categoryGroupOnePiece => '連身裝';
+
+  @override
+  String get categoryGroupSets => '套裝';
+
+  @override
+  String get categoryGroupUnderwear => '內衣';
+
+  @override
+  String get categoryGroupFootwear => '鞋靴';
+
+  @override
+  String get categoryGroupAccessories => '配件';
+
+  @override
+  String get categoryTshirt => 'T恤';
+
+  @override
+  String get categoryShirt => '襯衫';
+
+  @override
+  String get categoryPolo => 'Polo衫';
+
+  @override
+  String get categoryTank => '背心／細肩帶上衣';
+
+  @override
+  String get categorySweatshirt => '運動衫／帽T';
+
+  @override
+  String get categoryKnitwear => '毛衣／針織衫';
+
+  @override
+  String get categoryCardigan => '開襟衫';
+
+  @override
+  String get categoryVest => '背心外套';
+
+  @override
+  String get categoryBlazer => '西裝外套';
+
+  @override
+  String get categoryJacket => '夾克';
+
+  @override
+  String get categoryTrench => '風衣';
+
+  @override
+  String get categoryLongCoat => '大衣';
+
+  @override
+  String get categoryPaddedJacket => '鋪棉外套';
+
+  @override
+  String get categoryShellJacket => '機能外套';
+
+  @override
+  String get categoryLeatherJacket => '皮衣';
+
+  @override
+  String get categorySunProtective => '防曬外套';
+
+  @override
+  String get categoryOtherTops => '其他上裝';
+
+  @override
+  String get categoryJeans => '牛仔褲';
+
+  @override
+  String get categoryDressPants => '西裝褲';
+
+  @override
+  String get categoryCasualPants => '休閒褲';
+
+  @override
+  String get categoryCargoPants => '工裝褲';
+
+  @override
+  String get categorySweatpants => '運動褲';
+
+  @override
+  String get categoryLeggings => '內搭褲';
+
+  @override
+  String get categoryWideLegPants => '寬褲';
+
+  @override
+  String get categoryShorts => '短褲';
+
+  @override
+  String get categorySkirt => '半身裙';
+
+  @override
+  String get categoryCulottes => '裙褲';
+
+  @override
+  String get categoryOtherBottoms => '其他下裝';
+
+  @override
+  String get categoryDress => '連身裙';
+
+  @override
+  String get categoryGown => '禮服';
+
+  @override
+  String get categoryJumpsuit => '連身褲';
+
+  @override
+  String get categoryRomper => '連身短褲';
+
+  @override
+  String get categoryOveralls => '吊帶褲';
+
+  @override
+  String get categoryPinafore => '吊帶裙';
+
+  @override
+  String get categoryBodysuit => '連身衣';
+
+  @override
+  String get categoryOtherOnePiece => '其他連身裝';
+
+  @override
+  String get categorySuitSet => '西裝套裝';
+
+  @override
+  String get categoryCasualSet => '休閒套裝';
+
+  @override
+  String get categoryTracksuit => '運動套裝';
+
+  @override
+  String get categoryKnitSet => '針織套裝';
+
+  @override
+  String get categoryPajamaSet => '睡衣套裝';
+
+  @override
+  String get categoryLoungewear => '居家服';
+
+  @override
+  String get categorySwimwear => '泳裝';
+
+  @override
+  String get categoryOtherSets => '其他套裝';
+
+  @override
+  String get categoryBra => '胸罩';
+
+  @override
+  String get categoryBriefs => '內褲';
+
+  @override
+  String get categoryUndershirt => '內衣上衣';
+
+  @override
+  String get categoryBaseLayerTop => '內搭上衣';
+
+  @override
+  String get categoryBaseLayerBottom => '內搭褲';
+
+  @override
+  String get categoryShapewear => '塑身衣';
+
+  @override
+  String get categorySocks => '襪子';
+
+  @override
+  String get categoryTights => '褲襪';
+
+  @override
+  String get categoryStockings => '長筒襪';
+
+  @override
+  String get categoryOtherUnderwear => '其他內衣';
+
+  @override
+  String get categorySneakers => '運動鞋';
+
+  @override
+  String get categoryCasualShoes => '休閒鞋';
+
+  @override
+  String get categoryCanvasShoes => '帆布鞋';
+
+  @override
+  String get categoryDressShoes => '正裝鞋';
+
+  @override
+  String get categoryLoafers => '樂福鞋';
+
+  @override
+  String get categoryHeels => '高跟鞋';
+
+  @override
+  String get categoryFlats => '平底鞋';
+
+  @override
+  String get categorySandals => '涼鞋';
+
+  @override
+  String get categorySlippers => '拖鞋';
+
+  @override
+  String get categoryAnkleBoots => '短靴';
+
+  @override
+  String get categoryTallBoots => '長靴';
+
+  @override
+  String get categoryRainBoots => '雨靴';
+
+  @override
+  String get categoryHikingShoes => '登山鞋';
+
+  @override
+  String get categoryOtherFootwear => '其他鞋靴';
+
+  @override
+  String get categoryHeadwear => '頭飾';
+
+  @override
+  String get categoryScarf => '圍巾';
+
+  @override
+  String get categoryShawl => '披肩';
+
+  @override
+  String get categoryGloves => '手套';
+
+  @override
+  String get categoryBelt => '腰帶';
+
+  @override
+  String get categoryTie => '領帶';
+
+  @override
+  String get categoryBowTie => '領結';
+
+  @override
+  String get categorySleeve => '袖套';
+
+  @override
+  String get categoryOtherAccessories => '其他配件';
 }

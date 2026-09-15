@@ -12,7 +12,10 @@ class Clothing {
   final String id;
   final String ownerId;
 
-  final String name;
+  /// 衣物存放位置，例如：
+  /// 主衣柜左侧第二层 / 收纳箱 A。
+  final String location;
+
   final String? brand;
   final String category;
   final String color;
@@ -38,7 +41,7 @@ class Clothing {
   const Clothing({
     required this.id,
     required this.ownerId,
-    required this.name,
+    required this.location,
     required this.imagePath,
     required this.imageType,
     required this.category,
@@ -46,8 +49,7 @@ class Clothing {
     required this.season,
     this.brand,
     this.price,
-    this.visibility =
-        ClothingVisibility.private,
+    this.visibility = ClothingVisibility.private,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -57,70 +59,34 @@ class Clothing {
   // ============================================================
 
   factory Clothing.fromJson(
-      Map<String, dynamic> json,
-      ) {
-    final rawPrice =
-    json['price'];
+    Map<String, dynamic> json,
+  ) {
+    final rawPrice = json['price'];
 
     final imageUrl =
-        json['imageUrl']
-        as String? ??
-            '';
+        json['imageUrl'] as String? ?? '';
 
     return Clothing(
-      id:
-      json['id'] as String,
-
-      ownerId:
-      json['ownerId']
-      as String,
-
-      name:
-      json['name']
-      as String,
-
-      brand:
-      json['brand']
-      as String?,
-
-      category:
-      json['category']
-      as String,
-
-      color:
-      json['color']
-      as String,
-
-      season:
-      json['season']
-      as String,
-
-      price:
-      rawPrice is num
+      id: json['id'] as String,
+      ownerId: json['ownerId'] as String,
+      location: json['location'] as String,
+      brand: json['brand'] as String?,
+      category: json['category'] as String,
+      color: json['color'] as String,
+      season: json['season'] as String,
+      price: rawPrice is num
           ? rawPrice.toDouble()
           : null,
-
-      imagePath:
-      imageUrl,
-
-      imageType:
-      ClothingImageType.remote,
-
-      visibility:
-      _visibilityFromJson(
+      imagePath: imageUrl,
+      imageType: ClothingImageType.remote,
+      visibility: _visibilityFromJson(
         json['visibility'],
       ),
-
-      createdAt:
-      DateTime.parse(
-        json['createdAt']
-        as String,
+      createdAt: DateTime.parse(
+        json['createdAt'] as String,
       ),
-
-      updatedAt:
-      DateTime.parse(
-        json['updatedAt']
-        as String,
+      updatedAt: DateTime.parse(
+        json['updatedAt'] as String,
       ),
     );
   }
@@ -131,24 +97,21 @@ class Clothing {
   /// createdAt / updatedAt
   /// 都由后端负责，
   /// 不应该从客户端提交。
-  Map<String, dynamic>
-  toRequestJson() {
+  Map<String, dynamic> toRequestJson() {
     return {
-      'name': name,
+      'location': location,
       'brand': brand,
       'category': category,
       'color': color,
       'season': season,
       'price': price,
-      'visibility':
-      visibility.name,
+      'visibility': visibility.name,
     };
   }
 
-  static ClothingVisibility
-  _visibilityFromJson(
-      dynamic value,
-      ) {
+  static ClothingVisibility _visibilityFromJson(
+    dynamic value,
+  ) {
     switch (value) {
       case 'public':
         return ClothingVisibility.public;
@@ -168,68 +131,32 @@ class Clothing {
   Clothing copyWith({
     String? id,
     String? ownerId,
-    String? name,
+    String? location,
     String? brand,
     String? imagePath,
-    ClothingImageType?
-    imageType,
+    ClothingImageType? imageType,
     String? category,
     String? color,
     String? season,
     double? price,
-    ClothingVisibility?
-    visibility,
+    ClothingVisibility? visibility,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
     return Clothing(
-      id:
-      id ?? this.id,
-
-      ownerId:
-      ownerId ??
-          this.ownerId,
-
-      name:
-      name ?? this.name,
-
-      brand:
-      brand ?? this.brand,
-
-      imagePath:
-      imagePath ??
-          this.imagePath,
-
-      imageType:
-      imageType ??
-          this.imageType,
-
-      category:
-      category ??
-          this.category,
-
-      color:
-      color ??
-          this.color,
-
-      season:
-      season ??
-          this.season,
-
-      price:
-      price ?? this.price,
-
-      visibility:
-      visibility ??
-          this.visibility,
-
-      createdAt:
-      createdAt ??
-          this.createdAt,
-
-      updatedAt:
-      updatedAt ??
-          this.updatedAt,
+      id: id ?? this.id,
+      ownerId: ownerId ?? this.ownerId,
+      location: location ?? this.location,
+      brand: brand ?? this.brand,
+      imagePath: imagePath ?? this.imagePath,
+      imageType: imageType ?? this.imageType,
+      category: category ?? this.category,
+      color: color ?? this.color,
+      season: season ?? this.season,
+      price: price ?? this.price,
+      visibility: visibility ?? this.visibility,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
