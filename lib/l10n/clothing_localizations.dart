@@ -73,6 +73,8 @@ const Map<String, List<String>> clothingCategoryHierarchy = {
     'underwear.undershirt',
     'underwear.base_layer_top',
     'underwear.base_layer_bottom',
+    'underwear.long_johns',
+    'underwear.thermal_pants',
     'underwear.shapewear',
     'underwear.socks',
     'underwear.tights',
@@ -154,7 +156,7 @@ String localizedCategory(
   final l10n = context.l10n;
 
   switch (categoryId) {
-    case 'tops.tshirt':
+    case 'tops.t-shirt':
       return l10n.categoryTshirt;
     case 'tops.shirt':
       return l10n.categoryShirt;
@@ -254,6 +256,10 @@ String localizedCategory(
       return l10n.categoryBaseLayerTop;
     case 'underwear.base_layer_bottom':
       return l10n.categoryBaseLayerBottom;
+    case 'underwear.long_johns':
+      return l10n.categoryLongJohns;
+    case 'underwear.thermal_pants':
+      return l10n.categoryThermalPants;
     case 'underwear.shapewear':
       return l10n.categoryShapewear;
     case 'underwear.socks':
@@ -335,6 +341,8 @@ String localizedSeason(BuildContext context, String season) {
   final l10n = context.l10n;
 
   switch (season) {
+    case '全季':
+      return l10n.seasonAll;
     case '春季':
       return l10n.seasonSpring;
     case '夏季':
@@ -343,6 +351,10 @@ String localizedSeason(BuildContext context, String season) {
       return l10n.seasonAutumn;
     case '冬季':
       return l10n.seasonWinter;
+    case '春秋':
+      return l10n.seasonSpringAutumn;
+    case '秋冬':
+      return l10n.seasonAutumnWinter;
     default:
       return season;
   }

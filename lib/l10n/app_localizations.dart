@@ -196,17 +196,35 @@ abstract class AppLocalizations {
   /// **'Receive outfit reminders'**
   String get notificationsSubtitle;
 
-  /// No description provided for @darkMode.
+  /// No description provided for @theme.
   ///
   /// In en, this message translates to:
-  /// **'Dark Mode'**
-  String get darkMode;
+  /// **'Theme'**
+  String get theme;
 
-  /// No description provided for @darkModeSubtitle.
+  /// No description provided for @themeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Use dark appearance'**
-  String get darkModeSubtitle;
+  /// **'Choose app appearance'**
+  String get themeSubtitle;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow system'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
 
   /// No description provided for @appSection.
   ///
@@ -447,6 +465,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hats'**
   String get categoryHat;
+
+  /// No description provided for @seasonAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All Seasons'**
+  String get seasonAll;
+
+  /// No description provided for @seasonSpringAutumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Spring / Autumn'**
+  String get seasonSpringAutumn;
+
+  /// No description provided for @seasonAutumnWinter.
+  ///
+  /// In en, this message translates to:
+  /// **'Autumn / Winter'**
+  String get seasonAutumnWinter;
 
   /// No description provided for @seasonSpring.
   ///
@@ -1899,6 +1935,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Base-layer Bottom'**
   String get categoryBaseLayerBottom;
+
+  /// No description provided for @categoryLongJohns.
+  ///
+  /// In en, this message translates to:
+  /// **'Long Johns'**
+  String get categoryLongJohns;
+
+  /// No description provided for @categoryThermalPants.
+  ///
+  /// In en, this message translates to:
+  /// **'Thermal Pants'**
+  String get categoryThermalPants;
 
   /// No description provided for @categoryShapewear.
   ///

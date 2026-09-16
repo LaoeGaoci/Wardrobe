@@ -6,18 +6,29 @@ import '../../services/auth_service.dart';
 
 class SettingsPage extends StatefulWidget {
   final bool notificationsEnabled;
-  final bool darkModeEnabled;
 
-  final ValueChanged<bool> onNotificationsChanged;
-  final ValueChanged<bool> onDarkModeChanged;
-  final ValueChanged<Locale> onLocaleChanged;
+  /// 当前主题模式。
+  ///
+  /// ThemeMode.system -> 跟随系统
+  /// ThemeMode.light  -> 浅色
+  /// ThemeMode.dark   -> 深色
+  final ThemeMode themeMode;
+
+  final ValueChanged<bool>
+  onNotificationsChanged;
+
+  final ValueChanged<ThemeMode>
+  onThemeModeChanged;
+
+  final ValueChanged<Locale>
+  onLocaleChanged;
 
   const SettingsPage({
     super.key,
     required this.notificationsEnabled,
-    required this.darkModeEnabled,
+    required this.themeMode,
     required this.onNotificationsChanged,
-    required this.onDarkModeChanged,
+    required this.onThemeModeChanged,
     required this.onLocaleChanged,
   });
 
@@ -28,10 +39,14 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState
     extends State<SettingsPage> {
-  late bool notificationsEnabled;
-  late bool darkModeEnabled;
+  late bool
+  notificationsEnabled;
 
-  bool _isDeletingAccount = false;
+  late ThemeMode
+  themeMode;
+
+  bool _isDeletingAccount =
+  false;
 
   @override
   void initState() {
@@ -40,8 +55,8 @@ class _SettingsPageState
     notificationsEnabled =
         widget.notificationsEnabled;
 
-    darkModeEnabled =
-        widget.darkModeEnabled;
+    themeMode =
+        widget.themeMode;
   }
 
   // ============================================================
@@ -51,24 +66,33 @@ class _SettingsPageState
   Locale _normalizedLocale(
       Locale locale,
       ) {
-    if (locale.languageCode == 'en') {
-      return const Locale('en');
+    if (locale.languageCode ==
+        'en') {
+      return const Locale(
+        'en',
+      );
     }
 
     final countryCode =
         locale.countryCode;
 
-    if (locale.scriptCode == 'Hant' ||
-        countryCode == 'TW' ||
-        countryCode == 'HK' ||
-        countryCode == 'MO') {
-      return const Locale.fromSubtags(
+    if (locale.scriptCode ==
+        'Hant' ||
+        countryCode ==
+            'TW' ||
+        countryCode ==
+            'HK' ||
+        countryCode ==
+            'MO') {
+      return const Locale
+          .fromSubtags(
         languageCode: 'zh',
         scriptCode: 'Hant',
       );
     }
 
-    return const Locale.fromSubtags(
+    return const Locale
+        .fromSubtags(
       languageCode: 'zh',
       scriptCode: 'Hans',
     );
@@ -78,7 +102,9 @@ class _SettingsPageState
       Locale locale,
       ) {
     final normalized =
-    _normalizedLocale(locale);
+    _normalizedLocale(
+      locale,
+    );
 
     if (normalized.languageCode ==
         'en') {
@@ -97,7 +123,9 @@ class _SettingsPageState
   _showLanguagePicker() async {
     final currentLocale =
     _normalizedLocale(
-      Localizations.localeOf(context),
+      Localizations.localeOf(
+        context,
+      ),
     );
 
     final selected =
@@ -108,43 +136,66 @@ class _SettingsPageState
           bottomSheetContext,
           ) {
         return SafeArea(
-          child: RadioGroup<Locale>(
+          child:
+          RadioGroup<Locale>(
             groupValue:
             currentLocale,
-            onChanged: (value) {
-              if (value != null) {
+            onChanged: (
+                value,
+                ) {
+              if (value !=
+                  null) {
                 Navigator.pop(
                   bottomSheetContext,
                   value,
                 );
               }
             },
-            child: const Column(
+            child:
+            const Column(
               mainAxisSize:
               MainAxisSize.min,
               children: [
-                RadioListTile<Locale>(
+                RadioListTile<
+                    Locale>(
                   value:
-                  Locale.fromSubtags(
-                    languageCode: 'zh',
-                    scriptCode: 'Hans',
+                  Locale
+                      .fromSubtags(
+                    languageCode:
+                    'zh',
+                    scriptCode:
+                    'Hans',
                   ),
                   title:
-                  Text('简体中文'),
+                  Text(
+                    '简体中文',
+                  ),
                 ),
-                RadioListTile<Locale>(
+                RadioListTile<
+                    Locale>(
                   value:
-                  Locale.fromSubtags(
-                    languageCode: 'zh',
-                    scriptCode: 'Hant',
+                  Locale
+                      .fromSubtags(
+                    languageCode:
+                    'zh',
+                    scriptCode:
+                    'Hant',
                   ),
                   title:
-                  Text('繁體中文'),
+                  Text(
+                    '繁體中文',
+                  ),
                 ),
-                RadioListTile<Locale>(
-                  value: Locale('en'),
+                RadioListTile<
+                    Locale>(
+                  value:
+                  Locale(
+                    'en',
+                  ),
                   title:
-                  Text('English'),
+                  Text(
+                    'English',
+                  ),
                 ),
               ],
             ),
@@ -164,19 +215,261 @@ class _SettingsPageState
   }
 
   // ============================================================
+  // Theme
+  // ============================================================
+
+  /// 当前语言使用的主题标题。
+  ///
+  /// 暂时放在这里，这样不修改 ARB
+  /// 也可以直接编译运行。
+  String _themeTitle(
+      Locale locale,
+      ) {
+    final normalized =
+    _normalizedLocale(
+      locale,
+    );
+
+    if (normalized.languageCode ==
+        'en') {
+      return 'Theme';
+    }
+
+    if (normalized.scriptCode ==
+        'Hant') {
+      return '主題';
+    }
+
+    return '主题';
+  }
+
+  String _themeSubtitle(
+      Locale locale,
+      ) {
+    final normalized =
+    _normalizedLocale(
+      locale,
+    );
+
+    if (normalized.languageCode ==
+        'en') {
+      return 'Choose app appearance';
+    }
+
+    if (normalized.scriptCode ==
+        'Hant') {
+      return '選擇應用程式外觀';
+    }
+
+    return '选择应用外观';
+  }
+
+  String _themeModeName(
+      Locale locale,
+      ThemeMode mode,
+      ) {
+    final normalized =
+    _normalizedLocale(
+      locale,
+    );
+
+    final isEnglish =
+        normalized.languageCode ==
+            'en';
+
+    final isTraditional =
+        normalized.scriptCode ==
+            'Hant';
+
+    switch (mode) {
+      case ThemeMode.system:
+        if (isEnglish) {
+          return 'Follow system';
+        }
+
+        if (isTraditional) {
+          return '跟隨系統';
+        }
+
+        return '跟随系统';
+
+      case ThemeMode.light:
+        if (isEnglish) {
+          return 'Light';
+        }
+
+        if (isTraditional) {
+          return '淺色';
+        }
+
+        return '浅色';
+
+      case ThemeMode.dark:
+        if (isEnglish) {
+          return 'Dark';
+        }
+
+        if (isTraditional) {
+          return '深色';
+        }
+
+        return '深色';
+    }
+  }
+
+  IconData _themeModeIcon(
+      ThemeMode mode,
+      ) {
+    switch (mode) {
+      case ThemeMode.system:
+        return Icons
+            .brightness_auto_outlined;
+
+      case ThemeMode.light:
+        return Icons
+            .light_mode_outlined;
+
+      case ThemeMode.dark:
+        return Icons
+            .dark_mode_outlined;
+    }
+  }
+
+  Future<void>
+  _showThemePicker() async {
+    final locale =
+    Localizations.localeOf(
+      context,
+    );
+
+    final selected =
+    await showModalBottomSheet<
+        ThemeMode>(
+      context: context,
+      builder: (
+          bottomSheetContext,
+          ) {
+        return SafeArea(
+          child:
+          RadioGroup<ThemeMode>(
+            groupValue:
+            themeMode,
+            onChanged: (
+                value,
+                ) {
+              if (value !=
+                  null) {
+                Navigator.pop(
+                  bottomSheetContext,
+                  value,
+                );
+              }
+            },
+            child: Column(
+              mainAxisSize:
+              MainAxisSize.min,
+              children: [
+                RadioListTile<
+                    ThemeMode>(
+                  value:
+                  ThemeMode
+                      .system,
+                  secondary:
+                  const Icon(
+                    Icons
+                        .brightness_auto_outlined,
+                  ),
+                  title: Text(
+                    _themeModeName(
+                      locale,
+                      ThemeMode
+                          .system,
+                    ),
+                  ),
+                ),
+                RadioListTile<
+                    ThemeMode>(
+                  value:
+                  ThemeMode
+                      .light,
+                  secondary:
+                  const Icon(
+                    Icons
+                        .light_mode_outlined,
+                  ),
+                  title: Text(
+                    _themeModeName(
+                      locale,
+                      ThemeMode
+                          .light,
+                    ),
+                  ),
+                ),
+                RadioListTile<
+                    ThemeMode>(
+                  value:
+                  ThemeMode
+                      .dark,
+                  secondary:
+                  const Icon(
+                    Icons
+                        .dark_mode_outlined,
+                  ),
+                  title: Text(
+                    _themeModeName(
+                      locale,
+                      ThemeMode
+                          .dark,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selected == null ||
+        !mounted) {
+      return;
+    }
+
+    if (selected ==
+        themeMode) {
+      return;
+    }
+
+    setState(() {
+      themeMode =
+          selected;
+    });
+
+    widget.onThemeModeChanged(
+      selected,
+    );
+  }
+
+  // ============================================================
   // Delete account
   // ============================================================
 
-  Future<void> _showDeleteAccountDialog() async {
-    final user = AuthService.instance.currentUser;
+  Future<void>
+  _showDeleteAccountDialog() async {
+    final user =
+        AuthService
+            .instance
+            .currentUser;
 
     if (user == null) {
       return;
     }
 
-    final confirmed = await showDialog<bool>(
+    final confirmed =
+    await showDialog<bool>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible:
+      false,
       builder: (_) {
         return _DeleteAccountDialog(
           email: user.email,
@@ -184,47 +477,55 @@ class _SettingsPageState
       },
     );
 
-    if (confirmed != true || !mounted) {
+    if (confirmed != true ||
+        !mounted) {
       return;
     }
 
     await _deleteAccount();
   }
 
-  Future<void> _deleteAccount() async {
+  Future<void>
+  _deleteAccount() async {
     if (_isDeletingAccount) {
       return;
     }
 
     setState(() {
-      _isDeletingAccount = true;
+      _isDeletingAccount =
+      true;
     });
 
     try {
-      await AuthService.instance.deleteAccount();
+      await AuthService
+          .instance
+          .deleteAccount();
 
       if (!mounted) {
         return;
       }
 
-      // 这里只退出 SettingsPage。
+      // 删除账号后 AuthService 会：
       //
-      // deleteAccount() 会：
       // currentUser = null
       // notifyListeners()
       //
-      // AuthGate 会自动把首页切换成 AuthPage。
-      Navigator.of(context).pop();
+      // AuthGate 会自动切换回登录页面。
+      Navigator.of(context)
+          .pop();
     } on AuthException catch (e) {
       if (!mounted) {
         return;
       }
 
       setState(() {
-        _isDeletingAccount = false;
+        _isDeletingAccount =
+        false;
       });
 
-      ScaffoldMessenger.of(context)
+      ScaffoldMessenger.of(
+        context,
+      )
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
@@ -234,7 +535,9 @@ class _SettingsPageState
                 e.message,
               ),
             ),
-            behavior: SnackBarBehavior.floating,
+            behavior:
+            SnackBarBehavior
+                .floating,
           ),
         );
     } catch (_) {
@@ -243,17 +546,24 @@ class _SettingsPageState
       }
 
       setState(() {
-        _isDeletingAccount = false;
+        _isDeletingAccount =
+        false;
       });
 
-      ScaffoldMessenger.of(context)
+      ScaffoldMessenger.of(
+        context,
+      )
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
             content: Text(
-              context.l10n.operationFailed,
+              context
+                  .l10n
+                  .operationFailed,
             ),
-            behavior: SnackBarBehavior.floating,
+            behavior:
+            SnackBarBehavior
+                .floating,
           ),
         );
     }
@@ -267,7 +577,8 @@ class _SettingsPageState
   Widget build(
       BuildContext context,
       ) {
-    final l10n = context.l10n;
+    final l10n =
+        context.l10n;
 
     final locale =
     Localizations.localeOf(
@@ -282,7 +593,8 @@ class _SettingsPageState
       appBar: AppBar(
         title: Text(
           l10n.settings,
-          style: const TextStyle(
+          style:
+          const TextStyle(
             fontWeight:
             FontWeight.w600,
           ),
@@ -301,17 +613,23 @@ class _SettingsPageState
 
           Text(
             l10n.preferences,
-            style: const TextStyle(
+            style:
+            const TextStyle(
               fontSize: 14,
               fontWeight:
               FontWeight.w600,
-              color: Colors.grey,
+              color:
+              Colors.grey,
             ),
           ),
 
           const SizedBox(
             height: 12,
           ),
+
+          // ====================================================
+          // Notifications
+          // ====================================================
 
           Card(
             elevation: 0,
@@ -342,7 +660,9 @@ class _SettingsPageState
               ),
               value:
               notificationsEnabled,
-              onChanged: (value) {
+              onChanged: (
+                  value,
+                  ) {
                 setState(() {
                   notificationsEnabled =
                       value;
@@ -360,22 +680,27 @@ class _SettingsPageState
             height: 12,
           ),
 
+          // ====================================================
+          // Theme
+          // ====================================================
+
           Card(
             elevation: 0,
-            child:
-            SwitchListTile(
+            child: ListTile(
               contentPadding:
               const EdgeInsets
                   .symmetric(
                 horizontal: 16,
               ),
-              secondary:
-              const Icon(
-                Icons
-                    .dark_mode_outlined,
+              leading: Icon(
+                _themeModeIcon(
+                  themeMode,
+                ),
               ),
               title: Text(
-                l10n.darkMode,
+                _themeTitle(
+                  locale,
+                ),
                 style:
                 const TextStyle(
                   fontWeight:
@@ -384,22 +709,39 @@ class _SettingsPageState
                 ),
               ),
               subtitle: Text(
-                l10n
-                    .darkModeSubtitle,
+                _themeSubtitle(
+                  locale,
+                ),
               ),
-              value:
-              darkModeEnabled,
-              onChanged: (value) {
-                setState(() {
-                  darkModeEnabled =
-                      value;
-                });
-
-                widget
-                    .onDarkModeChanged(
-                  value,
-                );
-              },
+              trailing: Row(
+                mainAxisSize:
+                MainAxisSize.min,
+                children: [
+                  Text(
+                    _themeModeName(
+                      locale,
+                      themeMode,
+                    ),
+                    style: TextStyle(
+                      color:
+                      colorScheme
+                          .onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 4,
+                  ),
+                  Icon(
+                    Icons
+                        .chevron_right,
+                    color:
+                    colorScheme
+                        .onSurfaceVariant,
+                  ),
+                ],
+              ),
+              onTap:
+              _showThemePicker,
             ),
           ),
 
@@ -413,17 +755,23 @@ class _SettingsPageState
 
           Text(
             l10n.appSection,
-            style: const TextStyle(
+            style:
+            const TextStyle(
               fontSize: 14,
               fontWeight:
               FontWeight.w600,
-              color: Colors.grey,
+              color:
+              Colors.grey,
             ),
           ),
 
           const SizedBox(
             height: 12,
           ),
+
+          // ====================================================
+          // Language
+          // ====================================================
 
           Card(
             elevation: 0,
@@ -442,15 +790,31 @@ class _SettingsPageState
                       .w500,
                 ),
               ),
-              trailing: Text(
-                _languageName(
-                  locale,
-                ),
-                style:
-                const TextStyle(
-                  color:
-                  Colors.grey,
-                ),
+              trailing: Row(
+                mainAxisSize:
+                MainAxisSize.min,
+                children: [
+                  Text(
+                    _languageName(
+                      locale,
+                    ),
+                    style: TextStyle(
+                      color:
+                      colorScheme
+                          .onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 4,
+                  ),
+                  Icon(
+                    Icons
+                        .chevron_right,
+                    color:
+                    colorScheme
+                        .onSurfaceVariant,
+                  ),
+                ],
               ),
               onTap:
               _showLanguagePicker,
@@ -467,11 +831,13 @@ class _SettingsPageState
 
           Text(
             l10n.accountSection,
-            style: const TextStyle(
+            style:
+            const TextStyle(
               fontSize: 14,
               fontWeight:
               FontWeight.w600,
-              color: Colors.grey,
+              color:
+              Colors.grey,
             ),
           ),
 
@@ -520,7 +886,8 @@ class _SettingsPageState
                     .deleteAccountSubtitle,
               ),
               trailing: Icon(
-                Icons.chevron_right,
+                Icons
+                    .chevron_right,
                 color:
                 colorScheme
                     .error,
@@ -536,6 +903,11 @@ class _SettingsPageState
     );
   }
 }
+
+// ============================================================
+// Delete Account Dialog
+// ============================================================
+
 class _DeleteAccountDialog
     extends StatefulWidget {
   final String email;
@@ -551,11 +923,13 @@ class _DeleteAccountDialog
 }
 
 class _DeleteAccountDialogState
-    extends State<_DeleteAccountDialog> {
+    extends State<
+        _DeleteAccountDialog> {
   late final TextEditingController
   _controller;
 
-  bool _emailMatches = false;
+  bool _emailMatches =
+  false;
 
   @override
   void initState() {
@@ -576,15 +950,21 @@ class _DeleteAccountDialogState
       String value,
       ) {
     final matches =
-        value.trim().toLowerCase() ==
-            widget.email.trim().toLowerCase();
+        value
+            .trim()
+            .toLowerCase() ==
+            widget.email
+                .trim()
+                .toLowerCase();
 
-    if (matches == _emailMatches) {
+    if (matches ==
+        _emailMatches) {
       return;
     }
 
     setState(() {
-      _emailMatches = matches;
+      _emailMatches =
+          matches;
     });
   }
 
@@ -593,97 +973,106 @@ class _DeleteAccountDialogState
       return;
     }
 
-    // 先主动关闭软键盘，
-    // 避免 Dialog 退出动画和 IME 动画同时进行。
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context)
+        .unfocus();
 
-    Navigator.of(context).pop(true);
+    Navigator.of(context)
+        .pop(true);
   }
 
   @override
   Widget build(
       BuildContext context,
       ) {
-    final l10n = context.l10n;
+    final l10n =
+        context.l10n;
 
     final colorScheme =
-        Theme.of(context).colorScheme;
+        Theme.of(context)
+            .colorScheme;
 
     return AlertDialog(
-      // 关键：
-      // 键盘弹出、横屏、小屏设备时允许内容滚动，
-      // 避免 RenderFlex overflow。
       scrollable: true,
-
       title: Row(
         children: [
           Icon(
-            Icons.warning_amber_rounded,
-            color: colorScheme.error,
+            Icons
+                .warning_amber_rounded,
+            color:
+            colorScheme.error,
           ),
-          const SizedBox(width: 10),
+
+          const SizedBox(
+            width: 10,
+          ),
+
           Expanded(
             child: Text(
-              l10n.deleteAccount,
+              l10n
+                  .deleteAccount,
             ),
           ),
         ],
       ),
-
       content: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize:
+        MainAxisSize.min,
         crossAxisAlignment:
         CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.deleteAccountDescription,
+            l10n
+                .deleteAccountDescription,
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(
+            height: 20,
+          ),
 
           Text(
-            l10n.deleteAccountEmailPrompt(
+            l10n
+                .deleteAccountEmailPrompt(
               widget.email,
             ),
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
+            style:
+            const TextStyle(
+              fontWeight:
+              FontWeight.w500,
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(
+            height: 12,
+          ),
 
           TextField(
-            controller: _controller,
-
-            // 不要 autofocus。
-            //
-            // 让用户点击输入框以后
-            // 再弹出键盘，会稳定很多。
+            controller:
+            _controller,
             autofocus: false,
-
             keyboardType:
-            TextInputType.emailAddress,
-
+            TextInputType
+                .emailAddress,
             autocorrect: false,
-
-            enableSuggestions: false,
-
+            enableSuggestions:
+            false,
             textInputAction:
             TextInputAction.done,
-
-            onChanged: _onEmailChanged,
-
+            onChanged:
+            _onEmailChanged,
             onSubmitted: (_) {
               if (_emailMatches) {
                 _confirm();
               }
             },
-
-            decoration: InputDecoration(
+            decoration:
+            InputDecoration(
               hintText:
-              l10n.deleteAccountEmailHint,
-              prefixIcon: const Icon(
-                Icons.email_outlined,
+              l10n
+                  .deleteAccountEmailHint,
+              prefixIcon:
+              const Icon(
+                Icons
+                    .email_outlined,
               ),
               border:
               const OutlineInputBorder(),
@@ -691,33 +1080,37 @@ class _DeleteAccountDialogState
           ),
         ],
       ),
-
       actions: [
         TextButton(
           onPressed: () {
-            FocusScope.of(context)
-                .unfocus();
+            FocusScope.of(
+              context,
+            ).unfocus();
 
-            Navigator.of(context)
-                .pop(false);
+            Navigator.of(
+              context,
+            ).pop(false);
           },
-          child: Text(
+          child:
+          Text(
             l10n.cancel,
           ),
         ),
-
         FilledButton(
           onPressed:
           _emailMatches
               ? _confirm
               : null,
-          style: FilledButton.styleFrom(
+          style:
+          FilledButton
+              .styleFrom(
             backgroundColor:
             colorScheme.error,
             foregroundColor:
             colorScheme.onError,
           ),
-          child: Text(
+          child:
+          Text(
             l10n.deleteAccount,
           ),
         ),

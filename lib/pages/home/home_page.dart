@@ -11,142 +11,265 @@ import 'recommendation_envelope_dialog.dart';
 import 'wardrobe_page.dart';
 
 class HomePage extends StatefulWidget {
-  final ValueChanged<bool> onThemeChanged;
-  final bool isDarkMode;
-  final ValueChanged<Locale> onLocaleChanged;
+  /// 当前主题模式：
+  ///
+  /// ThemeMode.system -> 跟随系统
+  /// ThemeMode.light  -> 浅色
+  /// ThemeMode.dark   -> 深色
+  final ThemeMode themeMode;
+
+  /// 修改主题模式
+  final ValueChanged<ThemeMode>
+  onThemeModeChanged;
+
+  /// 修改语言
+  final ValueChanged<Locale>
+  onLocaleChanged;
 
   const HomePage({
     super.key,
-    required this.onThemeChanged,
-    required this.isDarkMode,
+    required this.themeMode,
+    required this.onThemeModeChanged,
     required this.onLocaleChanged,
   });
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() =>
+      _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState
+    extends State<HomePage> {
   int selectedIndex = 0;
 
-  final RecommendationService _recommendationService =
+  final RecommendationService
+  _recommendationService =
       RecommendationService.instance;
-  final FriendService _friendService = FriendService.instance;
 
-  bool _openingRecommendation = false;
-  bool _loadingRecommendations = false;
+  final FriendService
+  _friendService =
+      FriendService.instance;
+
+  bool _openingRecommendation =
+  false;
+
+  bool _loadingRecommendations =
+  false;
 
   @override
   void initState() {
     super.initState();
 
-    _recommendationService.addListener(_onRecommendationChanged);
-    _friendService.addListener(_onFriendChanged);
+    _recommendationService
+        .addListener(
+      _onRecommendationChanged,
+    );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _refreshUnreadRecommendations();
-      _refreshFriendRequests();
-    });
+    _friendService.addListener(
+      _onFriendChanged,
+    );
+
+    WidgetsBinding.instance
+        .addPostFrameCallback(
+          (_) {
+        _refreshUnreadRecommendations();
+        _refreshFriendRequests();
+      },
+    );
   }
 
   @override
   void dispose() {
-    _recommendationService.removeListener(_onRecommendationChanged);
-    _friendService.removeListener(_onFriendChanged);
+    _recommendationService
+        .removeListener(
+      _onRecommendationChanged,
+    );
+
+    _friendService.removeListener(
+      _onFriendChanged,
+    );
+
     super.dispose();
   }
 
   void _onRecommendationChanged() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _onFriendChanged() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
-  Future<void> _refreshUnreadRecommendations() async {
-    if (_loadingRecommendations) return;
+  // ============================================================
+  // Recommendation
+  // ============================================================
 
-    setState(() => _loadingRecommendations = true);
+  Future<void>
+  _refreshUnreadRecommendations() async {
+    if (_loadingRecommendations) {
+      return;
+    }
+
+    setState(() {
+      _loadingRecommendations =
+      true;
+    });
 
     try {
-      await _recommendationService.refreshUnreadRecommendations();
+      await _recommendationService
+          .refreshUnreadRecommendations();
     } on RecommendationException catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
-      final error = localizedErrorMessage(context, e.message);
+      final error =
+      localizedErrorMessage(
+        context,
+        e.message,
+      );
+
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(context.l10n.recommendationLoadFailed(error)),
+            content: Text(
+              context.l10n
+                  .recommendationLoadFailed(
+                error,
+              ),
+            ),
           ),
         );
     } finally {
       if (mounted) {
-        setState(() => _loadingRecommendations = false);
+        setState(() {
+          _loadingRecommendations =
+          false;
+        });
       }
     }
   }
 
-  Future<void> _refreshFriendRequests() async {
+  Future<void>
+  _refreshFriendRequests() async {
     try {
-      await _friendService.refreshReceivedRequests();
+      await _friendService
+          .refreshReceivedRequests();
     } on FriendException {
-      // Badge sync failure must not block the home page.
+      // 好友申请角标同步失败
+      // 不应该阻塞主页。
     }
   }
 
-  Future<void> _openTopRecommendation() async {
-    if (_openingRecommendation) return;
+  Future<void>
+  _openTopRecommendation() async {
+    if (_openingRecommendation) {
+      return;
+    }
 
     final recommendation =
-        _recommendationService.latestUnreadRecommendation;
-    if (recommendation == null) return;
+        _recommendationService
+            .latestUnreadRecommendation;
 
-    setState(() => _openingRecommendation = true);
+    if (recommendation == null) {
+      return;
+    }
+
+    setState(() {
+      _openingRecommendation =
+      true;
+    });
 
     await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => RecommendationEnvelopeDialog(
-        recommendation: recommendation,
-      ),
+      builder: (_) =>
+          RecommendationEnvelopeDialog(
+            recommendation:
+            recommendation,
+          ),
     );
 
-    if (!mounted) return;
-    setState(() => _openingRecommendation = false);
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _openingRecommendation =
+      false;
+    });
   }
 
-  void _selectDestination(int index) {
-    setState(() => selectedIndex = index);
+  // ============================================================
+  // Navigation
+  // ============================================================
+
+  void _selectDestination(
+      int index,
+      ) {
+    setState(() {
+      selectedIndex =
+          index;
+    });
 
     if (index == 0) {
       _refreshUnreadRecommendations();
     }
   }
 
-  Widget _buildFriendNavigationIcon({required bool selected}) {
-    final requestCount = _friendService.receivedRequestCount;
+  Widget _buildFriendNavigationIcon({
+    required bool selected,
+  }) {
+    final requestCount =
+        _friendService
+            .receivedRequestCount;
 
     return Badge(
-      isLabelVisible: requestCount > 0,
-      label: Text(requestCount > 99 ? '99+' : '$requestCount'),
-      child: Icon(selected ? Icons.people : Icons.people_outline),
+      isLabelVisible:
+      requestCount > 0,
+      label: Text(
+        requestCount > 99
+            ? '99+'
+            : '$requestCount',
+      ),
+      child: Icon(
+        selected
+            ? Icons.people
+            : Icons.people_outline,
+      ),
     );
   }
 
+  // ============================================================
+  // UI
+  // ============================================================
+
   @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
+  Widget build(
+      BuildContext context,
+      ) {
+    final l10n =
+        context.l10n;
 
     final pages = [
       const WardrobePage(),
+
       const FriendsPage(),
+
       ProfilePage(
-        isDarkMode: widget.isDarkMode,
-        onThemeChanged: widget.onThemeChanged,
-        onLocaleChanged: widget.onLocaleChanged,
+        themeMode:
+        widget.themeMode,
+        onThemeModeChanged:
+        widget
+            .onThemeModeChanged,
+        onLocaleChanged:
+        widget
+            .onLocaleChanged,
       ),
     ];
 
@@ -155,10 +278,13 @@ class _HomePageState extends State<HomePage> {
         children: [
           Positioned.fill(
             child: IndexedStack(
-              index: selectedIndex,
-              children: pages,
+              index:
+              selectedIndex,
+              children:
+              pages,
             ),
           ),
+
           if (selectedIndex == 0)
             Positioned(
               left: 20,
@@ -166,88 +292,181 @@ class _HomePageState extends State<HomePage> {
               bottom: 18,
               child: SafeArea(
                 top: false,
-                child: _buildRecommendationOverlay(),
+                child:
+                _buildRecommendationOverlay(),
               ),
             ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: _selectDestination,
+
+      bottomNavigationBar:
+      NavigationBar(
+        selectedIndex:
+        selectedIndex,
+        onDestinationSelected:
+        _selectDestination,
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.checkroom_outlined),
-            selectedIcon: const Icon(Icons.checkroom),
-            label: l10n.wardrobe,
+            icon: const Icon(
+              Icons
+                  .checkroom_outlined,
+            ),
+            selectedIcon:
+            const Icon(
+              Icons.checkroom,
+            ),
+            label:
+            l10n.wardrobe,
           ),
+
           NavigationDestination(
-            icon: _buildFriendNavigationIcon(selected: false),
-            selectedIcon: _buildFriendNavigationIcon(selected: true),
-            label: l10n.friends,
+            icon:
+            _buildFriendNavigationIcon(
+              selected: false,
+            ),
+            selectedIcon:
+            _buildFriendNavigationIcon(
+              selected: true,
+            ),
+            label:
+            l10n.friends,
           ),
+
           NavigationDestination(
-            icon: const Icon(Icons.person_outline),
-            selectedIcon: const Icon(Icons.person),
-            label: l10n.profile,
+            icon: const Icon(
+              Icons
+                  .person_outline,
+            ),
+            selectedIcon:
+            const Icon(
+              Icons.person,
+            ),
+            label:
+            l10n.profile,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildRecommendationOverlay() {
-    final unread = _recommendationService.unreadRecommendations;
-    if (unread.isEmpty) return const SizedBox.shrink();
+  // ============================================================
+  // Recommendation Overlay
+  // ============================================================
 
-    final top = unread.first;
+  Widget
+  _buildRecommendationOverlay() {
+    final unread =
+        _recommendationService
+            .unreadRecommendations;
+
+    if (unread.isEmpty) {
+      return const SizedBox
+          .shrink();
+    }
+
+    final top =
+        unread.first;
 
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 420),
-      switchInCurve: Curves.easeOutBack,
-      switchOutCurve: Curves.easeIn,
-      layoutBuilder: (currentChild, previousChildren) {
+      duration:
+      const Duration(
+        milliseconds: 420,
+      ),
+      switchInCurve:
+      Curves.easeOutBack,
+      switchOutCurve:
+      Curves.easeIn,
+      layoutBuilder: (
+          currentChild,
+          previousChildren,
+          ) {
         return Stack(
-          alignment: Alignment.bottomCenter,
+          alignment:
+          Alignment
+              .bottomCenter,
           children: [
             ...previousChildren,
-            if (currentChild != null) currentChild,
+            if (currentChild !=
+                null)
+              currentChild,
           ],
         );
       },
-      transitionBuilder: (child, animation) {
-        final curved = CurvedAnimation(
+      transitionBuilder: (
+          child,
+          animation,
+          ) {
+        final curved =
+        CurvedAnimation(
           parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
+          curve:
+          Curves.easeOutCubic,
+          reverseCurve:
+          Curves.easeInCubic,
         );
 
         return FadeTransition(
           opacity: animation,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0.10, 0.08),
-              end: Offset.zero,
-            ).animate(curved),
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.96, end: 1.0).animate(curved),
-              child: child,
+          child:
+          SlideTransition(
+            position:
+            Tween<Offset>(
+              begin:
+              const Offset(
+                0.10,
+                0.08,
+              ),
+              end:
+              Offset.zero,
+            ).animate(
+              curved,
+            ),
+            child:
+            ScaleTransition(
+              scale:
+              Tween<double>(
+                begin: 0.96,
+                end: 1.0,
+              ).animate(
+                curved,
+              ),
+              child:
+              child,
             ),
           ),
         );
       },
-      child: _RecommendationEnvelopeStack(
-        key: ValueKey(top.id),
-        recommendations: unread,
-        totalCount: _recommendationService.unreadCount,
-        onTap: _openingRecommendation ? null : _openTopRecommendation,
+      child:
+      _RecommendationEnvelopeStack(
+        key:
+        ValueKey(
+          top.id,
+        ),
+        recommendations:
+        unread,
+        totalCount:
+        _recommendationService
+            .unreadCount,
+        onTap:
+        _openingRecommendation
+            ? null
+            : _openTopRecommendation,
       ),
     );
   }
 }
 
-class _RecommendationEnvelopeStack extends StatelessWidget {
-  final List<ClothingRecommendation> recommendations;
+// ============================================================
+// Recommendation Envelope Stack
+// ============================================================
+
+class _RecommendationEnvelopeStack
+    extends StatelessWidget {
+  final List<ClothingRecommendation>
+  recommendations;
+
   final int totalCount;
+
   final VoidCallback? onTap;
 
   const _RecommendationEnvelopeStack({
@@ -258,75 +477,146 @@ class _RecommendationEnvelopeStack extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final visible = recommendations.take(3).toList(growable: false);
+  Widget build(
+      BuildContext context,
+      ) {
+    final visible =
+    recommendations
+        .take(3)
+        .toList(
+      growable: false,
+    );
 
     return SizedBox(
       height: 180,
       child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.bottomCenter,
+        clipBehavior:
+        Clip.none,
+        alignment:
+        Alignment
+            .bottomCenter,
         children: [
-          for (int depth = visible.length - 1; depth >= 0; depth--)
-            _buildEnvelopeLayer(context, visible[depth], depth),
+          for (
+          int depth =
+              visible.length - 1;
+          depth >= 0;
+          depth--
+          )
+            _buildEnvelopeLayer(
+              context,
+              visible[depth],
+              depth,
+            ),
         ],
       ),
     );
   }
 
   Widget _buildEnvelopeLayer(
-    BuildContext context,
-    ClothingRecommendation recommendation,
-    int depth,
-  ) {
-    final isTop = depth == 0;
-    final verticalOffset = -12.0 * depth;
-    final scale = 1.0 - (depth * 0.035);
+      BuildContext context,
+      ClothingRecommendation
+      recommendation,
+      int depth,
+      ) {
+    final isTop =
+        depth == 0;
+
+    final verticalOffset =
+        -12.0 * depth;
+
+    final scale =
+        1.0 -
+            (depth * 0.035);
 
     return Transform.translate(
-      offset: Offset(0, verticalOffset),
-      child: Transform.scale(
+      offset: Offset(
+        0,
+        verticalOffset,
+      ),
+      child:
+      Transform.scale(
         scale: scale,
-        alignment: Alignment.bottomCenter,
+        alignment:
+        Alignment
+            .bottomCenter,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: depth * 10.0),
+          padding:
+          EdgeInsets.symmetric(
+            horizontal:
+            depth * 10.0,
+          ),
           child: SizedBox(
-            width: double.infinity,
+            width:
+            double.infinity,
             height: 138,
             child: isTop
-                ? _buildTopEnvelope(context, recommendation)
-                : _buildBackEnvelope(context, depth),
+                ? _buildTopEnvelope(
+              context,
+              recommendation,
+            )
+                : _buildBackEnvelope(
+              context,
+              depth,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBackEnvelope(BuildContext context, int depth) {
+  Widget _buildBackEnvelope(
+      BuildContext context,
+      int depth,
+      ) {
     return Material(
       elevation: 2,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius:
+      BorderRadius.circular(
+        20,
+      ),
       color: depth == 1
-          ? Theme.of(context).colorScheme.surfaceContainerHigh
-          : Theme.of(context).colorScheme.surfaceContainer,
+          ? Theme.of(context)
+          .colorScheme
+          .surfaceContainerHigh
+          : Theme.of(context)
+          .colorScheme
+          .surfaceContainer,
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+        decoration:
+        BoxDecoration(
+          borderRadius:
+          BorderRadius.circular(
+            20,
+          ),
           border: Border.all(
-            color: Theme.of(context).colorScheme.outlineVariant,
+            color:
+            Theme.of(context)
+                .colorScheme
+                .outlineVariant,
           ),
         ),
         child: Align(
-          alignment: Alignment.topCenter,
+          alignment:
+          Alignment
+              .topCenter,
           child: Padding(
-            padding: const EdgeInsets.only(top: 10),
+            padding:
+            const EdgeInsets
+                .only(
+              top: 10,
+            ),
             child: Icon(
-              Icons.mail_outline,
+              Icons
+                  .mail_outline,
               size: 20,
-              color: Theme.of(context)
+              color:
+              Theme.of(context)
                   .colorScheme
                   .onSurfaceVariant
-                  .withValues(alpha: 0.45),
+                  .withValues(
+                alpha:
+                0.45,
+              ),
             ),
           ),
         ),
@@ -335,87 +625,206 @@ class _RecommendationEnvelopeStack extends StatelessWidget {
   }
 
   Widget _buildTopEnvelope(
-    BuildContext context,
-    ClothingRecommendation recommendation,
-  ) {
-    final senderName = recommendation.fromUser.username;
-    final l10n = context.l10n;
+      BuildContext context,
+      ClothingRecommendation
+      recommendation,
+      ) {
+    final senderName =
+        recommendation
+            .fromUser
+            .username;
+
+    final l10n =
+        context.l10n;
 
     return Material(
       elevation: 10,
-      borderRadius: BorderRadius.circular(20),
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      clipBehavior: Clip.antiAlias,
+      borderRadius:
+      BorderRadius.circular(
+        20,
+      ),
+      color:
+      Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest,
+      clipBehavior:
+      Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding:
+          const EdgeInsets
+              .symmetric(
+            horizontal: 18,
+            vertical: 16,
+          ),
           child: Row(
             children: [
               Container(
                 width: 54,
                 height: 54,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(16),
+                decoration:
+                BoxDecoration(
+                  color:
+                  Theme.of(
+                    context,
+                  )
+                      .colorScheme
+                      .primaryContainer,
+                  borderRadius:
+                  BorderRadius.circular(
+                    16,
+                  ),
                 ),
                 child: Icon(
-                  Icons.mail_outline,
+                  Icons
+                      .mail_outline,
                   size: 30,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  color:
+                  Theme.of(
+                    context,
+                  )
+                      .colorScheme
+                      .onPrimaryContainer,
                 ),
               ),
-              const SizedBox(width: 14),
+
+              const SizedBox(
+                width: 14,
+              ),
+
               Expanded(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment:
+                  MainAxisAlignment
+                      .center,
+                  crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
                   children: [
                     Text(
-                      l10n.recommendationLetterFrom(senderName),
+                      l10n
+                          .recommendationLetterFrom(
+                        senderName,
+                      ),
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      overflow:
+                      TextOverflow
+                          .ellipsis,
+                      style:
+                      Theme.of(
+                        context,
+                      )
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(
+                        fontWeight:
+                        FontWeight
+                            .bold,
+                      ),
                     ),
-                    const SizedBox(height: 5),
+
+                    const SizedBox(
+                      height: 5,
+                    ),
+
                     Text(
-                      recommendation.message,
+                      recommendation
+                          .message,
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
-                          ),
+                      overflow:
+                      TextOverflow
+                          .ellipsis,
+                      style:
+                      Theme.of(
+                        context,
+                      )
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(
+                        color:
+                        Theme.of(
+                          context,
+                        )
+                            .colorScheme
+                            .onSurfaceVariant,
+                      ),
                     ),
-                    const SizedBox(height: 7),
+
+                    const SizedBox(
+                      height: 7,
+                    ),
+
                     Text(
                       totalCount == 1
-                          ? l10n.tapOpenLetter
-                          : l10n.unreadRecommendations(totalCount),
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                          ? l10n
+                          .tapOpenLetter
+                          : l10n
+                          .unreadRecommendations(
+                        totalCount,
+                      ),
+                      style:
+                      Theme.of(
+                        context,
+                      )
+                          .textTheme
+                          .labelMedium
+                          ?.copyWith(
+                        color:
+                        Theme.of(
+                          context,
+                        )
+                            .colorScheme
+                            .primary,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
+
+              const SizedBox(
+                width: 10,
+              ),
+
               Container(
-                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.circular(16),
+                constraints:
+                const BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
                 ),
-                alignment: Alignment.center,
+                padding:
+                const EdgeInsets
+                    .symmetric(
+                  horizontal: 8,
+                ),
+                decoration:
+                BoxDecoration(
+                  color:
+                  Theme.of(
+                    context,
+                  )
+                      .colorScheme
+                      .primary,
+                  borderRadius:
+                  BorderRadius.circular(
+                    16,
+                  ),
+                ),
+                alignment:
+                Alignment.center,
                 child: Text(
                   '$totalCount',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    fontWeight: FontWeight.bold,
+                  style:
+                  TextStyle(
+                    color:
+                    Theme.of(
+                      context,
+                    )
+                        .colorScheme
+                        .onPrimary,
+                    fontWeight:
+                    FontWeight
+                        .bold,
                   ),
                 ),
               ),
