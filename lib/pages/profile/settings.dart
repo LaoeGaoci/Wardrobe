@@ -1,25 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
-import '../../services/auth_service.dart';
-import '../../services/notification_service.dart';
+import '../../services/users/auth_service.dart';
+import '../../services/notification/notification_service.dart';
 
 class SettingsPage extends StatefulWidget {
-  // Kept for compatibility with the existing ProfilePage.
-  // NotificationService is the real source of truth.
+  // 为兼容现有 ProfilePage 保留。
+  // 通知真实状态由 NotificationService 管理。
   final bool notificationsEnabled;
 
   final ThemeMode themeMode;
 
-  final ValueChanged<bool>
-      onNotificationsChanged;
+  final ValueChanged<bool> onNotificationsChanged;
 
-  final ValueChanged<ThemeMode>
-      onThemeModeChanged;
+  final ValueChanged<ThemeMode> onThemeModeChanged;
 
-  final ValueChanged<Locale>
-      onLocaleChanged;
+  final ValueChanged<Locale> onLocaleChanged;
 
   const SettingsPage({
     super.key,
@@ -31,51 +30,42 @@ class SettingsPage extends StatefulWidget {
   });
 
   @override
-  State<SettingsPage> createState() =>
-      _SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState
-    extends State<SettingsPage> {
-  final NotificationService
-      _notificationService =
-      NotificationService.instance;
+class _SettingsPageState extends State<SettingsPage> {
+  final NotificationService _notificationService = NotificationService.instance;
 
-  late bool
-      notificationsEnabled;
+  late bool notificationsEnabled;
+  late ThemeMode themeMode;
 
-  late ThemeMode
-      themeMode;
+  bool _changingNotification = false;
+  bool _isDeletingAccount = false;
 
-  bool _changingNotification =
-      false;
-
-  bool _isDeletingAccount =
-      false;
+  // ==========================================================
+  // Lifecycle
+  // ==========================================================
 
   @override
   void initState() {
     super.initState();
 
-    notificationsEnabled =
-        _notificationService
-            .enabled;
+    notificationsEnabled = _notificationService.enabled;
 
-    themeMode =
-        widget.themeMode;
+    themeMode = widget.themeMode;
 
-    _notificationService
-        .addListener(
-      _onNotificationChanged,
-    );
+    _notificationService.addListener(_onNotificationChanged);
+
+    // 用户可能在 Android 系统设置中手动关闭了通知。
+    // 每次进入 Settings 时重新同步一次真实权限。
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_notificationService.refreshSystemPermission());
+    });
   }
 
   @override
   void dispose() {
-    _notificationService
-        .removeListener(
-      _onNotificationChanged,
-    );
+    _notificationService.removeListener(_onNotificationChanged);
 
     super.dispose();
   }
@@ -86,334 +76,138 @@ class _SettingsPageState
     }
 
     setState(() {
-      notificationsEnabled =
-          _notificationService
-              .enabled;
+      notificationsEnabled = _notificationService.enabled;
     });
+
+    // 当前 ProfilePage 里这个 callback 可以继续保留兼容。
+    widget.onNotificationsChanged(notificationsEnabled);
   }
 
   // ==========================================================
   // Notification
   // ==========================================================
 
-  Future<void>
-      _changeNotificationSetting(
-    bool value,
-  ) async {
+  Future<void> _changeNotificationSetting(bool value) async {
     if (_changingNotification) {
       return;
     }
 
     setState(() {
-      _changingNotification =
-          true;
+      _changingNotification = true;
     });
 
-    final success =
-        await _notificationService
-            .setEnabled(
-      value,
-    );
+    try {
+      final success = await _notificationService.setEnabled(value);
 
-    if (!mounted) {
-      return;
-    }
+      if (!mounted) {
+        return;
+      }
 
-    setState(() {
-      _changingNotification =
-          false;
+      notificationsEnabled = _notificationService.enabled;
 
-      notificationsEnabled =
-          _notificationService
-              .enabled;
-    });
+      widget.onNotificationsChanged(notificationsEnabled);
 
-    // Keep the old callback alive for compatibility.
-    widget
-        .onNotificationsChanged(
-      notificationsEnabled,
-    );
+      // 用户主动打开通知，但 Android 权限未授予。
+      // 此时跳到系统通知设置。
+      if (value && !success) {
+        final opened = await _notificationService
+            .openSystemNotificationSettings();
 
-    if (
-      value &&
-      !success
-    ) {
-      await _showPermissionDialog();
+        if (!opened && mounted) {
+          _showUnableToOpenSettingsMessage();
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _changingNotification = false;
+
+          notificationsEnabled = _notificationService.enabled;
+        });
+      }
     }
   }
 
-  Future<void>
-      _showPermissionDialog() async {
-    final locale =
-        _normalizedLocale(
-      Localizations.localeOf(
-        context,
-      ),
-    );
-
-    final isEnglish =
-        locale.languageCode ==
-            'en';
-
-    final isTraditional =
-        locale.scriptCode ==
-            'Hant';
-
-    final message =
-        isEnglish
-            ? 'Notification permission is required to receive friend requests, clothing recommendations and system notifications.'
-            : isTraditional
-                ? '需要允許系統通知權限，才能接收好友請求、衣物推薦和系統通知。'
-                : '需要允许系统通知权限，才能接收好友请求、衣物推荐和系统通知。';
-
-    final settingsText =
-        isEnglish
-            ? 'Open system settings'
-            : isTraditional
-                ? '前往系統設定'
-                : '前往系统设置';
-
-    final open =
-        await showDialog<bool>(
-      context:
-          context,
-
-      builder:
-          (dialogContext) {
-        return AlertDialog(
-          title:
-              Text(
-            context
-                .l10n
-                .notifications,
-          ),
-
-          content:
-              Text(
-            message,
-          ),
-
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  false,
-                );
-              },
-              child:
-                  Text(
-                context
-                    .l10n
-                    .cancel,
-              ),
-            ),
-
-            FilledButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  true,
-                );
-              },
-              child:
-                  Text(
-                settingsText,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (
-      open == true
-    ) {
-      await _notificationService
-          .openSystemNotificationSettings();
-    }
+  void _showUnableToOpenSettingsMessage() {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.notificationSettingsOpenFailed),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   // ==========================================================
   // Locale
   // ==========================================================
 
-  Locale _normalizedLocale(
-    Locale locale,
-  ) {
-    if (
-      locale.languageCode ==
-      'en'
-    ) {
-      return const Locale(
-        'en',
-      );
+  Locale _normalizedLocale(Locale locale) {
+    if (locale.languageCode == 'en') {
+      return const Locale('en');
     }
 
-    final countryCode =
-        locale.countryCode;
+    final countryCode = locale.countryCode;
 
-    if (
-      locale.scriptCode ==
-          'Hant' ||
-      countryCode ==
-          'TW' ||
-      countryCode ==
-          'HK' ||
-      countryCode ==
-          'MO'
-    ) {
-      return const Locale
-          .fromSubtags(
-        languageCode:
-            'zh',
-        scriptCode:
-            'Hant',
-      );
+    if (locale.scriptCode == 'Hant' ||
+        countryCode == 'TW' ||
+        countryCode == 'HK' ||
+        countryCode == 'MO') {
+      return const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant');
     }
 
-    return const Locale
-        .fromSubtags(
-      languageCode:
-          'zh',
-      scriptCode:
-          'Hans',
-    );
+    return const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans');
   }
 
-  String _languageName(
-    Locale locale,
-  ) {
-    final normalized =
-        _normalizedLocale(
-      locale,
-    );
+  String _languageName(Locale locale) {
+    final normalized = _normalizedLocale(locale);
 
-    if (
-      normalized.languageCode ==
-      'en'
-    ) {
+    if (normalized.languageCode == 'en') {
       return 'English';
     }
 
-    if (
-      normalized.scriptCode ==
-      'Hant'
-    ) {
+    if (normalized.scriptCode == 'Hant') {
       return '繁體中文';
     }
 
     return '简体中文';
   }
 
-  String _notificationSubtitle(
-    Locale locale,
-  ) {
-    final normalized =
-        _normalizedLocale(
-      locale,
-    );
+  Future<void> _showLanguagePicker() async {
+    final currentLocale = _normalizedLocale(Localizations.localeOf(context));
 
-    if (
-      normalized.languageCode ==
-      'en'
-    ) {
-      return 'Receive friend requests, clothing recommendations and system notifications';
-    }
-
-    if (
-      normalized.scriptCode ==
-      'Hant'
-    ) {
-      return '接收好友請求、衣物推薦和系統通知';
-    }
-
-    return '接收好友请求、衣物推荐和系统通知';
-  }
-
-  Future<void>
-      _showLanguagePicker() async {
-    final currentLocale =
-        _normalizedLocale(
-      Localizations.localeOf(
-        context,
-      ),
-    );
-
-    final selected =
-        await showModalBottomSheet<
-            Locale>(
-      context:
-          context,
-
-      builder:
-          (
-        bottomSheetContext,
-      ) {
+    final selected = await showModalBottomSheet<Locale>(
+      context: context,
+      builder: (bottomSheetContext) {
         return SafeArea(
-          child:
-              RadioGroup<Locale>(
-            groupValue:
-                currentLocale,
-
-            onChanged:
-                (
-              value,
-            ) {
-              if (
-                value != null
-              ) {
-                Navigator.pop(
-                  bottomSheetContext,
-                  value,
-                );
+          child: RadioGroup<Locale>(
+            groupValue: currentLocale,
+            onChanged: (value) {
+              if (value != null) {
+                Navigator.pop(bottomSheetContext, value);
               }
             },
-
-            child:
-                const Column(
-              mainAxisSize:
-                  MainAxisSize.min,
-
+            child: const Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                RadioListTile<
-                    Locale>(
-                  value:
-                      Locale.fromSubtags(
-                    languageCode:
-                        'zh',
-                    scriptCode:
-                        'Hans',
+                RadioListTile<Locale>(
+                  value: Locale.fromSubtags(
+                    languageCode: 'zh',
+                    scriptCode: 'Hans',
                   ),
-                  title:
-                      Text(
-                    '简体中文',
-                  ),
+                  title: Text('简体中文'),
                 ),
-                RadioListTile<
-                    Locale>(
-                  value:
-                      Locale.fromSubtags(
-                    languageCode:
-                        'zh',
-                    scriptCode:
-                        'Hant',
+                RadioListTile<Locale>(
+                  value: Locale.fromSubtags(
+                    languageCode: 'zh',
+                    scriptCode: 'Hant',
                   ),
-                  title:
-                      Text(
-                    '繁體中文',
-                  ),
+                  title: Text('繁體中文'),
                 ),
-                RadioListTile<
-                    Locale>(
-                  value:
-                      Locale(
-                    'en',
-                  ),
-                  title:
-                      Text(
-                    'English',
-                  ),
+                RadioListTile<Locale>(
+                  value: Locale('en'),
+                  title: Text('English'),
                 ),
               ],
             ),
@@ -422,88 +216,51 @@ class _SettingsPageState
       },
     );
 
-    if (
-      selected == null ||
-      !mounted
-    ) {
+    if (selected == null || !mounted) {
       return;
     }
 
-    widget.onLocaleChanged(
-      selected,
-    );
+    widget.onLocaleChanged(selected);
   }
 
   // ==========================================================
   // Theme
   // ==========================================================
 
-  String _themeTitle(
-    Locale locale,
-  ) {
-    final normalized =
-        _normalizedLocale(
-      locale,
-    );
+  String _themeTitle(Locale locale) {
+    final normalized = _normalizedLocale(locale);
 
-    if (
-      normalized.languageCode ==
-      'en'
-    ) {
+    if (normalized.languageCode == 'en') {
       return 'Theme';
     }
 
-    if (
-      normalized.scriptCode ==
-      'Hant'
-    ) {
+    if (normalized.scriptCode == 'Hant') {
       return '主題';
     }
 
     return '主题';
   }
 
-  String _themeSubtitle(
-    Locale locale,
-  ) {
-    final normalized =
-        _normalizedLocale(
-      locale,
-    );
+  String _themeSubtitle(Locale locale) {
+    final normalized = _normalizedLocale(locale);
 
-    if (
-      normalized.languageCode ==
-      'en'
-    ) {
+    if (normalized.languageCode == 'en') {
       return 'Choose app appearance';
     }
 
-    if (
-      normalized.scriptCode ==
-      'Hant'
-    ) {
+    if (normalized.scriptCode == 'Hant') {
       return '選擇應用程式外觀';
     }
 
     return '选择应用外观';
   }
 
-  String _themeModeName(
-    Locale locale,
-    ThemeMode mode,
-  ) {
-    final normalized =
-        _normalizedLocale(
-      locale,
-    );
+  String _themeModeName(Locale locale, ThemeMode mode) {
+    final normalized = _normalizedLocale(locale);
 
-    final english =
-        normalized.languageCode ==
-            'en';
+    final english = normalized.languageCode == 'en';
 
-    final traditional =
-        normalized.scriptCode ==
-            'Hant';
+    final traditional = normalized.scriptCode == 'Hant';
 
     switch (mode) {
       case ThemeMode.system:
@@ -537,90 +294,41 @@ class _SettingsPageState
     }
   }
 
-  IconData _themeModeIcon(
-    ThemeMode mode,
-  ) {
+  IconData _themeModeIcon(ThemeMode mode) {
     switch (mode) {
       case ThemeMode.system:
-        return Icons
-            .brightness_auto_outlined;
+        return Icons.brightness_auto_outlined;
 
       case ThemeMode.light:
-        return Icons
-            .light_mode_outlined;
+        return Icons.light_mode_outlined;
 
       case ThemeMode.dark:
-        return Icons
-            .dark_mode_outlined;
+        return Icons.dark_mode_outlined;
     }
   }
 
-  Future<void>
-      _showThemePicker() async {
-    final locale =
-        Localizations.localeOf(
-      context,
-    );
+  Future<void> _showThemePicker() async {
+    final locale = Localizations.localeOf(context);
 
-    final selected =
-        await showModalBottomSheet<
-            ThemeMode>(
-      context:
-          context,
-
-      builder:
-          (
-        bottomSheetContext,
-      ) {
+    final selected = await showModalBottomSheet<ThemeMode>(
+      context: context,
+      builder: (bottomSheetContext) {
         return SafeArea(
-          child:
-              RadioGroup<ThemeMode>(
-            groupValue:
-                themeMode,
-
-            onChanged:
-                (
-              value,
-            ) {
-              if (
-                value != null
-              ) {
-                Navigator.pop(
-                  bottomSheetContext,
-                  value,
-                );
+          child: RadioGroup<ThemeMode>(
+            groupValue: themeMode,
+            onChanged: (value) {
+              if (value != null) {
+                Navigator.pop(bottomSheetContext, value);
               }
             },
-
-            child:
-                Column(
-              mainAxisSize:
-                  MainAxisSize.min,
-
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                for (
-                  final mode
-                  in ThemeMode.values
-                )
-                  RadioListTile<
-                      ThemeMode>(
-                    value:
-                        mode,
-
-                    secondary:
-                        Icon(
-                      _themeModeIcon(
-                        mode,
-                      ),
-                    ),
-
-                    title:
-                        Text(
-                      _themeModeName(
-                        locale,
-                        mode,
-                      ),
-                    ),
+                for (final mode in ThemeMode.values)
+                  RadioListTile<ThemeMode>(
+                    value: mode,
+                    secondary: Icon(_themeModeIcon(mode)),
+                    title: Text(_themeModeName(locale, mode)),
                   ),
               ],
             ),
@@ -629,117 +337,75 @@ class _SettingsPageState
       },
     );
 
-    if (
-      selected == null ||
-      !mounted ||
-      selected ==
-          themeMode
-    ) {
+    if (selected == null || !mounted || selected == themeMode) {
       return;
     }
 
     setState(() {
-      themeMode =
-          selected;
+      themeMode = selected;
     });
 
-    widget
-        .onThemeModeChanged(
-      selected,
-    );
+    widget.onThemeModeChanged(selected);
   }
 
   // ==========================================================
   // Delete account
   // ==========================================================
 
-  Future<void>
-      _showDeleteAccountDialog() async {
-    final user =
-        AuthService
-            .instance
-            .currentUser;
+  Future<void> _showDeleteAccountDialog() async {
+    final user = AuthService.instance.currentUser;
 
     if (user == null) {
       return;
     }
 
-    final confirmed =
-        await showDialog<bool>(
-      context:
-          context,
-
-      barrierDismissible:
-          false,
-
-      builder:
-          (_) {
-        return _DeleteAccountDialog(
-          email:
-              user.email,
-        );
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return _DeleteAccountDialog(email: user.email);
       },
     );
 
-    if (
-      confirmed != true ||
-      !mounted
-    ) {
+    if (confirmed != true || !mounted) {
       return;
     }
 
     await _deleteAccount();
   }
 
-  Future<void>
-      _deleteAccount() async {
+  Future<void> _deleteAccount() async {
     if (_isDeletingAccount) {
       return;
     }
 
     setState(() {
-      _isDeletingAccount =
-          true;
+      _isDeletingAccount = true;
     });
 
     try {
-      await AuthService
-          .instance
-          .deleteAccount();
+      await AuthService.instance.deleteAccount();
 
       if (!mounted) {
         return;
       }
 
-      Navigator.of(
-        context,
-      ).pop();
+      Navigator.of(context).pop();
     } on AuthException catch (e) {
       if (!mounted) {
         return;
       }
 
       setState(() {
-        _isDeletingAccount =
-            false;
+        _isDeletingAccount = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      )
+      ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content:
-                Text(
-              localizedErrorMessage(
-                context,
-                e.message,
-              ),
-            ),
-            behavior:
-                SnackBarBehavior
-                    .floating,
+            content: Text(localizedErrorMessage(context, e.message)),
+            behavior: SnackBarBehavior.floating,
           ),
         );
     } catch (_) {
@@ -748,25 +414,15 @@ class _SettingsPageState
       }
 
       setState(() {
-        _isDeletingAccount =
-            false;
+        _isDeletingAccount = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      )
+      ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content:
-                Text(
-              context
-                  .l10n
-                  .operationFailed,
-            ),
-            behavior:
-                SnackBarBehavior
-                    .floating,
+            content: Text(context.l10n.operationFailed),
+            behavior: SnackBarBehavior.floating,
           ),
         );
     }
@@ -777,346 +433,178 @@ class _SettingsPageState
   // ==========================================================
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final l10n =
-        context.l10n;
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
 
-    final locale =
-        Localizations.localeOf(
-      context,
-    );
+    final locale = Localizations.localeOf(context);
 
-    final colorScheme =
-        Theme.of(
-      context,
-    ).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar:
-          AppBar(
-        title:
-            Text(
+      appBar: AppBar(
+        title: Text(
           l10n.settings,
-          style:
-              const TextStyle(
-            fontWeight:
-                FontWeight.w600,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        centerTitle:
-            true,
+        centerTitle: true,
       ),
-
-      body:
-          ListView(
-        padding:
-            const EdgeInsets.all(
-          20,
-        ),
-
+      body: ListView(
+        padding: const EdgeInsets.all(20),
         children: [
           Text(
             l10n.preferences,
-            style:
-                const TextStyle(
-              fontSize:
-                  14,
-              fontWeight:
-                  FontWeight.w600,
-              color:
-                  Colors.grey,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey,
             ),
           ),
 
-          const SizedBox(
-            height:
-                12,
-          ),
+          const SizedBox(height: 12),
 
+          // ==================================================
+          // Notifications
+          // ==================================================
           Card(
-            elevation:
-                0,
-            child:
-                SwitchListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(
-                horizontal:
-                    16,
-              ),
-
-              secondary:
-                  _changingNotification
-                      ? const SizedBox(
-                          width:
-                              24,
-                          height:
-                              24,
-                          child:
-                              CircularProgressIndicator(
-                            strokeWidth:
-                                2.2,
-                          ),
-                        )
-                      : const Icon(
-                          Icons.notifications_outlined,
-                        ),
-
-              title:
-                  Text(
+            elevation: 0,
+            child: SwitchListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              secondary: _changingNotification
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2.2),
+                    )
+                  : const Icon(Icons.notifications_outlined),
+              title: Text(
                 l10n.notifications,
-                style:
-                    const TextStyle(
-                  fontWeight:
-                      FontWeight.w500,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
-
-              subtitle:
-                  Text(
-                _notificationSubtitle(
-                  locale,
-                ),
-              ),
-
-              value:
-                  notificationsEnabled,
-
-              onChanged:
-                  _changingNotification
-                      ? null
-                      : _changeNotificationSetting,
+              subtitle: Text(l10n.notificationsSubtitle),
+              value: notificationsEnabled,
+              onChanged: _changingNotification
+                  ? null
+                  : _changeNotificationSetting,
             ),
           ),
 
-          const SizedBox(
-            height:
-                12,
-          ),
+          const SizedBox(height: 12),
 
+          // ==================================================
+          // Theme
+          // ==================================================
           Card(
-            elevation:
-                0,
-            child:
-                ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(
-                horizontal:
-                    16,
+            elevation: 0,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              leading: Icon(_themeModeIcon(themeMode)),
+              title: Text(
+                _themeTitle(locale),
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
-
-              leading:
-                  Icon(
-                _themeModeIcon(
-                  themeMode,
-                ),
-              ),
-
-              title:
-                  Text(
-                _themeTitle(
-                  locale,
-                ),
-                style:
-                    const TextStyle(
-                  fontWeight:
-                      FontWeight.w500,
-                ),
-              ),
-
-              subtitle:
-                  Text(
-                _themeSubtitle(
-                  locale,
-                ),
-              ),
-
-              trailing:
-                  Row(
-                mainAxisSize:
-                    MainAxisSize.min,
+              subtitle: Text(_themeSubtitle(locale)),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _themeModeName(
-                      locale,
-                      themeMode,
-                    ),
-                    style:
-                        TextStyle(
-                      color:
-                          colorScheme.onSurfaceVariant,
-                    ),
+                    _themeModeName(locale, themeMode),
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
                   ),
-                  const SizedBox(
-                    width:
-                        4,
-                  ),
+                  const SizedBox(width: 4),
                   Icon(
                     Icons.chevron_right,
-                    color:
-                        colorScheme.onSurfaceVariant,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ],
               ),
-
-              onTap:
-                  _showThemePicker,
+              onTap: _showThemePicker,
             ),
           ),
 
-          const SizedBox(
-            height:
-                32,
-          ),
+          const SizedBox(height: 32),
 
+          // ==================================================
+          // App
+          // ==================================================
           Text(
             l10n.appSection,
-            style:
-                const TextStyle(
-              fontSize:
-                  14,
-              fontWeight:
-                  FontWeight.w600,
-              color:
-                  Colors.grey,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey,
             ),
           ),
 
-          const SizedBox(
-            height:
-                12,
-          ),
+          const SizedBox(height: 12),
 
           Card(
-            elevation:
-                0,
-            child:
-                ListTile(
-              leading:
-                  const Icon(
-                Icons.language_outlined,
-              ),
-
-              title:
-                  Text(
+            elevation: 0,
+            child: ListTile(
+              leading: const Icon(Icons.language_outlined),
+              title: Text(
                 l10n.language,
-                style:
-                    const TextStyle(
-                  fontWeight:
-                      FontWeight.w500,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
-
-              trailing:
-                  Row(
-                mainAxisSize:
-                    MainAxisSize.min,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _languageName(
-                      locale,
-                    ),
-                    style:
-                        TextStyle(
-                      color:
-                          colorScheme.onSurfaceVariant,
-                    ),
+                    _languageName(locale),
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
                   ),
-                  const SizedBox(
-                    width:
-                        4,
-                  ),
+                  const SizedBox(width: 4),
                   Icon(
                     Icons.chevron_right,
-                    color:
-                        colorScheme.onSurfaceVariant,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ],
               ),
-
-              onTap:
-                  _showLanguagePicker,
+              onTap: _showLanguagePicker,
             ),
           ),
 
-          const SizedBox(
-            height:
-                32,
-          ),
+          const SizedBox(height: 32),
 
+          // ==================================================
+          // Account
+          // ==================================================
           Text(
             l10n.accountSection,
-            style:
-                const TextStyle(
-              fontSize:
-                  14,
-              fontWeight:
-                  FontWeight.w600,
-              color:
-                  Colors.grey,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey,
             ),
           ),
 
-          const SizedBox(
-            height:
-                12,
-          ),
+          const SizedBox(height: 12),
 
           Card(
-            elevation:
-                0,
-            child:
-                ListTile(
-              leading:
-                  _isDeletingAccount
-                      ? SizedBox(
-                          width:
-                              24,
-                          height:
-                              24,
-                          child:
-                              CircularProgressIndicator(
-                            strokeWidth:
-                                2.2,
-                            color:
-                                colorScheme.error,
-                          ),
-                        )
-                      : Icon(
-                          Icons.delete_forever_outlined,
-                          color:
-                              colorScheme.error,
-                        ),
-
-              title:
-                  Text(
+            elevation: 0,
+            child: ListTile(
+              leading: _isDeletingAccount
+                  ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        color: colorScheme.error,
+                      ),
+                    )
+                  : Icon(
+                      Icons.delete_forever_outlined,
+                      color: colorScheme.error,
+                    ),
+              title: Text(
                 l10n.deleteAccount,
-                style:
-                    TextStyle(
-                  color:
-                      colorScheme.error,
-                  fontWeight:
-                      FontWeight.w600,
+                style: TextStyle(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-
-              subtitle:
-                  Text(
-                l10n.deleteAccountSubtitle,
-              ),
-
-              trailing:
-                  Icon(
-                Icons.chevron_right,
-                color:
-                    colorScheme.error,
-              ),
-
-              onTap:
-                  _isDeletingAccount
-                      ? null
-                      : _showDeleteAccountDialog,
+              subtitle: Text(l10n.deleteAccountSubtitle),
+              trailing: Icon(Icons.chevron_right, color: colorScheme.error),
+              onTap: _isDeletingAccount ? null : _showDeleteAccountDialog,
             ),
           ),
         ],
@@ -1125,35 +613,29 @@ class _SettingsPageState
   }
 }
 
-class _DeleteAccountDialog
-    extends StatefulWidget {
+// ============================================================
+// Delete account dialog
+// ============================================================
+
+class _DeleteAccountDialog extends StatefulWidget {
   final String email;
 
-  const _DeleteAccountDialog({
-    required this.email,
-  });
+  const _DeleteAccountDialog({required this.email});
 
   @override
-  State<_DeleteAccountDialog>
-      createState() =>
-      _DeleteAccountDialogState();
+  State<_DeleteAccountDialog> createState() => _DeleteAccountDialogState();
 }
 
-class _DeleteAccountDialogState
-    extends State<
-        _DeleteAccountDialog> {
-  late final TextEditingController
-      _controller;
+class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
+  late final TextEditingController _controller;
 
-  bool _emailMatches =
-      false;
+  bool _emailMatches = false;
 
   @override
   void initState() {
     super.initState();
 
-    _controller =
-        TextEditingController();
+    _controller = TextEditingController();
   }
 
   @override
@@ -1163,27 +645,16 @@ class _DeleteAccountDialogState
     super.dispose();
   }
 
-  void _onEmailChanged(
-    String value,
-  ) {
+  void _onEmailChanged(String value) {
     final matches =
-        value
-            .trim()
-            .toLowerCase() ==
-        widget.email
-            .trim()
-            .toLowerCase();
+        value.trim().toLowerCase() == widget.email.trim().toLowerCase();
 
-    if (
-      matches ==
-      _emailMatches
-    ) {
+    if (matches == _emailMatches) {
       return;
     }
 
     setState(() {
-      _emailMatches =
-          matches;
+      _emailMatches = matches;
     });
   }
 
@@ -1192,170 +663,73 @@ class _DeleteAccountDialogState
       return;
     }
 
-    FocusScope.of(
-      context,
-    ).unfocus();
+    FocusScope.of(context).unfocus();
 
-    Navigator.of(
-      context,
-    ).pop(
-      true,
-    );
+    Navigator.of(context).pop(true);
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final l10n =
-        context.l10n;
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
 
-    final colorScheme =
-        Theme.of(
-      context,
-    ).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return AlertDialog(
-      scrollable:
-          true,
-
-      title:
-          Row(
+      scrollable: true,
+      title: Row(
         children: [
-          Icon(
-            Icons.warning_amber_rounded,
-            color:
-                colorScheme.error,
-          ),
-          const SizedBox(
-            width:
-                10,
-          ),
-          Expanded(
-            child:
-                Text(
-              l10n.deleteAccount,
-            ),
-          ),
+          Icon(Icons.warning_amber_rounded, color: colorScheme.error),
+          const SizedBox(width: 10),
+          Expanded(child: Text(l10n.deleteAccount)),
         ],
       ),
-
-      content:
-          Column(
-        mainAxisSize:
-            MainAxisSize.min,
-
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(l10n.deleteAccountDescription),
+          const SizedBox(height: 20),
           Text(
-            l10n.deleteAccountDescription,
+            l10n.deleteAccountEmailPrompt(widget.email),
+            style: const TextStyle(fontWeight: FontWeight.w500),
           ),
-
-          const SizedBox(
-            height:
-                20,
-          ),
-
-          Text(
-            l10n.deleteAccountEmailPrompt(
-              widget.email,
-            ),
-            style:
-                const TextStyle(
-              fontWeight:
-                  FontWeight.w500,
-            ),
-          ),
-
-          const SizedBox(
-            height:
-                12,
-          ),
-
+          const SizedBox(height: 12),
           TextField(
-            controller:
-                _controller,
-
-            keyboardType:
-                TextInputType.emailAddress,
-
-            autocorrect:
-                false,
-
-            enableSuggestions:
-                false,
-
-            textInputAction:
-                TextInputAction.done,
-
-            onChanged:
-                _onEmailChanged,
-
-            onSubmitted:
-                (_) {
+            controller: _controller,
+            keyboardType: TextInputType.emailAddress,
+            autocorrect: false,
+            enableSuggestions: false,
+            textInputAction: TextInputAction.done,
+            onChanged: _onEmailChanged,
+            onSubmitted: (_) {
               if (_emailMatches) {
                 _confirm();
               }
             },
-
-            decoration:
-                InputDecoration(
-              hintText:
-                  l10n.deleteAccountEmailHint,
-
-              prefixIcon:
-                  const Icon(
-                Icons.email_outlined,
-              ),
-
-              border:
-                  const OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintText: l10n.deleteAccountEmailHint,
+              prefixIcon: const Icon(Icons.email_outlined),
+              border: const OutlineInputBorder(),
             ),
           ),
         ],
       ),
-
       actions: [
         TextButton(
-          onPressed:
-              () {
-            FocusScope.of(
-              context,
-            ).unfocus();
+          onPressed: () {
+            FocusScope.of(context).unfocus();
 
-            Navigator.of(
-              context,
-            ).pop(
-              false,
-            );
+            Navigator.of(context).pop(false);
           },
-          child:
-              Text(
-            l10n.cancel,
-          ),
+          child: Text(l10n.cancel),
         ),
-
         FilledButton(
-          onPressed:
-              _emailMatches
-                  ? _confirm
-                  : null,
-
-          style:
-              FilledButton.styleFrom(
-            backgroundColor:
-                colorScheme.error,
-
-            foregroundColor:
-                colorScheme.onError,
+          onPressed: _emailMatches ? _confirm : null,
+          style: FilledButton.styleFrom(
+            backgroundColor: colorScheme.error,
+            foregroundColor: colorScheme.onError,
           ),
-
-          child:
-              Text(
-            l10n.deleteAccount,
-          ),
+          child: Text(l10n.deleteAccount),
         ),
       ],
     );

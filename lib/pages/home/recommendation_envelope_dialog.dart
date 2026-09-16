@@ -2,18 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
-import '../../models/clothing.dart';
-import '../../models/clothing_recommendation.dart';
-import '../../services/recommendation_service.dart';
+import '../../models/clothing/clothing.dart';
+import '../../models/friends/clothing_recommendation.dart';
+import '../../services/friends/recommendation_service.dart';
 import '../../widgets/clothing_card.dart';
 
 class RecommendationEnvelopeDialog extends StatefulWidget {
   final ClothingRecommendation recommendation;
 
-  const RecommendationEnvelopeDialog({
-    super.key,
-    required this.recommendation,
-  });
+  const RecommendationEnvelopeDialog({super.key, required this.recommendation});
 
   @override
   State<RecommendationEnvelopeDialog> createState() =>
@@ -48,9 +45,7 @@ class _RecommendationEnvelopeDialogState
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          SnackBar(
-            content: Text(localizedErrorMessage(context, e.message)),
-          ),
+          SnackBar(content: Text(localizedErrorMessage(context, e.message))),
         );
     }
   }
@@ -84,9 +79,9 @@ class _RecommendationEnvelopeDialogState
           const SizedBox(height: 20),
           Text(
             l10n.receivedClothingRecommendation,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -125,8 +120,8 @@ class _RecommendationEnvelopeDialogState
                   child: Text(
                     l10n.recommendationFrom(senderName),
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -147,9 +142,9 @@ class _RecommendationEnvelopeDialogState
             const SizedBox(height: 20),
             Text(
               l10n.recommendedClothing,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Expanded(
@@ -159,11 +154,11 @@ class _RecommendationEnvelopeDialogState
                       itemCount: clothes.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.72,
-                      ),
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.72,
+                          ),
                       itemBuilder: (context, index) {
                         return ClothingCard(clothing: clothes[index]);
                       },
@@ -181,9 +176,7 @@ class _RecommendationEnvelopeDialogState
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.inventory_2_outlined),
-                label: Text(
-                  _savingRead ? l10n.storingLetter : l10n.keepLetter,
-                ),
+                label: Text(_savingRead ? l10n.storingLetter : l10n.keepLetter),
               ),
             ),
           ],

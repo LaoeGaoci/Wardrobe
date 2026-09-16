@@ -193,8 +193,74 @@ abstract class AppLocalizations {
   /// No description provided for @notificationsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Receive outfit reminders'**
+  /// **'Receive friend requests, clothing recommendations and system notifications'**
   String get notificationsSubtitle;
+
+  /// No description provided for @notificationPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission is required to receive friend requests, clothing recommendations and system notifications.'**
+  String get notificationPermissionRequired;
+
+  /// No description provided for @openSystemNotificationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open system settings'**
+  String get openSystemNotificationSettings;
+
+  /// No description provided for @notificationSettingsOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open Android app settings. Please enable Wardrobe notifications manually in system settings.'**
+  String get notificationSettingsOpenFailed;
+
+  /// No description provided for @notificationFriendRequestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New friend request'**
+  String get notificationFriendRequestTitle;
+
+  /// No description provided for @notificationFriendRequestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You received a new friend request'**
+  String get notificationFriendRequestBody;
+
+  /// No description provided for @notificationRecommendationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New clothing recommendation'**
+  String get notificationRecommendationTitle;
+
+  /// No description provided for @notificationRecommendationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A friend sent you a clothing recommendation'**
+  String get notificationRecommendationBody;
+
+  /// No description provided for @notificationSystemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wardrobe'**
+  String get notificationSystemTitle;
+
+  /// No description provided for @notificationSystemBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You received a new system notification'**
+  String get notificationSystemBody;
+
+  /// No description provided for @notificationOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open notification content. Please try again later.'**
+  String get notificationOpenFailed;
+
+  /// No description provided for @systemNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'System notification'**
+  String get systemNotificationTitle;
 
   /// No description provided for @theme.
   ///

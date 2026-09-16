@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
-import '../../models/clothing_recommendation.dart';
-import '../../services/recommendation_service.dart';
+import '../../models/friends/clothing_recommendation.dart';
+import '../../services/friends/recommendation_service.dart';
 import '../../widgets/clothing_card.dart';
 import '../../widgets/wardrobe_image.dart';
 
@@ -105,10 +105,7 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
     }
 
     if (!mounted) return;
-    await _showRecommendationDetail(
-      recommendation: current,
-      isReceived: true,
-    );
+    await _showRecommendationDetail(recommendation: current, isReceived: true);
   }
 
   Future<void> _openSent(ClothingRecommendation recommendation) async {
@@ -138,9 +135,7 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(localizedErrorMessage(context, message)),
-        ),
+        SnackBar(content: Text(localizedErrorMessage(context, message))),
       );
   }
 
@@ -161,10 +156,7 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildReceivedTab(),
-          _buildSentTab(),
-        ],
+        children: [_buildReceivedTab(), _buildSentTab()],
       ),
     );
   }
@@ -230,10 +222,7 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
                 ),
               ),
               const SizedBox(width: 10),
-              WardrobeAvatar(
-                user: sender,
-                radius: 24,
-              ),
+              WardrobeAvatar(user: sender, radius: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -339,10 +328,7 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              WardrobeAvatar(
-                user: receiver,
-                radius: 24,
-              ),
+              WardrobeAvatar(user: receiver, radius: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -413,10 +399,7 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
     );
   }
 
-  Widget _buildErrorState(
-    String message,
-    Future<void> Function() retry,
-  ) {
+  Widget _buildErrorState(String message, Future<void> Function() retry) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -430,10 +413,7 @@ class _RecommendationHistoryPageState extends State<RecommendationHistoryPage>
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: retry,
-              child: Text(context.l10n.reload),
-            ),
+            FilledButton(onPressed: retry, child: Text(context.l10n.reload)),
           ],
         ),
       ),
@@ -519,8 +499,9 @@ class _RecommendationHistoryDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final otherUser =
-        isReceived ? recommendation.fromUser : recommendation.toUser;
+    final otherUser = isReceived
+        ? recommendation.fromUser
+        : recommendation.toUser;
     final l10n = context.l10n;
 
     return Padding(
@@ -545,8 +526,8 @@ class _RecommendationHistoryDetail extends StatelessWidget {
                         ? l10n.recommendationFrom(otherUser.username)
                         : l10n.recommendationTo(otherUser.username),
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -572,8 +553,8 @@ class _RecommendationHistoryDetail extends StatelessWidget {
                 Text(
                   l10n.recommendedClothing,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const Spacer(),
                 Text(l10n.itemCount(recommendation.clothes.length)),
@@ -587,11 +568,11 @@ class _RecommendationHistoryDetail extends StatelessWidget {
                       itemCount: recommendation.clothes.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.72,
-                      ),
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.72,
+                          ),
                       itemBuilder: (context, index) {
                         return ClothingCard(
                           clothing: recommendation.clothes[index],

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
-import '../../models/app_user.dart';
-import '../../services/friend_service.dart';
+import '../../models/user/app_user.dart';
+import '../../services/friends/friend_service.dart';
 import '../../widgets/wardrobe_image.dart';
 import 'friend_requests_page.dart';
 import 'recommendation_history_page.dart';
@@ -243,9 +243,7 @@ class _FriendsPageState extends State<FriendsPage> {
                   onPressed: _clearSearch,
                 )
               : null,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
         ),
       ),
     );
@@ -259,10 +257,7 @@ class _FriendsPageState extends State<FriendsPage> {
     if (_searchError != null) {
       return _buildErrorState(
         _searchError!,
-        () => _performSearch(
-          _searchController.text.trim(),
-          _searchGeneration,
-        ),
+        () => _performSearch(_searchController.text.trim(), _searchGeneration),
       );
     }
 
@@ -315,7 +310,9 @@ class _FriendsPageState extends State<FriendsPage> {
   Widget _buildUserTile(AppUser user, {required bool showRemark}) {
     final status = _friendService.getFriendStatus(user.id);
     final remark = _friendService.getRemark(user.id);
-    final displayName = showRemark && remark.isNotEmpty ? remark : user.username;
+    final displayName = showRemark && remark.isNotEmpty
+        ? remark
+        : user.username;
 
     return Card(
       child: ListTile(
@@ -350,10 +347,7 @@ class _FriendsPageState extends State<FriendsPage> {
     }
   }
 
-  Widget _buildErrorState(
-    String message,
-    Future<void> Function() retry,
-  ) {
+  Widget _buildErrorState(String message, Future<void> Function() retry) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -367,10 +361,7 @@ class _FriendsPageState extends State<FriendsPage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: retry,
-              child: Text(context.l10n.reload),
-            ),
+            FilledButton(onPressed: retry, child: Text(context.l10n.reload)),
           ],
         ),
       ),

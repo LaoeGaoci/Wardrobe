@@ -6,10 +6,7 @@ import '../../l10n/l10n.dart';
 class ClothingCategoryPickerPage extends StatefulWidget {
   final String currentCategory;
 
-  const ClothingCategoryPickerPage({
-    super.key,
-    required this.currentCategory,
-  });
+  const ClothingCategoryPickerPage({super.key, required this.currentCategory});
 
   @override
   State<ClothingCategoryPickerPage> createState() =>
@@ -27,7 +24,8 @@ class _ClothingCategoryPickerPageState
   void initState() {
     super.initState();
     _selectedMainCategory =
-        mainCategoryIdFor(widget.currentCategory) ?? clothingMainCategoryIds.first;
+        mainCategoryIdFor(widget.currentCategory) ??
+        clothingMainCategoryIds.first;
   }
 
   @override
@@ -42,9 +40,7 @@ class _ClothingCategoryPickerPageState
     final searching = _query.trim().isNotEmpty;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.selectCategoryTitle),
-      ),
+      appBar: AppBar(title: Text(l10n.selectCategoryTitle)),
       body: Column(
         children: [
           Padding(
@@ -62,19 +58,18 @@ class _ClothingCategoryPickerPageState
                 suffixIcon: _query.isEmpty
                     ? null
                     : IconButton(
-                  onPressed: () {
-                    _searchController.clear();
-                    setState(() {
-                      _query = '';
-                    });
-                  },
-                  icon: const Icon(Icons.close),
-                ),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {
+                            _query = '';
+                          });
+                        },
+                        icon: const Icon(Icons.close),
+                      ),
                 filled: true,
-                fillColor: Theme.of(context)
-                    .colorScheme
-                    .surfaceContainerHighest
-                    .withValues(alpha: 0.55),
+                fillColor: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.55),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -102,9 +97,7 @@ class _ClothingCategoryPickerPageState
                   final mainCategoryId = clothingMainCategoryIds[index];
 
                   return ChoiceChip(
-                    label: Text(
-                      localizedMainCategory(context, mainCategoryId),
-                    ),
+                    label: Text(localizedMainCategory(context, mainCategoryId)),
                     selected: mainCategoryId == _selectedMainCategory,
                     onSelected: (_) {
                       setState(() {
@@ -133,15 +126,9 @@ class _ClothingCategoryPickerPageState
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(8, 4, 8, 24),
       itemCount: categories.length,
-      separatorBuilder: (_, __) => const Divider(
-        height: 1,
-        indent: 56,
-      ),
+      separatorBuilder: (_, __) => const Divider(height: 1, indent: 56),
       itemBuilder: (context, index) {
-        return _buildCategoryTile(
-          categories[index],
-          showMainCategory: false,
-        );
+        return _buildCategoryTile(categories[index], showMainCategory: false);
       },
     );
   }
@@ -151,14 +138,20 @@ class _ClothingCategoryPickerPageState
     final results = <String>[];
 
     for (final entry in clothingCategoryHierarchy.entries) {
-      final mainCategoryLabel =
-      localizedMainCategory(context, entry.key).toLowerCase();
+      final mainCategoryLabel = localizedMainCategory(
+        context,
+        entry.key,
+      ).toLowerCase();
 
       for (final categoryId in entry.value) {
-        final subCategoryLabel =
-        localizedCategory(context, categoryId).toLowerCase();
-        final categoryPath =
-        localizedCategoryPath(context, categoryId).toLowerCase();
+        final subCategoryLabel = localizedCategory(
+          context,
+          categoryId,
+        ).toLowerCase();
+        final categoryPath = localizedCategoryPath(
+          context,
+          categoryId,
+        ).toLowerCase();
 
         if (mainCategoryLabel.contains(query) ||
             subCategoryLabel.contains(query) ||
@@ -186,23 +179,17 @@ class _ClothingCategoryPickerPageState
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(8, 4, 8, 24),
       itemCount: results.length,
-      separatorBuilder: (_, __) => const Divider(
-        height: 1,
-        indent: 56,
-      ),
+      separatorBuilder: (_, __) => const Divider(height: 1, indent: 56),
       itemBuilder: (context, index) {
-        return _buildCategoryTile(
-          results[index],
-          showMainCategory: true,
-        );
+        return _buildCategoryTile(results[index], showMainCategory: true);
       },
     );
   }
 
   Widget _buildCategoryTile(
-      String categoryId, {
-        required bool showMainCategory,
-      }) {
+    String categoryId, {
+    required bool showMainCategory,
+  }) {
     final mainCategoryId = mainCategoryIdFor(categoryId);
     final selected = categoryId == widget.currentCategory;
 
@@ -214,13 +201,11 @@ class _ClothingCategoryPickerPageState
           : null,
       trailing: selected
           ? Icon(
-        Icons.check_rounded,
-        color: Theme.of(context).colorScheme.primary,
-      )
+              Icons.check_rounded,
+              color: Theme.of(context).colorScheme.primary,
+            )
           : null,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       onTap: () {
         Navigator.pop(context, categoryId);
       },

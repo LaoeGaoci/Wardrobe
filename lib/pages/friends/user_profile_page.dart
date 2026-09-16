@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
-import '../../models/app_user.dart';
-import '../../services/friend_service.dart';
+import '../../models/user/app_user.dart';
+import '../../services/friends/friend_service.dart';
 import '../../widgets/wardrobe_image.dart';
 import 'friend_requests_page.dart';
 import 'friend_wardrobe_page.dart';
@@ -11,10 +11,7 @@ import 'friend_wardrobe_page.dart';
 class UserProfilePage extends StatefulWidget {
   final AppUser user;
 
-  const UserProfilePage({
-    super.key,
-    required this.user,
-  });
+  const UserProfilePage({super.key, required this.user});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -273,9 +270,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(localizedErrorMessage(context, message)),
-        ),
+        SnackBar(content: Text(localizedErrorMessage(context, message))),
       );
   }
 
@@ -288,54 +283,46 @@ class _UserProfilePageState extends State<UserProfilePage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _loadError != null
-              ? _buildError()
-              : ListView(
-                  padding: const EdgeInsets.all(24),
-                  children: [
-                    const SizedBox(height: 20),
-                    Center(
-                      child: WardrobeAvatar(
-                        user: widget.user,
-                        radius: 48,
-                      ),
+          ? _buildError()
+          : ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                const SizedBox(height: 20),
+                Center(child: WardrobeAvatar(user: widget.user, radius: 48)),
+                const SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    widget.user.username,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Text(
-                        widget.user.username,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Center(
-                      child: Text(
-                        widget.user.email,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    _buildStatusCard(),
-                    const SizedBox(height: 20),
-                    AbsorbPointer(
-                      absorbing: _isOperating,
-                      child: Opacity(
-                        opacity: _isOperating ? 0.6 : 1,
-                        child: _buildActionButtons(remark),
-                      ),
-                    ),
-                    if (_isOperating) ...[
-                      const SizedBox(height: 20),
-                      const Center(child: CircularProgressIndicator()),
-                    ],
-                  ],
+                  ),
                 ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    widget.user.email,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                _buildStatusCard(),
+                const SizedBox(height: 20),
+                AbsorbPointer(
+                  absorbing: _isOperating,
+                  child: Opacity(
+                    opacity: _isOperating ? 0.6 : 1,
+                    child: _buildActionButtons(remark),
+                  ),
+                ),
+                if (_isOperating) ...[
+                  const SizedBox(height: 20),
+                  const Center(child: CircularProgressIndicator()),
+                ],
+              ],
+            ),
     );
   }
 

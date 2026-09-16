@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/clothing_localizations.dart';
 import '../../l10n/l10n.dart';
-import '../../models/clothing.dart';
-import '../../services/clothing_repository.dart';
+import '../../models/clothing/clothing.dart';
+import '../../services/clothing/clothing_repository.dart';
 import '../../widgets/info_row.dart';
 import '../../widgets/wardrobe_image.dart';
 import 'edit_clothing_page.dart';
@@ -11,14 +11,10 @@ import 'edit_clothing_page.dart';
 class ClothingDetailPage extends StatefulWidget {
   final Clothing clothing;
 
-  const ClothingDetailPage({
-    super.key,
-    required this.clothing,
-  });
+  const ClothingDetailPage({super.key, required this.clothing});
 
   @override
-  State<ClothingDetailPage> createState() =>
-      _ClothingDetailPageState();
+  State<ClothingDetailPage> createState() => _ClothingDetailPageState();
 }
 
 class _ClothingDetailPageState extends State<ClothingDetailPage> {
@@ -37,11 +33,7 @@ class _ClothingDetailPageState extends State<ClothingDetailPage> {
   Future<void> _editCard() async {
     final updated = await Navigator.push<Clothing>(
       context,
-      MaterialPageRoute(
-        builder: (_) => EditClothingPage(
-          clothing: _clothing,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => EditClothingPage(clothing: _clothing)),
     );
 
     if (updated == null || !mounted) {
@@ -59,10 +51,7 @@ class _ClothingDetailPageState extends State<ClothingDetailPage> {
     }
 
     final l10n = context.l10n;
-    final subCategory = localizedCategory(
-      context,
-      _clothing.category,
-    );
+    final subCategory = localizedCategory(context, _clothing.category);
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -70,16 +59,10 @@ class _ClothingDetailPageState extends State<ClothingDetailPage> {
         final colorScheme = Theme.of(context).colorScheme;
 
         return AlertDialog(
-          icon: Icon(
-            Icons.delete_outline,
-            color: colorScheme.error,
-          ),
+          icon: Icon(Icons.delete_outline, color: colorScheme.error),
           title: Text(l10n.deleteClothing),
           content: Text(
-            l10n.deleteClothingConfirm(
-              subCategory,
-              _clothing.location,
-            ),
+            l10n.deleteClothingConfirm(subCategory, _clothing.location),
           ),
           actions: [
             TextButton(
@@ -159,19 +142,11 @@ class _ClothingDetailPageState extends State<ClothingDetailPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final subCategory = localizedCategory(
-      context,
-      _clothing.category,
-    );
-    final categoryPath = localizedCategoryPath(
-      context,
-      _clothing.category,
-    );
+    final subCategory = localizedCategory(context, _clothing.category);
+    final categoryPath = localizedCategoryPath(context, _clothing.category);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.clothingDetails),
-      ),
+      appBar: AppBar(title: Text(l10n.clothingDetails)),
       body: ListView(
         children: [
           _buildImage(),
@@ -188,28 +163,16 @@ class _ClothingDetailPageState extends State<ClothingDetailPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                InfoRow(
-                  title: l10n.storageLocation,
-                  value: _clothing.location,
-                ),
+                InfoRow(title: l10n.storageLocation, value: _clothing.location),
                 InfoRow(
                   title: l10n.brand,
                   value: _clothing.brand ?? l10n.notSet,
                 ),
-                InfoRow(
-                  title: l10n.category,
-                  value: categoryPath,
-                ),
-                InfoRow(
-                  title: l10n.color,
-                  value: _clothing.color,
-                ),
+                InfoRow(title: l10n.category, value: categoryPath),
+                InfoRow(title: l10n.color, value: _clothing.color),
                 InfoRow(
                   title: l10n.season,
-                  value: localizedSeason(
-                    context,
-                    _clothing.season,
-                  ),
+                  value: localizedSeason(context, _clothing.season),
                 ),
                 InfoRow(
                   title: l10n.price,
@@ -219,10 +182,7 @@ class _ClothingDetailPageState extends State<ClothingDetailPage> {
                 ),
                 InfoRow(
                   title: l10n.visibility,
-                  value: localizedVisibility(
-                    context,
-                    _clothing.visibility,
-                  ),
+                  value: localizedVisibility(context, _clothing.visibility),
                 ),
                 const SizedBox(height: 28),
                 SizedBox(
@@ -246,18 +206,16 @@ class _ClothingDetailPageState extends State<ClothingDetailPage> {
                     ),
                     icon: _deleting
                         ? SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    )
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          )
                         : const Icon(Icons.delete_outline),
                     label: Text(
-                      _deleting
-                          ? l10n.deletingClothing
-                          : l10n.deleteClothing,
+                      _deleting ? l10n.deletingClothing : l10n.deleteClothing,
                     ),
                   ),
                 ),

@@ -54,7 +54,41 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notifications => '通知';
 
   @override
-  String get notificationsSubtitle => '接收穿搭提醒';
+  String get notificationsSubtitle => '接收好友请求、衣物推荐和系统通知';
+
+  @override
+  String get notificationPermissionRequired => '需要允许系统通知权限，才能接收好友请求、衣物推荐和系统通知。';
+
+  @override
+  String get openSystemNotificationSettings => '前往系统设置';
+
+  @override
+  String get notificationSettingsOpenFailed =>
+      '无法打开 Android 应用设置，请在系统设置中手动允许 Wardrobe 通知。';
+
+  @override
+  String get notificationFriendRequestTitle => '新的好友请求';
+
+  @override
+  String get notificationFriendRequestBody => '你收到了一条新的好友请求';
+
+  @override
+  String get notificationRecommendationTitle => '新的衣物推荐';
+
+  @override
+  String get notificationRecommendationBody => '好友为你发送了一份衣物推荐';
+
+  @override
+  String get notificationSystemTitle => 'Wardrobe';
+
+  @override
+  String get notificationSystemBody => '你收到了一条新的系统通知';
+
+  @override
+  String get notificationOpenFailed => '无法打开通知内容，请稍后重试';
+
+  @override
+  String get systemNotificationTitle => '系统通知';
 
   @override
   String get theme => '主题';
@@ -1117,7 +1151,41 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get notifications => '通知';
 
   @override
-  String get notificationsSubtitle => '接收穿搭提醒';
+  String get notificationsSubtitle => '接收好友请求、衣物推荐和系统通知';
+
+  @override
+  String get notificationPermissionRequired => '需要允许系统通知权限，才能接收好友请求、衣物推荐和系统通知。';
+
+  @override
+  String get openSystemNotificationSettings => '前往系统设置';
+
+  @override
+  String get notificationSettingsOpenFailed =>
+      '无法打开 Android 应用设置，请在系统设置中手动允许 Wardrobe 通知。';
+
+  @override
+  String get notificationFriendRequestTitle => '新的好友请求';
+
+  @override
+  String get notificationFriendRequestBody => '你收到了一条新的好友请求';
+
+  @override
+  String get notificationRecommendationTitle => '新的衣物推荐';
+
+  @override
+  String get notificationRecommendationBody => '好友为你发送了一份衣物推荐';
+
+  @override
+  String get notificationSystemTitle => 'Wardrobe';
+
+  @override
+  String get notificationSystemBody => '你收到了一条新的系统通知';
+
+  @override
+  String get notificationOpenFailed => '无法打开通知内容，请稍后重试';
+
+  @override
+  String get systemNotificationTitle => '系统通知';
 
   @override
   String get theme => '主题';
@@ -1893,7 +1961,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get categoryGroupAccessories => '配饰';
 
   @override
-  String get categoryTshirt => 'T恤';
+  String get categoryTshirt => 'T恤（半袖）';
 
   @override
   String get categoryShirt => '衬衫';
@@ -2180,7 +2248,41 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get notifications => '通知';
 
   @override
-  String get notificationsSubtitle => '接收穿搭提醒';
+  String get notificationsSubtitle => '接收好友申請、衣物推薦和系統通知';
+
+  @override
+  String get notificationPermissionRequired => '需要允許系統通知權限，才能接收好友申請、衣物推薦和系統通知。';
+
+  @override
+  String get openSystemNotificationSettings => '前往系統設定';
+
+  @override
+  String get notificationSettingsOpenFailed =>
+      '無法開啟 Android 應用程式設定，請在系統設定中手動允許 Wardrobe 通知。';
+
+  @override
+  String get notificationFriendRequestTitle => '新的好友申請';
+
+  @override
+  String get notificationFriendRequestBody => '你收到了一則新的好友申請';
+
+  @override
+  String get notificationRecommendationTitle => '新的衣物推薦';
+
+  @override
+  String get notificationRecommendationBody => '好友傳送了一份衣物推薦給你';
+
+  @override
+  String get notificationSystemTitle => 'Wardrobe';
+
+  @override
+  String get notificationSystemBody => '你收到了一則新的系統通知';
+
+  @override
+  String get notificationOpenFailed => '無法開啟通知內容，請稍後再試';
+
+  @override
+  String get systemNotificationTitle => '系統通知';
 
   @override
   String get theme => '主題';

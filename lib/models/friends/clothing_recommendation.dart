@@ -1,5 +1,5 @@
-import 'app_user.dart';
-import 'clothing.dart';
+import '../user/app_user.dart';
+import '../clothing/clothing.dart';
 
 /// ============================================================
 /// ClothingRecommendation
@@ -70,101 +70,53 @@ class ClothingRecommendation {
   /// recommendation.fromUserId
   ///
   /// 不会立刻报错。
-  String get fromUserId =>
-      fromUser.id;
+  String get fromUserId => fromUser.id;
 
-  String get toUserId =>
-      toUser.id;
+  String get toUserId => toUser.id;
 
   List<String> get clothingIds =>
-      clothes
-          .map(
-            (item) => item.id,
-      )
-          .toList(
-        growable: false,
-      );
+      clothes.map((item) => item.id).toList(growable: false);
 
   /// 是否已经阅读。
-  bool get isRead =>
-      readAt != null;
+  bool get isRead => readAt != null;
 
   // ============================================================
   // Backend JSON
   // ============================================================
 
-  factory ClothingRecommendation.fromJson(
-      Map<String, dynamic> json,
-      ) {
-    final rawFromUser =
-    json['fromUser'];
+  factory ClothingRecommendation.fromJson(Map<String, dynamic> json) {
+    final rawFromUser = json['fromUser'];
 
-    final rawToUser =
-    json['toUser'];
+    final rawToUser = json['toUser'];
 
-    final rawClothes =
-    json['clothes'];
+    final rawClothes = json['clothes'];
 
-    if (rawFromUser is! Map ||
-        rawToUser is! Map ||
-        rawClothes is! List) {
-      throw const FormatException(
-        'Invalid recommendation data',
-      );
+    if (rawFromUser is! Map || rawToUser is! Map || rawClothes is! List) {
+      throw const FormatException('Invalid recommendation data');
     }
 
     return ClothingRecommendation(
-      id:
-      json['id'] as String,
+      id: json['id'] as String,
 
-      fromUser:
-      AppUser.fromJson(
-        Map<String, dynamic>.from(
-          rawFromUser,
-        ),
-      ),
+      fromUser: AppUser.fromJson(Map<String, dynamic>.from(rawFromUser)),
 
-      toUser:
-      AppUser.fromJson(
-        Map<String, dynamic>.from(
-          rawToUser,
-        ),
-      ),
+      toUser: AppUser.fromJson(Map<String, dynamic>.from(rawToUser)),
 
-      clothes:
-      rawClothes
-          .map(
-            (value) {
-          if (value is! Map) {
-            throw const FormatException(
-              'Invalid recommendation clothing',
-            );
-          }
+      clothes: rawClothes
+          .map((value) {
+            if (value is! Map) {
+              throw const FormatException('Invalid recommendation clothing');
+            }
 
-          return Clothing.fromJson(
-            Map<String, dynamic>.from(
-              value,
-            ),
-          );
-        },
-      )
-          .toList(
-        growable: false,
-      ),
+            return Clothing.fromJson(Map<String, dynamic>.from(value));
+          })
+          .toList(growable: false),
 
-      message:
-      json['message'] as String? ??
-          '',
+      message: json['message'] as String? ?? '',
 
-      createdAt:
-      _parseRequiredDateTime(
-        json['createdAt'],
-      ),
+      createdAt: _parseRequiredDateTime(json['createdAt']),
 
-      readAt:
-      _parseOptionalDateTime(
-        json['readAt'],
-      ),
+      readAt: _parseOptionalDateTime(json['readAt']),
     );
   }
 
@@ -182,18 +134,12 @@ class ClothingRecommendation {
   }) {
     return ClothingRecommendation(
       id: id,
-      fromUser:
-      fromUser ?? this.fromUser,
-      toUser:
-      toUser ?? this.toUser,
-      clothes:
-      clothes ?? this.clothes,
-      message:
-      message ?? this.message,
-      createdAt:
-      createdAt ?? this.createdAt,
-      readAt:
-      readAt ?? this.readAt,
+      fromUser: fromUser ?? this.fromUser,
+      toUser: toUser ?? this.toUser,
+      clothes: clothes ?? this.clothes,
+      message: message ?? this.message,
+      createdAt: createdAt ?? this.createdAt,
+      readAt: readAt ?? this.readAt,
     );
   }
 }
@@ -211,49 +157,28 @@ class ClothingRecommendation {
 /// 2026-09-13T22:30:00
 ///
 /// 所以这里统一兼容。
-DateTime _parseRequiredDateTime(
-    dynamic value,
-    ) {
-  if (value is! String ||
-      value.isEmpty) {
-    throw const FormatException(
-      'Invalid recommendation date',
-    );
+DateTime _parseRequiredDateTime(dynamic value) {
+  if (value is! String || value.isEmpty) {
+    throw const FormatException('Invalid recommendation date');
   }
 
-  final parsed =
-  DateTime.tryParse(
-    value.replaceFirst(
-      ' ',
-      'T',
-    ),
-  );
+  final parsed = DateTime.tryParse(value.replaceFirst(' ', 'T'));
 
   if (parsed == null) {
-    throw const FormatException(
-      'Invalid recommendation date',
-    );
+    throw const FormatException('Invalid recommendation date');
   }
 
   return parsed;
 }
 
-DateTime? _parseOptionalDateTime(
-    dynamic value,
-    ) {
+DateTime? _parseOptionalDateTime(dynamic value) {
   if (value == null) {
     return null;
   }
 
-  if (value is! String ||
-      value.isEmpty) {
+  if (value is! String || value.isEmpty) {
     return null;
   }
 
-  return DateTime.tryParse(
-    value.replaceFirst(
-      ' ',
-      'T',
-    ),
-  );
+  return DateTime.tryParse(value.replaceFirst(' ', 'T'));
 }
