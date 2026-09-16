@@ -38,17 +38,42 @@ class ClothingCard extends StatelessWidget {
               memCacheWidth: 720,
             ),
           ),
+
           Padding(
-            padding: const EdgeInsets.all(10),
-            child: Text(
-              '$season · $subCategory · ${clothing.location}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.grey.shade700,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
+            padding: const EdgeInsets.fromLTRB(
+              10,
+              8,
+              10,
+              9,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 类型
+                Text(
+                  subCategory,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const SizedBox(height: 3),
+
+                // 季节 · 位置
+                Text(
+                  '$season · ${clothing.location}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

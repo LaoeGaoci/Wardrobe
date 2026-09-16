@@ -23,13 +23,21 @@ class WardrobeApp extends StatefulWidget {
 
 class _WardrobeAppState
     extends State<WardrobeApp> {
-  static const String _darkModeKey =
-      'dark_mode_enabled';
+  // ============================================================
+  // Preference Keys
+  // ============================================================
+
+  static const String _themeModeKey =
+      'theme_mode';
 
   static const String _languageKey =
       'app_language';
 
-  late bool isDarkMode;
+  // ============================================================
+  // State
+  // ============================================================
+
+  late ThemeMode _themeMode;
 
   late Locale _locale;
 
@@ -37,21 +45,37 @@ class _WardrobeAppState
   void initState() {
     super.initState();
 
-    isDarkMode =
-        widget.preferences
-            .getBool(
-          _darkModeKey,
-        ) ??
-            false;
+    // ==========================================================
+    // Theme
+    // ==========================================================
+    //
+    // 没有保存过主题设置时：
+    //
+    // 默认 ThemeMode.system
+    //
+    // 即：
+    // 跟随 Android / iOS 系统主题。
+    //
+    final savedThemeMode =
+    widget.preferences.getString(
+      _themeModeKey,
+    );
+
+    _themeMode =
+        _themeModeFromCode(
+          savedThemeMode,
+        );
+
+    // ==========================================================
+    // Locale
+    // ==========================================================
 
     final savedLanguage =
-    widget.preferences
-        .getString(
+    widget.preferences.getString(
       _languageKey,
     );
 
-    if (savedLanguage ==
-        null) {
+    if (savedLanguage == null) {
       _locale =
           _localeFromSystem(
             WidgetsBinding
@@ -65,6 +89,78 @@ class _WardrobeAppState
             savedLanguage,
           );
     }
+  }
+
+  // ============================================================
+  // Theme
+  // ============================================================
+
+  /// 从 SharedPreferences 中保存的字符串恢复 ThemeMode。
+  ///
+  /// system -> ThemeMode.system
+  /// light  -> ThemeMode.light
+  /// dark   -> ThemeMode.dark
+  ///
+  /// null / 非法值：
+  /// 默认 ThemeMode.system。
+  ThemeMode _themeModeFromCode(
+      String? code,
+      ) {
+    switch (code) {
+      case 'light':
+        return ThemeMode.light;
+
+      case 'dark':
+        return ThemeMode.dark;
+
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  /// ThemeMode 转换为可以持久化的字符串。
+  String _themeModeCode(
+      ThemeMode mode,
+      ) {
+    switch (mode) {
+      case ThemeMode.system:
+        return 'system';
+
+      case ThemeMode.light:
+        return 'light';
+
+      case ThemeMode.dark:
+        return 'dark';
+    }
+  }
+
+  /// 修改主题。
+  ///
+  /// ThemeMode.system：
+  /// 跟随系统。
+  ///
+  /// ThemeMode.light：
+  /// 强制浅色。
+  ///
+  /// ThemeMode.dark：
+  /// 强制深色。
+  Future<void> changeThemeMode(
+      ThemeMode mode,
+      ) async {
+    if (_themeMode == mode) {
+      return;
+    }
+
+    setState(() {
+      _themeMode = mode;
+    });
+
+    await widget.preferences
+        .setString(
+      _themeModeKey,
+      _themeModeCode(mode),
+    );
   }
 
   // ============================================================
@@ -97,8 +193,7 @@ class _WardrobeAppState
                   'MO';
 
       return Locale.fromSubtags(
-        languageCode:
-        'zh',
+        languageCode: 'zh',
         scriptCode:
         traditional
             ? 'Hant'
@@ -107,10 +202,8 @@ class _WardrobeAppState
     }
 
     return const Locale.fromSubtags(
-      languageCode:
-      'zh',
-      scriptCode:
-      'Hans',
+      languageCode: 'zh',
+      scriptCode: 'Hans',
     );
   }
 
@@ -125,19 +218,15 @@ class _WardrobeAppState
 
       case 'zh_Hant':
         return const Locale.fromSubtags(
-          languageCode:
-          'zh',
-          scriptCode:
-          'Hant',
+          languageCode: 'zh',
+          scriptCode: 'Hant',
         );
 
       case 'zh_Hans':
       default:
         return const Locale.fromSubtags(
-          languageCode:
-          'zh',
-          scriptCode:
-          'Hans',
+          languageCode: 'zh',
+          scriptCode: 'Hans',
         );
     }
   }
@@ -159,30 +248,14 @@ class _WardrobeAppState
   }
 
   // ============================================================
-  // Settings
+  // Locale Settings
   // ============================================================
-
-  Future<void> changeTheme(
-      bool value,
-      ) async {
-    setState(() {
-      isDarkMode =
-          value;
-    });
-
-    await widget.preferences
-        .setBool(
-      _darkModeKey,
-      value,
-    );
-  }
 
   Future<void> changeLocale(
       Locale locale,
       ) async {
     setState(() {
-      _locale =
-          locale;
+      _locale = locale;
     });
 
     await widget.preferences
@@ -206,8 +279,11 @@ class _WardrobeAppState
       debugShowCheckedModeBanner:
       false,
 
-      locale:
-      _locale,
+      // ========================================================
+      // Locale
+      // ========================================================
+
+      locale: _locale,
 
       localizationsDelegates:
       AppLocalizations
@@ -224,23 +300,32 @@ class _WardrobeAppState
       )!
           .appTitle,
 
+      // ========================================================
+      // Theme
+      // ========================================================
+
       theme:
       AppTheme.light,
 
       darkTheme:
       AppTheme.dark,
 
+      /// 这里直接把 ThemeMode 交给 MaterialApp。
+      ///
+      /// ThemeMode.system 时 Flutter 会自动监听
+      /// Android / iOS 系统亮暗模式变化。
       themeMode:
-      isDarkMode
-          ? ThemeMode.dark
-          : ThemeMode.light,
+      _themeMode,
 
-      home:
-      _AuthGate(
-        isDarkMode:
-        isDarkMode,
-        onThemeChanged:
-        changeTheme,
+      // ========================================================
+      // Auth
+      // ========================================================
+
+      home: _AuthGate(
+        themeMode:
+        _themeMode,
+        onThemeModeChanged:
+        changeThemeMode,
         onLocaleChanged:
         changeLocale,
       ),
@@ -254,32 +339,25 @@ class _WardrobeAppState
 
 /// App 的认证入口。
 ///
-/// 与以前不同：
+/// 启动流程：
 ///
-/// 以前：
-///
-/// currentUser == null
-/// → 直接显示登录页
-///
-/// 现在：
-///
-/// 1. 启动
+/// 1. 启动 App
 /// 2. Secure Storage 读取 Token
-/// 3. /api/users/me 验证
-/// 4. 决定进入主页还是登录页
+/// 3. 请求 /api/users/me 验证
+/// 4. 决定进入 HomePage 或 AuthPage
 class _AuthGate
     extends StatefulWidget {
-  final bool isDarkMode;
+  final ThemeMode themeMode;
 
-  final ValueChanged<bool>
-  onThemeChanged;
+  final ValueChanged<ThemeMode>
+  onThemeModeChanged;
 
   final ValueChanged<Locale>
   onLocaleChanged;
 
   const _AuthGate({
-    required this.isDarkMode,
-    required this.onThemeChanged,
+    required this.themeMode,
+    required this.onThemeModeChanged,
     required this.onLocaleChanged,
   });
 
@@ -298,7 +376,7 @@ class _AuthGateState
     // 不 await。
     //
     // 初始化期间 AuthStatus.restoring，
-    // UI 会显示加载页面。
+    // UI 显示加载页面。
     AuthService.instance
         .initialize();
   }
@@ -331,12 +409,14 @@ class _AuthGateState
 
           case AuthStatus.authenticated:
             return HomePage(
-              isDarkMode:
-              widget.isDarkMode,
-              onThemeChanged:
-              widget.onThemeChanged,
+              themeMode:
+              widget.themeMode,
+              onThemeModeChanged:
+              widget
+                  .onThemeModeChanged,
               onLocaleChanged:
-              widget.onLocaleChanged,
+              widget
+                  .onLocaleChanged,
             );
 
         // ====================================================
@@ -383,7 +463,8 @@ class _SessionLoadingPage
     return const Scaffold(
       body: SafeArea(
         child: Center(
-          child: CircularProgressIndicator(),
+          child:
+          CircularProgressIndicator(),
         ),
       ),
     );
@@ -422,25 +503,26 @@ class _SessionRestoreErrorPage
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: SingleChildScrollView(
+          child:
+          SingleChildScrollView(
             padding:
             const EdgeInsets.all(
               32,
             ),
-            child: ConstrainedBox(
+            child:
+            ConstrainedBox(
               constraints:
               const BoxConstraints(
-                maxWidth:
-                420,
+                maxWidth: 420,
               ),
               child: Column(
                 mainAxisSize:
                 MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.cloud_off_outlined,
-                    size:
-                    64,
+                    Icons
+                        .cloud_off_outlined,
+                    size: 64,
                     color:
                     Theme.of(
                       context,
@@ -450,14 +532,14 @@ class _SessionRestoreErrorPage
                   ),
 
                   const SizedBox(
-                    height:
-                    20,
+                    height: 20,
                   ),
 
                   Text(
                     l10n.operationFailed,
                     textAlign:
-                    TextAlign.center,
+                    TextAlign
+                        .center,
                     style:
                     Theme.of(
                       context,
@@ -466,7 +548,8 @@ class _SessionRestoreErrorPage
                         .titleLarge
                         ?.copyWith(
                       fontWeight:
-                      FontWeight.w600,
+                      FontWeight
+                          .w600,
                     ),
                   ),
 
@@ -475,14 +558,14 @@ class _SessionRestoreErrorPage
                       message!
                           .isNotEmpty) ...[
                     const SizedBox(
-                      height:
-                      10,
+                      height: 10,
                     ),
 
                     Text(
                       message!,
                       textAlign:
-                      TextAlign.center,
+                      TextAlign
+                          .center,
                       style:
                       Theme.of(
                         context,
@@ -501,15 +584,13 @@ class _SessionRestoreErrorPage
                   ],
 
                   const SizedBox(
-                    height:
-                    28,
+                    height: 28,
                   ),
 
                   SizedBox(
                     width:
                     double.infinity,
-                    height:
-                    50,
+                    height: 50,
                     child:
                     FilledButton.icon(
                       onPressed: () {
@@ -527,8 +608,7 @@ class _SessionRestoreErrorPage
                   ),
 
                   const SizedBox(
-                    height:
-                    8,
+                    height: 8,
                   ),
 
                   SizedBox(

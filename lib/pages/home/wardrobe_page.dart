@@ -30,6 +30,7 @@ class _WardrobePageState extends State<WardrobePage> {
   String? _loadError;
   String _searchKeyword = '';
   String _selectedMainCategory = 'all';
+  String? _selectedSubCategory;
 
   @override
   void initState() {
@@ -87,6 +88,45 @@ class _WardrobePageState extends State<WardrobePage> {
     }
   }
 
+  List<String> get availableSubCategories {
+    if (_selectedMainCategory == 'all') {
+      return const [];
+    }
+
+    // 用户在当前一级分类下实际拥有的类别。
+    final existingCategories = _repository.clothes
+        .where(
+          (item) =>
+      mainCategoryIdFor(item.category) ==
+          _selectedMainCategory,
+    )
+        .map((item) => item.category)
+        .toSet();
+
+    // 按预定义的分类顺序排列，
+    // 避免顺序随着数据库结果变化。
+    final hierarchy =
+        clothingCategoryHierarchy[_selectedMainCategory] ??
+            const <String>[];
+
+    final result = hierarchy
+        .where(existingCategories.contains)
+        .toList();
+
+    // 兼容未来新增分类 / 旧数据。
+    //
+    // 即使某个类别没有出现在 hierarchy，
+    // 只要用户实际有这类衣物，也仍然显示。
+    final unknownCategories = existingCategories
+        .where((category) => !hierarchy.contains(category))
+        .toList()
+      ..sort();
+
+    result.addAll(unknownCategories);
+
+    return result;
+  }
+
   List<Clothing> get filteredClothes {
     if (AuthService.instance.currentUser == null) {
       return const [];
@@ -94,13 +134,25 @@ class _WardrobePageState extends State<WardrobePage> {
 
     Iterable<Clothing> result = _repository.clothes;
 
+    // 一级分类
     if (_selectedMainCategory != 'all') {
       result = result.where(
             (item) =>
-        mainCategoryIdFor(item.category) == _selectedMainCategory,
+        mainCategoryIdFor(item.category) ==
+            _selectedMainCategory,
       );
     }
 
+    // 二级分类
+    if (_selectedSubCategory != null) {
+      result = result.where(
+            (item) =>
+        item.category ==
+            _selectedSubCategory,
+      );
+    }
+
+    // 搜索
     final keyword = _searchKeyword.trim().toLowerCase();
 
     if (keyword.isNotEmpty) {
@@ -110,16 +162,35 @@ class _WardrobePageState extends State<WardrobePage> {
         final color = item.color.toLowerCase();
         final rawCategory = item.category.toLowerCase();
         final rawSeason = item.season.toLowerCase();
+
         final subCategory =
-        localizedCategory(context, item.category).toLowerCase();
+        localizedCategory(
+          context,
+          item.category,
+        ).toLowerCase();
+
         final categoryPath =
-        localizedCategoryPath(context, item.category).toLowerCase();
+        localizedCategoryPath(
+          context,
+          item.category,
+        ).toLowerCase();
+
         final season =
-        localizedSeason(context, item.season).toLowerCase();
-        final mainCategoryId = mainCategoryIdFor(item.category);
-        final mainCategory = mainCategoryId == null
+        localizedSeason(
+          context,
+          item.season,
+        ).toLowerCase();
+
+        final mainCategoryId =
+        mainCategoryIdFor(item.category);
+
+        final mainCategory =
+        mainCategoryId == null
             ? ''
-            : localizedMainCategory(context, mainCategoryId).toLowerCase();
+            : localizedMainCategory(
+          context,
+          mainCategoryId,
+        ).toLowerCase();
 
         return location.contains(keyword) ||
             brand.contains(keyword) ||
@@ -133,7 +204,136 @@ class _WardrobePageState extends State<WardrobePage> {
       });
     }
 
-    return result.toList(growable: false);
+    return result.toList(
+      growable: false,
+    );
+  }
+
+  Future<void> _showSubCategoryFilter() async {
+    if (_selectedMainCategory == 'all') {
+      return;
+    }
+
+    final categories = availableSubCategories;
+
+    if (categories.isEmpty) {
+      return;
+    }
+
+    final selectedCategory =
+    await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        final theme = Theme.of(sheetContext);
+        final l10n = sheetContext.l10n;
+
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              20,
+              4,
+              20,
+              24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+              children: [
+                Text(
+                  localizedMainCategory(
+                    sheetContext,
+                    _selectedMainCategory,
+                  ),
+                  style: theme
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(
+                    fontWeight:
+                    FontWeight.w600,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                Text(
+                  '选择类型',
+                  style: theme
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(
+                    color: theme
+                        .colorScheme
+                        .onSurfaceVariant,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    // 清除二级筛选
+                    ChoiceChip(
+                      label: Text(
+                        l10n.categoryAll,
+                      ),
+                      selected:
+                      _selectedSubCategory ==
+                          null,
+                      onSelected: (_) {
+                        Navigator.pop(
+                          sheetContext,
+                          '__all__',
+                        );
+                      },
+                    ),
+
+                    ...categories.map(
+                          (categoryId) {
+                        return ChoiceChip(
+                          label: Text(
+                            localizedCategory(
+                              sheetContext,
+                              categoryId,
+                            ),
+                          ),
+                          selected:
+                          _selectedSubCategory ==
+                              categoryId,
+                          onSelected: (_) {
+                            Navigator.pop(
+                              sheetContext,
+                              categoryId,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!mounted ||
+        selectedCategory == null) {
+      return;
+    }
+
+    setState(() {
+      if (selectedCategory == '__all__') {
+        _selectedSubCategory = null;
+      } else {
+        _selectedSubCategory =
+            selectedCategory;
+      }
+    });
   }
 
   void _scheduleImagePrefetch(
@@ -296,21 +496,53 @@ class _WardrobePageState extends State<WardrobePage> {
                 },
                 decoration: InputDecoration(
                   hintText: l10n.searchClothing,
-                  prefixIcon: const Icon(Icons.search),
+
+                  prefixIcon: const Icon(
+                    Icons.search,
+                  ),
+
+                  // 只有选择一级分类后才显示二级筛选。
+                  suffixIcon:
+                  _selectedMainCategory == 'all'
+                      ? null
+                      : IconButton(
+                    onPressed:
+                    availableSubCategories.isEmpty
+                        ? null
+                        : _showSubCategoryFilter,
+                    icon: Icon(
+                      _selectedSubCategory == null
+                          ? Icons.filter_alt_outlined
+                          : Icons.filter_alt,
+                      color:
+                      _selectedSubCategory == null
+                          ? null
+                          : Theme.of(context)
+                          .colorScheme
+                          .primary,
+                    ),
+                  ),
+
                   filled: true,
                   fillColor: Theme.of(context)
                       .colorScheme
                       .surfaceContainerHighest,
+
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius:
+                    BorderRadius.circular(16),
                     borderSide: BorderSide.none,
                   ),
+
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius:
+                    BorderRadius.circular(16),
                     borderSide: BorderSide.none,
                   ),
+
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius:
+                    BorderRadius.circular(16),
                     borderSide: BorderSide.none,
                   ),
                 ),
@@ -337,8 +569,18 @@ class _WardrobePageState extends State<WardrobePage> {
                     label: Text(label),
                     selected: _selectedMainCategory == categoryId,
                     onSelected: (_) {
+                      if (_selectedMainCategory ==
+                          categoryId) {
+                        return;
+                      }
+
                       setState(() {
-                        _selectedMainCategory = categoryId;
+                        _selectedMainCategory =
+                            categoryId;
+
+                        // 一级分类改变后，
+                        // 原来的二级分类已经失去意义。
+                        _selectedSubCategory = null;
                       });
                     },
                   );
@@ -416,3 +658,4 @@ class _EmptyWardrobe extends StatelessWidget {
     );
   }
 }
+

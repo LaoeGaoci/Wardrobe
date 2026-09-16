@@ -45,10 +45,13 @@ class _EditClothingPageState
 
 
   final List<String> _seasons = [
+    '全季',
     '春季',
     '夏季',
     '秋季',
     '冬季',
+    '春秋',
+    '秋冬',
   ];
 
   @override

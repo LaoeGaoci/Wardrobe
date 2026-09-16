@@ -8,43 +8,70 @@ import 'about.dart';
 import 'settings.dart';
 
 class ProfilePage extends StatefulWidget {
-  final bool isDarkMode;
-  final ValueChanged<bool> onThemeChanged;
-  final ValueChanged<Locale> onLocaleChanged;
+  /// 当前主题模式：
+  ///
+  /// ThemeMode.system -> 跟随系统
+  /// ThemeMode.light  -> 浅色
+  /// ThemeMode.dark   -> 深色
+  final ThemeMode themeMode;
+
+  /// 修改主题模式
+  final ValueChanged<ThemeMode>
+  onThemeModeChanged;
+
+  /// 修改语言
+  final ValueChanged<Locale>
+  onLocaleChanged;
 
   const ProfilePage({
     super.key,
-    required this.isDarkMode,
-    required this.onThemeChanged,
+    required this.themeMode,
+    required this.onThemeModeChanged,
     required this.onLocaleChanged,
   });
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfilePage> createState() =>
+      _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState
+    extends State<ProfilePage> {
   bool _isEditingUsername = false;
 
-  late final TextEditingController _usernameController;
-  late final FocusNode _usernameFocusNode;
+  late final TextEditingController
+  _usernameController;
+
+  late final FocusNode
+  _usernameFocusNode;
 
   @override
   void initState() {
     super.initState();
-    _usernameController = TextEditingController();
-    _usernameFocusNode = FocusNode();
+
+    _usernameController =
+        TextEditingController();
+
+    _usernameFocusNode =
+        FocusNode();
   }
 
   @override
   void dispose() {
     _usernameController.dispose();
     _usernameFocusNode.dispose();
+
     super.dispose();
   }
 
+  // ============================================================
+  // UI
+  // ============================================================
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     final l10n = context.l10n;
 
     return Scaffold(
@@ -52,47 +79,74 @@ class _ProfilePageState extends State<ProfilePage> {
         title: Text(
           l10n.profileTitle,
           style: const TextStyle(
-            fontWeight: FontWeight.w600,
+            fontWeight:
+            FontWeight.w600,
           ),
         ),
         centerTitle: true,
         elevation: 0,
       ),
       body: AnimatedBuilder(
-        animation: AuthService.instance,
-        builder: (context, _) {
-          final user = AuthService.instance.currentUser;
+        animation:
+        AuthService.instance,
+        builder: (
+            context,
+            _,
+            ) {
+          final user =
+              AuthService
+                  .instance
+                  .currentUser;
 
           if (user == null) {
-            return const SizedBox.shrink();
+            return const SizedBox
+                .shrink();
           }
 
           return ListView(
-            padding: const EdgeInsets.symmetric(
+            padding:
+            const EdgeInsets
+                .symmetric(
               horizontal: 20,
               vertical: 24,
             ),
             children: [
+              // ==================================================
+              // Profile
+              // ==================================================
+
               Center(
                 child: Column(
                   children: [
                     WardrobeAvatar(
                       user: user,
                       radius: 42,
-                      // 保留原 ProfilePage 没有头像时的人形图标风格。
-                      fallbackIcon: Icons.person_outline,
+                      fallbackIcon:
+                      Icons
+                          .person_outline,
                     ),
-                    const SizedBox(height: 14),
+
+                    const SizedBox(
+                      height: 14,
+                    ),
+
                     _buildUsernameEditor(
                       context,
                       user.username,
                     ),
-                    const SizedBox(height: 4),
+
+                    const SizedBox(
+                      height: 4,
+                    ),
+
                     Text(
                       user.email,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Theme.of(context)
+                        color:
+                        Theme.of(
+                          context,
+                        )
                             .colorScheme
                             .onSurfaceVariant,
                       ),
@@ -100,41 +154,92 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 36),
+
+              const SizedBox(
+                height: 36,
+              ),
+
+              // ==================================================
+              // Settings
+              // ==================================================
+
               _buildMenuItem(
                 context,
-                icon: Icons.settings_outlined,
-                title: l10n.settings,
-                onTap: _openSettings,
+                icon:
+                Icons
+                    .settings_outlined,
+                title:
+                l10n.settings,
+                onTap:
+                _openSettings,
               ),
-              const SizedBox(height: 12),
+
+              const SizedBox(
+                height: 12,
+              ),
+
+              // ==================================================
+              // About
+              // ==================================================
+
               _buildMenuItem(
                 context,
-                icon: Icons.info_outline,
-                title: l10n.about,
-                onTap: _openAbout,
+                icon:
+                Icons.info_outline,
+                title:
+                l10n.about,
+                onTap:
+                _openAbout,
               ),
-              const SizedBox(height: 32),
+
+              const SizedBox(
+                height: 32,
+              ),
+
               Divider(
-                color: Theme.of(context).dividerColor,
+                color:
+                Theme.of(
+                  context,
+                ).dividerColor,
               ),
-              const SizedBox(height: 12),
+
+              const SizedBox(
+                height: 12,
+              ),
+
+              // ==================================================
+              // Logout
+              // ==================================================
+
               ListTile(
-                contentPadding: const EdgeInsets.symmetric(
+                contentPadding:
+                const EdgeInsets
+                    .symmetric(
                   horizontal: 4,
                 ),
                 leading: Icon(
                   Icons.logout,
-                  color: Colors.red.shade400,
+                  color:
+                  Colors
+                      .red
+                      .shade400,
                 ),
                 title: Text(
                   l10n.logout,
                   style: TextStyle(
-                    color: Colors.red.shade400,
-                    fontWeight: FontWeight.w500,
+                    color:
+                    Colors
+                        .red
+                        .shade400,
+                    fontWeight:
+                    FontWeight
+                        .w500,
                   ),
                 ),
-                onTap: () => _showLogoutDialog(context),
+                onTap: () =>
+                    _showLogoutDialog(
+                      context,
+                    ),
               ),
             ],
           );
@@ -148,96 +253,149 @@ class _ProfilePageState extends State<ProfilePage> {
   // ============================================================
 
   Widget _buildUsernameEditor(
-    BuildContext context,
-    String username,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
+      BuildContext context,
+      String username,
+      ) {
+    final colorScheme =
+        Theme.of(context)
+            .colorScheme;
+
+    final l10n =
+        context.l10n;
 
     if (_isEditingUsername) {
       return Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize:
+        MainAxisSize.min,
         children: [
           ConstrainedBox(
-            constraints: const BoxConstraints(
+            constraints:
+            const BoxConstraints(
               minWidth: 100,
               maxWidth: 220,
             ),
             child: TextField(
-              controller: _usernameController,
-              focusNode: _usernameFocusNode,
+              controller:
+              _usernameController,
+              focusNode:
+              _usernameFocusNode,
               autofocus: true,
               maxLength: 20,
-              textAlign: TextAlign.center,
-              textInputAction: TextInputAction.done,
-              style: const TextStyle(
+              textAlign:
+              TextAlign.center,
+              textInputAction:
+              TextInputAction.done,
+              style:
+              const TextStyle(
                 fontSize: 20,
-                fontWeight: FontWeight.w600,
+                fontWeight:
+                FontWeight.w600,
               ),
-              decoration: const InputDecoration(
+              decoration:
+              const InputDecoration(
                 isDense: true,
                 counterText: '',
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
+                border:
+                InputBorder.none,
+                enabledBorder:
+                InputBorder.none,
+                focusedBorder:
+                InputBorder.none,
                 filled: true,
-                fillColor: Colors.transparent,
-                contentPadding: EdgeInsets.symmetric(
+                fillColor:
+                Colors.transparent,
+                contentPadding:
+                EdgeInsets
+                    .symmetric(
                   horizontal: 4,
                   vertical: 4,
                 ),
               ),
-              onSubmitted: (_) => _saveUsername(),
+              onSubmitted: (_) =>
+                  _saveUsername(),
             ),
           ),
-          const SizedBox(width: 2),
+
+          const SizedBox(
+            width: 2,
+          ),
+
           IconButton(
-            onPressed: _saveUsername,
-            tooltip: l10n.save,
+            onPressed:
+            _saveUsername,
+            tooltip:
+            l10n.save,
             icon: Icon(
               Icons.check,
               size: 20,
-              color: colorScheme.primary,
+              color:
+              colorScheme.primary,
             ),
-            visualDensity: VisualDensity.compact,
+            visualDensity:
+            VisualDensity
+                .compact,
           ),
+
           IconButton(
-            onPressed: _cancelUsernameEdit,
-            tooltip: l10n.cancel,
+            onPressed:
+            _cancelUsernameEdit,
+            tooltip:
+            l10n.cancel,
             icon: Icon(
               Icons.close,
               size: 20,
-              color: colorScheme.onSurfaceVariant,
+              color:
+              colorScheme
+                  .onSurfaceVariant,
             ),
-            visualDensity: VisualDensity.compact,
+            visualDensity:
+            VisualDensity
+                .compact,
           ),
         ],
       );
     }
 
     return InkWell(
-      borderRadius: BorderRadius.circular(10),
-      onTap: () => _startUsernameEdit(username),
+      borderRadius:
+      BorderRadius.circular(
+        10,
+      ),
+      onTap: () =>
+          _startUsernameEdit(
+            username,
+          ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
+        padding:
+        const EdgeInsets
+            .symmetric(
           horizontal: 8,
           vertical: 4,
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize:
+          MainAxisSize.min,
           children: [
             Text(
               username,
-              style: const TextStyle(
+              style:
+              const TextStyle(
                 fontSize: 20,
-                fontWeight: FontWeight.w600,
+                fontWeight:
+                FontWeight.w600,
               ),
             ),
-            const SizedBox(width: 6),
+
+            const SizedBox(
+              width: 6,
+            ),
+
             Icon(
               Icons.edit_outlined,
               size: 16,
-              color: colorScheme.onSurfaceVariant,
+              color:
+              colorScheme
+                  .onSurfaceVariant,
             ),
           ],
         ),
@@ -245,41 +403,62 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _startUsernameEdit(String username) {
-    _usernameController.text = username;
-    _usernameController.selection = TextSelection(
-      baseOffset: 0,
-      extentOffset: username.length,
-    );
+  void _startUsernameEdit(
+      String username,
+      ) {
+    _usernameController.text =
+        username;
+
+    _usernameController.selection =
+        TextSelection(
+          baseOffset: 0,
+          extentOffset:
+          username.length,
+        );
 
     setState(() {
-      _isEditingUsername = true;
+      _isEditingUsername =
+      true;
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _usernameFocusNode.requestFocus();
-      }
-    });
+    WidgetsBinding.instance
+        .addPostFrameCallback(
+          (_) {
+        if (mounted) {
+          _usernameFocusNode
+              .requestFocus();
+        }
+      },
+    );
   }
 
-  Future<void> _saveUsername() async {
+  Future<void>
+  _saveUsername() async {
     try {
-      await AuthService.instance.updateUsername(
+      await AuthService.instance
+          .updateUsername(
         _usernameController.text,
       );
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
-        _isEditingUsername = false;
+        _isEditingUsername =
+        false;
       });
 
-      FocusScope.of(context).unfocus();
+      FocusScope.of(context)
+          .unfocus();
     } on AuthException catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(
         SnackBar(
           content: Text(
             localizedErrorMessage(
@@ -287,7 +466,9 @@ class _ProfilePageState extends State<ProfilePage> {
               e.message,
             ),
           ),
-          behavior: SnackBarBehavior.floating,
+          behavior:
+          SnackBarBehavior
+              .floating,
         ),
       );
     }
@@ -295,10 +476,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _cancelUsernameEdit() {
     setState(() {
-      _isEditingUsername = false;
+      _isEditingUsername =
+      false;
     });
 
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context)
+        .unfocus();
   }
 
   // ============================================================
@@ -306,26 +489,42 @@ class _ProfilePageState extends State<ProfilePage> {
   // ============================================================
 
   Widget _buildMenuItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String title,
+        required VoidCallback onTap,
+      }) {
     return Material(
-      color: Colors.transparent,
+      color:
+      Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius:
+        BorderRadius.circular(
+          16,
+        ),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(
+          padding:
+          const EdgeInsets
+              .symmetric(
             horizontal: 16,
             vertical: 16,
           ),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(16),
+          decoration:
+          BoxDecoration(
+            color:
+            Theme.of(
+              context,
+            ).cardColor,
+            borderRadius:
+            BorderRadius.circular(
+              16,
+            ),
             border: Border.all(
-              color: Theme.of(context).dividerColor,
+              color:
+              Theme.of(
+                context,
+              ).dividerColor,
             ),
           ),
           child: Row(
@@ -333,21 +532,40 @@ class _ProfilePageState extends State<ProfilePage> {
               Icon(
                 icon,
                 size: 24,
-                color: Theme.of(context).colorScheme.onSurface,
+                color:
+                Theme.of(
+                  context,
+                )
+                    .colorScheme
+                    .onSurface,
               ),
-              const SizedBox(width: 16),
+
+              const SizedBox(
+                width: 16,
+              ),
+
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style:
+                  const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontWeight:
+                    FontWeight
+                        .w500,
                   ),
                 ),
               ),
+
               Icon(
-                Icons.chevron_right,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                Icons
+                    .chevron_right,
+                color:
+                Theme.of(
+                  context,
+                )
+                    .colorScheme
+                    .onSurfaceVariant,
               ),
             ],
           ),
@@ -356,17 +574,36 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // ============================================================
+  // Settings
+  // ============================================================
+
   void _openSettings() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => SettingsPage(
-          notificationsEnabled: true,
-          darkModeEnabled: widget.isDarkMode,
-          onNotificationsChanged: (_) {},
-          onDarkModeChanged: widget.onThemeChanged,
-          onLocaleChanged: widget.onLocaleChanged,
-        ),
+        builder: (_) =>
+            SettingsPage(
+              notificationsEnabled:
+              true,
+
+              // 当前主题模式直接传入。
+              themeMode:
+              widget.themeMode,
+
+              onNotificationsChanged:
+                  (_) {},
+
+              // SettingsPage 修改主题后，
+              // 继续交给 App 根节点处理。
+              onThemeModeChanged:
+              widget
+                  .onThemeModeChanged,
+
+              onLocaleChanged:
+              widget
+                  .onLocaleChanged,
+            ),
       ),
     );
   }
@@ -375,7 +612,8 @@ class _ProfilePageState extends State<ProfilePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const AboutPage(),
+        builder: (_) =>
+        const AboutPage(),
       ),
     );
   }
@@ -384,29 +622,53 @@ class _ProfilePageState extends State<ProfilePage> {
   // Logout
   // ============================================================
 
-  void _showLogoutDialog(BuildContext context) {
-    final l10n = context.l10n;
+  void _showLogoutDialog(
+      BuildContext context,
+      ) {
+    final l10n =
+        context.l10n;
 
     showDialog<void>(
       context: context,
-      builder: (dialogContext) {
+      builder:
+          (dialogContext) {
         return AlertDialog(
-          title: Text(l10n.logout),
-          content: Text(l10n.logoutConfirm),
+          title:
+          Text(
+            l10n.logout,
+          ),
+          content:
+          Text(
+            l10n.logoutConfirm,
+          ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(l10n.cancel),
+              onPressed: () =>
+                  Navigator.pop(
+                    dialogContext,
+                  ),
+              child:
+              Text(
+                l10n.cancel,
+              ),
             ),
             TextButton(
               onPressed: () async {
-                Navigator.pop(dialogContext);
-                await AuthService.instance.logout();
+                Navigator.pop(
+                  dialogContext,
+                );
+
+                await AuthService
+                    .instance
+                    .logout();
               },
               child: Text(
                 l10n.logout,
                 style: TextStyle(
-                  color: Colors.red.shade400,
+                  color:
+                  Colors
+                      .red
+                      .shade400,
                 ),
               ),
             ),

@@ -35,7 +35,7 @@ class _AddClothingPageState extends State<AddClothingPage> {
   final _colorController = TextEditingController();
   final _priceController = TextEditingController();
 
-  String _selectedCategory = 'tops.tshirt';
+  String _selectedCategory = 'tops.t-shirt';
   String _selectedSeason = '春季';
 
   ClothingVisibility _visibility = ClothingVisibility.private;
@@ -46,10 +46,13 @@ class _AddClothingPageState extends State<AddClothingPage> {
 
 
   final List<String> _seasons = [
+    '全季',
     '春季',
     '夏季',
     '秋季',
     '冬季',
+    '春秋',
+    '秋冬',
   ];
 
   @override

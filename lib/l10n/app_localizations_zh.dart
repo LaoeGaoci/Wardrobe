@@ -57,10 +57,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notificationsSubtitle => '接收穿搭提醒';
 
   @override
-  String get darkMode => '深色模式';
+  String get theme => '主题';
 
   @override
-  String get darkModeSubtitle => '使用深色外观';
+  String get themeSubtitle => '选择应用外观';
+
+  @override
+  String get themeSystem => '跟随系统';
+
+  @override
+  String get themeLight => '浅色';
+
+  @override
+  String get themeDark => '深色';
 
   @override
   String get appSection => '应用';
@@ -183,6 +192,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get categoryHat => '帽子';
+
+  @override
+  String get seasonAll => '全季';
+
+  @override
+  String get seasonSpringAutumn => '春秋';
+
+  @override
+  String get seasonAutumnWinter => '秋冬';
 
   @override
   String get seasonSpring => '春季';
@@ -812,7 +830,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get categoryGroupAccessories => '配饰';
 
   @override
-  String get categoryTshirt => 'T恤';
+  String get categoryTshirt => 'T恤（半袖）';
 
   @override
   String get categoryShirt => '衬衫';
@@ -957,6 +975,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get categoryBaseLayerBottom => '打底裤';
+
+  @override
+  String get categoryLongJohns => '秋裤';
+
+  @override
+  String get categoryThermalPants => '保暖裤';
 
   @override
   String get categoryShapewear => '塑身衣';
@@ -1096,10 +1120,19 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get notificationsSubtitle => '接收穿搭提醒';
 
   @override
-  String get darkMode => '深色模式';
+  String get theme => '主题';
 
   @override
-  String get darkModeSubtitle => '使用深色外观';
+  String get themeSubtitle => '选择应用外观';
+
+  @override
+  String get themeSystem => '跟随系统';
+
+  @override
+  String get themeLight => '浅色';
+
+  @override
+  String get themeDark => '深色';
 
   @override
   String get appSection => '应用';
@@ -1222,6 +1255,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get categoryHat => '帽子';
+
+  @override
+  String get seasonAll => '全季';
+
+  @override
+  String get seasonSpringAutumn => '春秋';
+
+  @override
+  String get seasonAutumnWinter => '秋冬';
 
   @override
   String get seasonSpring => '春季';
@@ -1998,6 +2040,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get categoryBaseLayerBottom => '打底裤';
 
   @override
+  String get categoryLongJohns => '秋裤';
+
+  @override
+  String get categoryThermalPants => '保暖裤';
+
+  @override
   String get categoryShapewear => '塑身衣';
 
   @override
@@ -2135,10 +2183,19 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get notificationsSubtitle => '接收穿搭提醒';
 
   @override
-  String get darkMode => '深色模式';
+  String get theme => '主題';
 
   @override
-  String get darkModeSubtitle => '使用深色外觀';
+  String get themeSubtitle => '選擇應用程式外觀';
+
+  @override
+  String get themeSystem => '跟隨系統';
+
+  @override
+  String get themeLight => '淺色';
+
+  @override
+  String get themeDark => '深色';
 
   @override
   String get appSection => '應用程式';
@@ -2261,6 +2318,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get categoryHat => '帽子';
+
+  @override
+  String get seasonAll => '全季';
+
+  @override
+  String get seasonSpringAutumn => '春秋';
+
+  @override
+  String get seasonAutumnWinter => '秋冬';
 
   @override
   String get seasonSpring => '春季';
@@ -3035,6 +3101,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get categoryBaseLayerBottom => '內搭褲';
+
+  @override
+  String get categoryLongJohns => '秋褲';
+
+  @override
+  String get categoryThermalPants => '保暖褲';
 
   @override
   String get categoryShapewear => '塑身衣';

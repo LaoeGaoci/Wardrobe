@@ -57,10 +57,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsSubtitle => 'Receive outfit reminders';
 
   @override
-  String get darkMode => 'Dark Mode';
+  String get theme => 'Theme';
 
   @override
-  String get darkModeSubtitle => 'Use dark appearance';
+  String get themeSubtitle => 'Choose app appearance';
+
+  @override
+  String get themeSystem => 'Follow system';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
 
   @override
   String get appSection => 'App';
@@ -186,6 +195,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryHat => 'Hats';
+
+  @override
+  String get seasonAll => 'All Seasons';
+
+  @override
+  String get seasonSpringAutumn => 'Spring / Autumn';
+
+  @override
+  String get seasonAutumnWinter => 'Autumn / Winter';
 
   @override
   String get seasonSpring => 'Spring';
@@ -997,6 +1015,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryBaseLayerBottom => 'Base-layer Bottom';
+
+  @override
+  String get categoryLongJohns => 'Long Johns';
+
+  @override
+  String get categoryThermalPants => 'Thermal Pants';
 
   @override
   String get categoryShapewear => 'Shapewear';
