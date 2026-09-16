@@ -7,19 +7,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class SessionStorage {
   SessionStorage._();
 
-  static final SessionStorage instance =
-  SessionStorage._();
+  static final SessionStorage instance = SessionStorage._();
 
-  static const String _accessTokenKey =
-      'wardrobe_access_token';
+  static const String _accessTokenKey = 'wardrobe_access_token';
 
-  final FlutterSecureStorage _storage =
-  const FlutterSecureStorage();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   /// 保存 Access Token。
-  Future<void> saveAccessToken(
-      String token,
-      ) async {
+  Future<void> saveAccessToken(String token) async {
     final value = token.trim();
 
     if (value.isEmpty) {
@@ -27,17 +22,12 @@ class SessionStorage {
       return;
     }
 
-    await _storage.write(
-      key: _accessTokenKey,
-      value: value,
-    );
+    await _storage.write(key: _accessTokenKey, value: value);
   }
 
   /// 读取 Access Token。
   Future<String?> readAccessToken() async {
-    final token = await _storage.read(
-      key: _accessTokenKey,
-    );
+    final token = await _storage.read(key: _accessTokenKey);
 
     if (token == null) {
       return null;
@@ -54,8 +44,6 @@ class SessionStorage {
 
   /// 删除 Access Token。
   Future<void> clearAccessToken() async {
-    await _storage.delete(
-      key: _accessTokenKey,
-    );
+    await _storage.delete(key: _accessTokenKey);
   }
 }

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../models/clothing.dart';
-import '../network/api_client.dart';
-import 'auth_service.dart';
+import '../../models/clothing/clothing.dart';
+import '../../network/api_client.dart';
+import '../users/auth_service.dart';
 
 /// Wardrobe 图片缓存 / 预加载服务。
 ///
@@ -28,7 +28,6 @@ class ImageCacheService {
   final Set<String> _preloadingKeys = <String>{};
   final Set<String> _preloadedKeys = <String>{};
   final Set<String> _scheduledKeys = <String>{};
-
 
   void _handleAuthChanged() {
     final nextUserId = AuthService.instance.currentUser?.id;
@@ -56,10 +55,7 @@ class ImageCacheService {
     required String imagePath,
     String? version,
   }) {
-    final request = _buildRequest(
-      imagePath: imagePath,
-      version: version,
-    );
+    final request = _buildRequest(imagePath: imagePath, version: version);
 
     return CachedNetworkImageProvider(
       request.url,
@@ -109,10 +105,7 @@ class ImageCacheService {
       // 磁盘缓存保留原图；这里只限制进入 Flutter ImageCache 的解码尺寸。
       // 这样列表预加载 720px 后，详情页仍然可以从同一份磁盘原图解码 1440px，
       // 不会因为第一次预加载缩略图而把磁盘缓存永久降成低分辨率。
-      final memoryProvider = ResizeImage(
-        networkProvider,
-        width: maxWidth,
-      );
+      final memoryProvider = ResizeImage(networkProvider, width: maxWidth);
 
       await precacheImage(
         memoryProvider,
@@ -155,11 +148,7 @@ class ImageCacheService {
 
     for (var index = safeStart; index < end; index++) {
       futures.add(
-        precacheClothing(
-          context,
-          clothes[index],
-          maxWidth: maxWidth,
-        ),
+        precacheClothing(context, clothes[index], maxWidth: maxWidth),
       );
     }
 
@@ -190,10 +179,7 @@ class ImageCacheService {
     final end = (start + count).clamp(0, clothes.length).toInt();
     final batchKey = clothes
         .sublist(start, end)
-        .map(
-          (item) =>
-              '${item.id}:${item.updatedAt.millisecondsSinceEpoch}',
-        )
+        .map((item) => '${item.id}:${item.updatedAt.millisecondsSinceEpoch}')
         .join('|');
 
     final scheduleKey = '$batchKey|w=$maxWidth';
@@ -234,10 +220,7 @@ class ImageCacheService {
     _scheduledKeys.clear();
   }
 
-  _ImageRequest _buildRequest({
-    required String imagePath,
-    String? version,
-  }) {
+  _ImageRequest _buildRequest({required String imagePath, String? version}) {
     final rawPath = imagePath.trim();
 
     if (rawPath.isEmpty) {
@@ -267,10 +250,7 @@ class ImageCacheService {
     );
   }
 
-  String _appendVersion(
-    String url,
-    String? version,
-  ) {
+  String _appendVersion(String url, String? version) {
     if (version == null || version.isEmpty) {
       return url;
     }
@@ -278,19 +258,11 @@ class ImageCacheService {
     final uri = Uri.parse(url);
 
     return uri
-        .replace(
-          queryParameters: {
-            ...uri.queryParameters,
-            'v': version,
-          },
-        )
+        .replace(queryParameters: {...uri.queryParameters, 'v': version})
         .toString();
   }
 
-  bool _isWardrobeApiImage(
-    String originalPath,
-    String resolvedUrl,
-  ) {
+  bool _isWardrobeApiImage(String originalPath, String resolvedUrl) {
     final originalUri = Uri.tryParse(originalPath);
 
     // 后端返回的相对 URL 一定属于 Wardrobe API。

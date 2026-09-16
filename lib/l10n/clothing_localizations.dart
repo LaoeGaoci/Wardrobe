@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../models/clothing.dart';
+import '../models/clothing/clothing.dart';
 import 'l10n.dart';
 
 const List<String> clothingMainCategoryIds = [
@@ -123,10 +123,7 @@ String? mainCategoryIdFor(String categoryId) {
       : null;
 }
 
-String localizedMainCategory(
-    BuildContext context,
-    String mainCategoryId,
-    ) {
+String localizedMainCategory(BuildContext context, String mainCategoryId) {
   final l10n = context.l10n;
 
   switch (mainCategoryId) {
@@ -149,10 +146,7 @@ String localizedMainCategory(
   }
 }
 
-String localizedCategory(
-    BuildContext context,
-    String categoryId,
-    ) {
+String localizedCategory(BuildContext context, String categoryId) {
   final l10n = context.l10n;
 
   switch (categoryId) {
@@ -323,10 +317,7 @@ String localizedCategory(
   }
 }
 
-String localizedCategoryPath(
-    BuildContext context,
-    String categoryId,
-    ) {
+String localizedCategoryPath(BuildContext context, String categoryId) {
   final mainCategoryId = mainCategoryIdFor(categoryId);
   final subCategory = localizedCategory(context, categoryId);
 
@@ -361,9 +352,9 @@ String localizedSeason(BuildContext context, String season) {
 }
 
 String localizedVisibility(
-    BuildContext context,
-    ClothingVisibility visibility,
-    ) {
+  BuildContext context,
+  ClothingVisibility visibility,
+) {
   return visibility == ClothingVisibility.public
       ? context.l10n.publicLabel
       : context.l10n.privateLabel;

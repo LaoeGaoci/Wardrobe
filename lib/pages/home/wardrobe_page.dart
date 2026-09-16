@@ -6,37 +6,29 @@ import '../../l10n/clothing_localizations.dart';
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../main.dart';
-import '../../models/clothing.dart';
-import '../../services/auth_service.dart';
-import '../../services/clothing_repository.dart';
-import '../../services/image_cache_service.dart';
+import '../../models/clothing/clothing.dart';
+import '../../services/users/auth_service.dart';
+import '../../services/clothing/clothing_repository.dart';
+import '../../services/clothing/image_cache_service.dart';
 import '../../widgets/clothing_card.dart';
 import '../clothing/add_clothing_page.dart';
 import '../clothing/clothing_detail_page.dart';
 
-enum _ClothingImageSource {
-  camera,
-  gallery,
-}
+enum _ClothingImageSource { camera, gallery }
 
 class WardrobePage extends StatefulWidget {
-  const WardrobePage({
-    super.key,
-  });
+  const WardrobePage({super.key});
 
   @override
   State<WardrobePage> createState() => _WardrobePageState();
 }
 
 class _WardrobePageState extends State<WardrobePage> {
-  final ClothingRepository _repository =
-      ClothingRepository.instance;
+  final ClothingRepository _repository = ClothingRepository.instance;
 
-  final ImageCacheService _imageCacheService =
-      ImageCacheService.instance;
+  final ImageCacheService _imageCacheService = ImageCacheService.instance;
 
-  final ImagePicker _imagePicker =
-  ImagePicker();
+  final ImagePicker _imagePicker = ImagePicker();
 
   bool _isLoading = true;
 
@@ -57,11 +49,8 @@ class _WardrobePageState extends State<WardrobePage> {
   // Load
   // ============================================================
 
-  Future<void> _loadClothes({
-    bool showLoading = true,
-  }) async {
-    final currentUser =
-        AuthService.instance.currentUser;
+  Future<void> _loadClothes({bool showLoading = true}) async {
+    final currentUser = AuthService.instance.currentUser;
 
     if (currentUser == null) {
       if (mounted) {
@@ -119,125 +108,71 @@ class _WardrobePageState extends State<WardrobePage> {
       return const [];
     }
 
-    Iterable<Clothing> result =
-        _repository.clothes;
+    Iterable<Clothing> result = _repository.clothes;
 
     if (_selectedMainCategory != 'all') {
       result = result.where(
-            (item) =>
-        mainCategoryIdFor(
-          item.category,
-        ) ==
-            _selectedMainCategory,
+        (item) => mainCategoryIdFor(item.category) == _selectedMainCategory,
       );
     }
 
-    final keyword =
-    _searchKeyword
-        .trim()
-        .toLowerCase();
+    final keyword = _searchKeyword.trim().toLowerCase();
 
     if (keyword.isNotEmpty) {
-      result = result.where(
-            (item) {
-          final location =
-          item.location.toLowerCase();
+      result = result.where((item) {
+        final location = item.location.toLowerCase();
 
-          final brand =
-          (item.brand ?? '')
-              .toLowerCase();
+        final brand = (item.brand ?? '').toLowerCase();
 
-          final color =
-          item.color.toLowerCase();
+        final color = item.color.toLowerCase();
 
-          final rawCategory =
-          item.category.toLowerCase();
+        final rawCategory = item.category.toLowerCase();
 
-          final rawSeason =
-          item.season.toLowerCase();
+        final rawSeason = item.season.toLowerCase();
 
-          final subCategory =
-          localizedCategory(
-            context,
-            item.category,
-          ).toLowerCase();
+        final subCategory = localizedCategory(
+          context,
+          item.category,
+        ).toLowerCase();
 
-          final categoryPath =
-          localizedCategoryPath(
-            context,
-            item.category,
-          ).toLowerCase();
+        final categoryPath = localizedCategoryPath(
+          context,
+          item.category,
+        ).toLowerCase();
 
-          final season =
-          localizedSeason(
-            context,
-            item.season,
-          ).toLowerCase();
+        final season = localizedSeason(context, item.season).toLowerCase();
 
-          final mainCategoryId =
-          mainCategoryIdFor(
-            item.category,
-          );
+        final mainCategoryId = mainCategoryIdFor(item.category);
 
-          final mainCategory =
-          mainCategoryId == null
-              ? ''
-              : localizedMainCategory(
-            context,
-            mainCategoryId,
-          ).toLowerCase();
+        final mainCategory = mainCategoryId == null
+            ? ''
+            : localizedMainCategory(context, mainCategoryId).toLowerCase();
 
-          return location.contains(
-            keyword,
-          ) ||
-              brand.contains(
-                keyword,
-              ) ||
-              color.contains(
-                keyword,
-              ) ||
-              rawCategory.contains(
-                keyword,
-              ) ||
-              rawSeason.contains(
-                keyword,
-              ) ||
-              subCategory.contains(
-                keyword,
-              ) ||
-              categoryPath.contains(
-                keyword,
-              ) ||
-              mainCategory.contains(
-                keyword,
-              ) ||
-              season.contains(
-                keyword,
-              );
-        },
-      );
+        return location.contains(keyword) ||
+            brand.contains(keyword) ||
+            color.contains(keyword) ||
+            rawCategory.contains(keyword) ||
+            rawSeason.contains(keyword) ||
+            subCategory.contains(keyword) ||
+            categoryPath.contains(keyword) ||
+            mainCategory.contains(keyword) ||
+            season.contains(keyword);
+      });
     }
 
-    return result.toList(
-      growable: false,
-    );
+    return result.toList(growable: false);
   }
 
   // ============================================================
   // Image prefetch
   // ============================================================
 
-  void _scheduleImagePrefetch(
-      List<Clothing> clothes,
-      int index,
-      ) {
-    if (index != 0 &&
-        (index + 1) % 6 != 0) {
+  void _scheduleImagePrefetch(List<Clothing> clothes, int index) {
+    if (index != 0 && (index + 1) % 6 != 0) {
       return;
     }
 
-    _imageCacheService
-        .schedulePrecacheAhead(
+    _imageCacheService.schedulePrecacheAhead(
       context,
       clothes,
       currentIndex: index,
@@ -250,11 +185,9 @@ class _WardrobePageState extends State<WardrobePage> {
   // Add clothing
   // ============================================================
 
-  CameraDescription?
-  _findBackCamera() {
+  CameraDescription? _findBackCamera() {
     for (final camera in cameras) {
-      if (camera.lensDirection ==
-          CameraLensDirection.back) {
+      if (camera.lensDirection == CameraLensDirection.back) {
         return camera;
       }
     }
@@ -262,98 +195,49 @@ class _WardrobePageState extends State<WardrobePage> {
     return null;
   }
 
-  Future<
-      _ClothingImageSource?>
-  _showImageSourcePicker() {
-    return showModalBottomSheet<
-        _ClothingImageSource>(
+  Future<_ClothingImageSource?> _showImageSourcePicker() {
+    return showModalBottomSheet<_ClothingImageSource>(
       context: context,
       showDragHandle: true,
-      builder: (
-          bottomSheetContext,
-          ) {
+      builder: (bottomSheetContext) {
         return SafeArea(
           child: Padding(
-            padding:
-            const EdgeInsets.only(
-              bottom: 12,
-            ),
+            padding: const EdgeInsets.only(bottom: 12),
             child: Column(
-              mainAxisSize:
-              MainAxisSize.min,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding:
-                  const EdgeInsets
-                      .fromLTRB(
-                    20,
-                    4,
-                    20,
-                    12,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
                   child: Align(
-                    alignment:
-                    Alignment
-                        .centerLeft,
+                    alignment: Alignment.centerLeft,
                     child: Text(
                       '添加衣物照片',
-                      style:
-                      Theme.of(
-                        bottomSheetContext,
-                      )
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(
-                        fontWeight:
-                        FontWeight
-                            .w600,
-                      ),
+                      style: Theme.of(bottomSheetContext).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
 
                 ListTile(
-                  leading:
-                  const Icon(
-                    Icons
-                        .camera_alt_outlined,
-                  ),
-                  title:
-                  const Text(
-                    '拍照',
-                  ),
-                  subtitle:
-                  const Text(
-                    '使用相机拍摄衣物',
-                  ),
+                  leading: const Icon(Icons.camera_alt_outlined),
+                  title: const Text('拍照'),
+                  subtitle: const Text('使用相机拍摄衣物'),
                   onTap: () {
                     Navigator.pop(
                       bottomSheetContext,
-                      _ClothingImageSource
-                          .camera,
+                      _ClothingImageSource.camera,
                     );
                   },
                 ),
 
                 ListTile(
-                  leading:
-                  const Icon(
-                    Icons
-                        .photo_library_outlined,
-                  ),
-                  title:
-                  const Text(
-                    '从相册选择',
-                  ),
-                  subtitle:
-                  const Text(
-                    '使用手机中已有的照片',
-                  ),
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: const Text('从相册选择'),
+                  subtitle: const Text('使用手机中已有的照片'),
                   onTap: () {
                     Navigator.pop(
                       bottomSheetContext,
-                      _ClothingImageSource
-                          .gallery,
+                      _ClothingImageSource.gallery,
                     );
                   },
                 ),
@@ -366,8 +250,7 @@ class _WardrobePageState extends State<WardrobePage> {
   }
 
   Future<void> _addClothing() async {
-    final currentUser =
-        AuthService.instance.currentUser;
+    final currentUser = AuthService.instance.currentUser;
 
     if (currentUser == null) {
       return;
@@ -377,16 +260,13 @@ class _WardrobePageState extends State<WardrobePage> {
     // 1. 先让用户选择图片来源
     // ----------------------------------------------------------
 
-    final source =
-    await _showImageSourcePicker();
+    final source = await _showImageSourcePicker();
 
-    if (source == null ||
-        !mounted) {
+    if (source == null || !mounted) {
       return;
     }
 
-    final backCamera =
-    _findBackCamera();
+    final backCamera = _findBackCamera();
 
     XFile? initialImage;
 
@@ -394,14 +274,10 @@ class _WardrobePageState extends State<WardrobePage> {
     // 2. 从相册选择
     // ----------------------------------------------------------
 
-    if (source ==
-        _ClothingImageSource
-            .gallery) {
+    if (source == _ClothingImageSource.gallery) {
       try {
-        initialImage =
-        await _imagePicker.pickImage(
-          source:
-          ImageSource.gallery,
+        initialImage = await _imagePicker.pickImage(
+          source: ImageSource.gallery,
 
           // 对衣物照片来说已经足够清晰，
           // 同时避免手机原图过大。
@@ -414,13 +290,7 @@ class _WardrobePageState extends State<WardrobePage> {
 
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(
-          SnackBar(
-            content: Text(
-              '读取相册失败：$e',
-            ),
-          ),
-        );
+        ).showSnackBar(SnackBar(content: Text('读取相册失败：$e')));
 
         return;
       }
@@ -435,25 +305,14 @@ class _WardrobePageState extends State<WardrobePage> {
     // 3. 拍照
     // ----------------------------------------------------------
 
-    if (source ==
-        _ClothingImageSource
-            .camera &&
-        backCamera == null) {
+    if (source == _ClothingImageSource.camera && backCamera == null) {
       if (!mounted) {
         return;
       }
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(
-        SnackBar(
-          content: Text(
-            context
-                .l10n
-                .rearCameraNotFound,
-          ),
-        ),
-      );
+      ).showSnackBar(SnackBar(content: Text(context.l10n.rearCameraNotFound)));
 
       return;
     }
@@ -474,27 +333,19 @@ class _WardrobePageState extends State<WardrobePage> {
     // - 拍照时为 null
     // ----------------------------------------------------------
 
-    final clothing =
-    await Navigator.push<
-        Clothing>(
+    final clothing = await Navigator.push<Clothing>(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            AddClothingPage(
-              camera: backCamera,
-              ownerId:
-              currentUser.id,
-              initialImage:
-              initialImage,
-            ),
+        builder: (_) => AddClothingPage(
+          camera: backCamera,
+          ownerId: currentUser.id,
+          initialImage: initialImage,
+        ),
       ),
     );
 
-    if (clothing != null &&
-        mounted) {
-      await _loadClothes(
-        showLoading: false,
-      );
+    if (clothing != null && mounted) {
+      await _loadClothes(showLoading: false);
     }
   }
 
@@ -502,27 +353,17 @@ class _WardrobePageState extends State<WardrobePage> {
   // Clothing detail
   // ============================================================
 
-  Future<void>
-  _openClothingDetail(
-      Clothing clothing,
-      ) async {
+  Future<void> _openClothingDetail(Clothing clothing) async {
     await Navigator.push<void>(
       context,
-      MaterialPageRoute(
-        builder: (_) =>
-            ClothingDetailPage(
-              clothing: clothing,
-            ),
-      ),
+      MaterialPageRoute(builder: (_) => ClothingDetailPage(clothing: clothing)),
     );
 
     if (!mounted) {
       return;
     }
 
-    await _loadClothes(
-      showLoading: false,
-    );
+    await _loadClothes(showLoading: false);
   }
 
   // ============================================================
@@ -530,46 +371,28 @@ class _WardrobePageState extends State<WardrobePage> {
   // ============================================================
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
-    final clothes =
-        filteredClothes;
+  Widget build(BuildContext context) {
+    final clothes = filteredClothes;
 
-    final l10n =
-        context.l10n;
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           l10n.myWardrobe,
-          style:
-          const TextStyle(
-            fontWeight:
-            FontWeight.bold,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
 
       body: _isLoading
-          ? const Center(
-        child:
-        CircularProgressIndicator(),
-      )
+          ? const Center(child: CircularProgressIndicator())
           : _loadError != null
           ? _buildLoadError()
-          : _buildWardrobeContent(
-        clothes,
-      ),
+          : _buildWardrobeContent(clothes),
 
-      floatingActionButton:
-      FloatingActionButton(
-        onPressed:
-        _addClothing,
-        child:
-        const Icon(
-          Icons.add,
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addClothing,
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -579,56 +402,31 @@ class _WardrobePageState extends State<WardrobePage> {
   // ============================================================
 
   Widget _buildLoadError() {
-    final l10n =
-        context.l10n;
+    final l10n = context.l10n;
 
     return Center(
       child: Padding(
-        padding:
-        const EdgeInsets.all(
-          32,
-        ),
+        padding: const EdgeInsets.all(32),
         child: Column(
-          mainAxisSize:
-          MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons
-                  .cloud_off_outlined,
-              size: 56,
-            ),
+            const Icon(Icons.cloud_off_outlined, size: 56),
 
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
 
             Text(
               _loadError == null
-                  ? l10n
-                  .wardrobeLoadFailed
-                  : localizedErrorMessage(
-                context,
-                _loadError!,
-              ),
-              textAlign:
-              TextAlign.center,
+                  ? l10n.wardrobeLoadFailed
+                  : localizedErrorMessage(context, _loadError!),
+              textAlign: TextAlign.center,
             ),
 
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
 
             FilledButton.icon(
-              onPressed:
-              _loadClothes,
-              icon:
-              const Icon(
-                Icons.refresh,
-              ),
-              label:
-              Text(
-                l10n.reload,
-              ),
+              onPressed: _loadClothes,
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n.reload),
             ),
           ],
         ),
@@ -640,103 +438,53 @@ class _WardrobePageState extends State<WardrobePage> {
   // Wardrobe content
   // ============================================================
 
-  Widget
-  _buildWardrobeContent(
-      List<Clothing> clothes,
-      ) {
-    final l10n =
-        context.l10n;
+  Widget _buildWardrobeContent(List<Clothing> clothes) {
+    final l10n = context.l10n;
 
     return RefreshIndicator(
-      onRefresh: () =>
-          _loadClothes(
-            showLoading: false,
-          ),
+      onRefresh: () => _loadClothes(showLoading: false),
 
-      child:
-      CustomScrollView(
-        physics:
-        const AlwaysScrollableScrollPhysics(),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
 
         slivers: [
           // ====================================================
           // Search
           // ====================================================
-
           SliverToBoxAdapter(
             child: Padding(
-              padding:
-              const EdgeInsets
-                  .fromLTRB(
-                16,
-                8,
-                16,
-                12,
-              ),
-              child:
-              TextField(
-                onChanged:
-                    (value) {
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: TextField(
+                onChanged: (value) {
                   setState(() {
-                    _searchKeyword =
-                        value;
+                    _searchKeyword = value;
                   });
                 },
 
-                decoration:
-                InputDecoration(
-                  hintText:
-                  l10n.searchClothing,
+                decoration: InputDecoration(
+                  hintText: l10n.searchClothing,
 
-                  prefixIcon:
-                  const Icon(
-                    Icons.search,
-                  ),
+                  prefixIcon: const Icon(Icons.search),
 
-                  filled:
-                  true,
+                  filled: true,
 
-                  fillColor:
-                  Theme.of(
+                  fillColor: Theme.of(
                     context,
-                  )
-                      .colorScheme
-                      .surfaceContainerHighest,
+                  ).colorScheme.surfaceContainerHighest,
 
-                  border:
-                  OutlineInputBorder(
-                    borderRadius:
-                    BorderRadius
-                        .circular(
-                      16,
-                    ),
-                    borderSide:
-                    BorderSide
-                        .none,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
                   ),
 
-                  enabledBorder:
-                  OutlineInputBorder(
-                    borderRadius:
-                    BorderRadius
-                        .circular(
-                      16,
-                    ),
-                    borderSide:
-                    BorderSide
-                        .none,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
                   ),
 
-                  focusedBorder:
-                  OutlineInputBorder(
-                    borderRadius:
-                    BorderRadius
-                        .circular(
-                      16,
-                    ),
-                    borderSide:
-                    BorderSide
-                        .none,
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
@@ -746,71 +494,35 @@ class _WardrobePageState extends State<WardrobePage> {
           // ====================================================
           // Main category
           // ====================================================
-
           SliverToBoxAdapter(
-            child:
-            SizedBox(
+            child: SizedBox(
               height: 45,
-              child:
-              ListView.separated(
-                scrollDirection:
-                Axis.horizontal,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
 
-                padding:
-                const EdgeInsets
-                    .symmetric(
-                  horizontal:
-                  12,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
 
-                itemCount:
-                clothingMainCategoryIds
-                    .length +
-                    1,
+                itemCount: clothingMainCategoryIds.length + 1,
 
-                separatorBuilder:
-                    (_, __) =>
-                const SizedBox(
-                  width: 8,
-                ),
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
 
-                itemBuilder:
-                    (
-                    context,
-                    index,
-                    ) {
-                  final categoryId =
-                  index == 0
+                itemBuilder: (context, index) {
+                  final categoryId = index == 0
                       ? 'all'
-                      : clothingMainCategoryIds[
-                  index -
-                      1];
+                      : clothingMainCategoryIds[index - 1];
 
-                  final label =
-                  categoryId ==
-                      'all'
-                      ? l10n
-                      .categoryAll
-                      : localizedMainCategory(
-                    context,
-                    categoryId,
-                  );
+                  final label = categoryId == 'all'
+                      ? l10n.categoryAll
+                      : localizedMainCategory(context, categoryId);
 
                   return ChoiceChip(
-                    label:
-                    Text(
-                      label,
-                    ),
+                    label: Text(label),
 
-                    selected:
-                    _selectedMainCategory ==
-                        categoryId,
+                    selected: _selectedMainCategory == categoryId,
 
-                    onSelected:
-                        (_) {
+                    onSelected: (_) {
                       setState(() {
-                        _selectedMainCategory =
-                            categoryId;
+                        _selectedMainCategory = categoryId;
                       });
                     },
                   );
@@ -819,75 +531,36 @@ class _WardrobePageState extends State<WardrobePage> {
             ),
           ),
 
-          const SliverToBoxAdapter(
-            child:
-            SizedBox(
-              height: 12,
-            ),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
           // ====================================================
           // Clothing grid
           // ====================================================
-
           SliverPadding(
-            padding:
-            const EdgeInsets
-                .all(
-              12,
-            ),
+            padding: const EdgeInsets.all(12),
 
-            sliver:
-            clothes.isEmpty
-                ? const SliverToBoxAdapter(
-              child:
-              _EmptyWardrobe(),
-            )
+            sliver: clothes.isEmpty
+                ? const SliverToBoxAdapter(child: _EmptyWardrobe())
                 : SliverGrid(
-              delegate:
-              SliverChildBuilderDelegate(
-                    (
-                    context,
-                    index,
-                    ) {
-                  final clothing =
-                  clothes[
-                  index];
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final clothing = clothes[index];
 
-                  _scheduleImagePrefetch(
-                    clothes,
-                    index,
-                  );
+                      _scheduleImagePrefetch(clothes, index);
 
-                  return GestureDetector(
-                    onTap:
-                        () =>
-                        _openClothingDetail(
-                          clothing,
+                      return GestureDetector(
+                        onTap: () => _openClothingDetail(clothing),
+                        child: ClothingCard(clothing: clothing),
+                      );
+                    }, childCount: clothes.length),
+
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 0.72,
                         ),
-                    child:
-                    ClothingCard(
-                      clothing:
-                      clothing,
-                    ),
-                  );
-                },
-                childCount:
-                clothes.length,
-              ),
-
-              gridDelegate:
-              const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount:
-                2,
-                crossAxisSpacing:
-                10,
-                mainAxisSpacing:
-                10,
-                childAspectRatio:
-                0.72,
-              ),
-            ),
+                  ),
           ),
         ],
       ),
@@ -899,47 +572,28 @@ class _WardrobePageState extends State<WardrobePage> {
 // Empty wardrobe
 // ============================================================
 
-class _EmptyWardrobe
-    extends StatelessWidget {
+class _EmptyWardrobe extends StatelessWidget {
   const _EmptyWardrobe();
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     return SizedBox(
       height: 300,
       child: Center(
         child: Column(
-          mainAxisAlignment:
-          MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons
-                  .checkroom_outlined,
+              Icons.checkroom_outlined,
               size: 56,
-              color:
-              Theme.of(
-                context,
-              )
-                  .colorScheme
-                  .onSurfaceVariant,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
 
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
 
             Text(
-              context
-                  .l10n
-                  .noClothing,
-              style:
-              Theme.of(
-                context,
-              )
-                  .textTheme
-                  .titleMedium,
+              context.l10n.noClothing,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
         ),

@@ -54,7 +54,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
-  String get notificationsSubtitle => 'Receive outfit reminders';
+  String get notificationsSubtitle =>
+      'Receive friend requests, clothing recommendations and system notifications';
+
+  @override
+  String get notificationPermissionRequired =>
+      'Notification permission is required to receive friend requests, clothing recommendations and system notifications.';
+
+  @override
+  String get openSystemNotificationSettings => 'Open system settings';
+
+  @override
+  String get notificationSettingsOpenFailed =>
+      'Unable to open Android app settings. Please enable Wardrobe notifications manually in system settings.';
+
+  @override
+  String get notificationFriendRequestTitle => 'New friend request';
+
+  @override
+  String get notificationFriendRequestBody =>
+      'You received a new friend request';
+
+  @override
+  String get notificationRecommendationTitle => 'New clothing recommendation';
+
+  @override
+  String get notificationRecommendationBody =>
+      'A friend sent you a clothing recommendation';
+
+  @override
+  String get notificationSystemTitle => 'Wardrobe';
+
+  @override
+  String get notificationSystemBody => 'You received a new system notification';
+
+  @override
+  String get notificationOpenFailed =>
+      'Unable to open notification content. Please try again later.';
+
+  @override
+  String get systemNotificationTitle => 'System notification';
 
   @override
   String get theme => 'Theme';

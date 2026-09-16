@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!--
+        Wardrobe "we" notification icon
+
+        Android notification small icon:
+        - transparent background
+        - white foreground
+        - Android will apply the final notification tint
+    -->
+
+    <!-- w -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="
+            M1.8,6.0
+            L5.0,6.0
+            L7.0,14.3
+            L9.1,6.0
+            L12.0,6.0
+            L14.0,14.3
+            L16.0,6.0
+            L19.1,6.0
+            L15.5,18.0
+            L12.5,18.0
+            L10.5,10.4
+            L8.5,18.0
+            L5.4,18.0
+            Z" />
+
+    <!-- e -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="
+            M22.2,11.0
+            C22.0,7.6 19.9,5.5 17.0,5.5
+            C13.7,5.5 11.4,8.0 11.4,12.0
+            C11.4,16.0 13.7,18.5 17.2,18.5
+            C19.8,18.5 21.6,17.2 22.2,15.1
+            L19.3,15.1
+            C18.9,15.9 18.2,16.3 17.2,16.3
+            C15.7,16.3 14.7,15.5 14.5,13.6
+            L22.2,13.6
+            Z
+
+            M14.5,11.2
+            C14.7,9.2 15.6,8.3 17.0,8.3
+            C18.4,8.3 19.2,9.3 19.3,11.2
+            Z" />
+
+</vector>

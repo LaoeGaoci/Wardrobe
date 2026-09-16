@@ -153,10 +153,6 @@ String localizedErrorMessage(BuildContext context, String message) {
     case '服务器返回的未读推荐数量格式不正确':
       return l10n.serverDataInvalid;
 
-    case 'Invalid verification code':
-    case '验证码错误':
-      return l10n.invalidVerificationCode;
-
     case 'Invalid or expired verification code':
       return l10n.invalidOrExpiredVerificationCode;
 

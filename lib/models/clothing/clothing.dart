@@ -1,12 +1,6 @@
-enum ClothingVisibility {
-  public,
-  private,
-}
+enum ClothingVisibility { public, private }
 
-enum ClothingImageType {
-  local,
-  remote,
-}
+enum ClothingImageType { local, remote }
 
 class Clothing {
   final String id;
@@ -58,13 +52,10 @@ class Clothing {
   // Backend JSON
   // ============================================================
 
-  factory Clothing.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory Clothing.fromJson(Map<String, dynamic> json) {
     final rawPrice = json['price'];
 
-    final imageUrl =
-        json['imageUrl'] as String? ?? '';
+    final imageUrl = json['imageUrl'] as String? ?? '';
 
     return Clothing(
       id: json['id'] as String,
@@ -74,20 +65,12 @@ class Clothing {
       category: json['category'] as String,
       color: json['color'] as String,
       season: json['season'] as String,
-      price: rawPrice is num
-          ? rawPrice.toDouble()
-          : null,
+      price: rawPrice is num ? rawPrice.toDouble() : null,
       imagePath: imageUrl,
       imageType: ClothingImageType.remote,
-      visibility: _visibilityFromJson(
-        json['visibility'],
-      ),
-      createdAt: DateTime.parse(
-        json['createdAt'] as String,
-      ),
-      updatedAt: DateTime.parse(
-        json['updatedAt'] as String,
-      ),
+      visibility: _visibilityFromJson(json['visibility']),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
   }
 
@@ -109,9 +92,7 @@ class Clothing {
     };
   }
 
-  static ClothingVisibility _visibilityFromJson(
-    dynamic value,
-  ) {
+  static ClothingVisibility _visibilityFromJson(dynamic value) {
     switch (value) {
       case 'public':
         return ClothingVisibility.public;

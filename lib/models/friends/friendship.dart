@@ -1,4 +1,4 @@
-import 'app_user.dart';
+import '../user/app_user.dart';
 
 /// ============================================================
 /// 好友状态
@@ -24,9 +24,7 @@ enum FriendStatus {
 }
 
 /// 把后端字符串转换为 Flutter enum。
-FriendStatus friendStatusFromJson(
-    dynamic value,
-    ) {
+FriendStatus friendStatusFromJson(dynamic value) {
   switch (value) {
     case 'friends':
       return FriendStatus.friends;
@@ -80,31 +78,19 @@ class FriendRelation {
   /// 好友 ID。
   String get friendId => user.id;
 
-  factory FriendRelation.fromJson(
-      Map<String, dynamic> json,
-      ) {
+  factory FriendRelation.fromJson(Map<String, dynamic> json) {
     final rawUser = json['user'];
 
     if (rawUser is! Map) {
-      throw const FormatException(
-        'Invalid friend user',
-      );
+      throw const FormatException('Invalid friend user');
     }
 
     return FriendRelation(
-      user: AppUser.fromJson(
-        Map<String, dynamic>.from(
-          rawUser,
-        ),
-      ),
+      user: AppUser.fromJson(Map<String, dynamic>.from(rawUser)),
 
-      remark:
-      json['remark'] as String? ??
-          '',
+      remark: json['remark'] as String? ?? '',
 
-      createdAt: _parseDateTime(
-        json['createdAt'],
-      ),
+      createdAt: _parseDateTime(json['createdAt']),
     );
   }
 
@@ -116,8 +102,7 @@ class FriendRelation {
     return FriendRelation(
       user: user ?? this.user,
       remark: remark ?? this.remark,
-      createdAt:
-      createdAt ?? this.createdAt,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }
@@ -159,44 +144,25 @@ class FriendRequest {
     required this.createdAt,
   });
 
-  factory FriendRequest.fromJson(
-      Map<String, dynamic> json,
-      ) {
-    final rawFromUser =
-    json['fromUser'];
+  factory FriendRequest.fromJson(Map<String, dynamic> json) {
+    final rawFromUser = json['fromUser'];
 
-    final rawToUser =
-    json['toUser'];
+    final rawToUser = json['toUser'];
 
-    if (rawFromUser is! Map ||
-        rawToUser is! Map) {
-      throw const FormatException(
-        'Invalid friend request users',
-      );
+    if (rawFromUser is! Map || rawToUser is! Map) {
+      throw const FormatException('Invalid friend request users');
     }
 
     return FriendRequest(
       id: json['id'] as String,
 
-      fromUser: AppUser.fromJson(
-        Map<String, dynamic>.from(
-          rawFromUser,
-        ),
-      ),
+      fromUser: AppUser.fromJson(Map<String, dynamic>.from(rawFromUser)),
 
-      toUser: AppUser.fromJson(
-        Map<String, dynamic>.from(
-          rawToUser,
-        ),
-      ),
+      toUser: AppUser.fromJson(Map<String, dynamic>.from(rawToUser)),
 
-      message:
-      json['message'] as String? ??
-          '',
+      message: json['message'] as String? ?? '',
 
-      createdAt: _parseDateTime(
-        json['createdAt'],
-      ),
+      createdAt: _parseDateTime(json['createdAt']),
     );
   }
 }
@@ -214,28 +180,13 @@ class FriendRequest {
 /// 2026-09-13T12:30:00
 ///
 /// 所以这里兼容两种格式。
-DateTime _parseDateTime(
-    dynamic value,
-    ) {
-  if (value is! String ||
-      value.isEmpty) {
-    return DateTime.fromMillisecondsSinceEpoch(
-      0,
-    );
+DateTime _parseDateTime(dynamic value) {
+  if (value is! String || value.isEmpty) {
+    return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
-  final normalized =
-  value.contains('T')
-      ? value
-      : value.replaceFirst(
-    ' ',
-    'T',
-  );
+  final normalized = value.contains('T') ? value : value.replaceFirst(' ', 'T');
 
-  return DateTime.tryParse(
-    normalized,
-  ) ??
-      DateTime.fromMillisecondsSinceEpoch(
-        0,
-      );
+  return DateTime.tryParse(normalized) ??
+      DateTime.fromMillisecondsSinceEpoch(0);
 }

@@ -12,29 +12,21 @@ class AppUser {
   });
 
   /// 从后端 JSON 创建用户对象
-  factory AppUser.fromJson(
-      Map<String, dynamic> json,
-      ) {
+  factory AppUser.fromJson(Map<String, dynamic> json) {
     return AppUser(
       id: json['id'] as String,
       username: json['username'] as String,
       email: json['email'] as String,
-      avatarUrl:
-      json['avatarUrl'] as String? ?? '',
+      avatarUrl: json['avatarUrl'] as String? ?? '',
     );
   }
 
-  AppUser copyWith({
-    String? username,
-    String? email,
-    String? avatarUrl,
-  }) {
+  AppUser copyWith({String? username, String? email, String? avatarUrl}) {
     return AppUser(
       id: id,
       username: username ?? this.username,
       email: email ?? this.email,
-      avatarUrl:
-      avatarUrl ?? this.avatarUrl,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 }

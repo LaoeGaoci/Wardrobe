@@ -1,28 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/clothing_localizations.dart';
-import '../models/clothing.dart';
+import '../models/clothing/clothing.dart';
 import 'wardrobe_image.dart';
 
 class ClothingCard extends StatelessWidget {
   final Clothing clothing;
 
-  const ClothingCard({
-    super.key,
-    required this.clothing,
-  });
+  const ClothingCard({super.key, required this.clothing});
 
   @override
   Widget build(BuildContext context) {
-    final subCategory = localizedCategory(
-      context,
-      clothing.category,
-    );
+    final subCategory = localizedCategory(context, clothing.category);
 
-    final season = localizedSeason(
-      context,
-      clothing.season,
-    );
+    final season = localizedSeason(context, clothing.season);
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -40,12 +31,7 @@ class ClothingCard extends StatelessWidget {
           ),
 
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              10,
-              8,
-              10,
-              9,
-            ),
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 9),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

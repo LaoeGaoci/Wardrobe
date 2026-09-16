@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:octo_image/octo_image.dart';
 
-import '../models/app_user.dart';
-import '../models/clothing.dart';
-import '../services/image_cache_service.dart';
+import '../models/user/app_user.dart';
+import '../models/clothing/clothing.dart';
+import '../services/clothing/image_cache_service.dart';
 
 /// Wardrobe 通用网络图片组件。
 ///
@@ -26,7 +26,8 @@ class WardrobeNetworkImage extends StatelessWidget {
     BuildContext context,
     Object error,
     StackTrace? stackTrace,
-  )? errorBuilder;
+  )?
+  errorBuilder;
 
   const WardrobeNetworkImage({
     super.key,
@@ -78,9 +79,7 @@ class WardrobeNetworkImage extends StatelessWidget {
                 return Container(
                   width: width,
                   height: height,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surfaceContainerHighest,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   alignment: Alignment.center,
                   child: SizedBox(
                     width: 24,
@@ -97,11 +96,7 @@ class WardrobeNetworkImage extends StatelessWidget {
           final customBuilder = errorBuilder;
 
           if (customBuilder != null) {
-            return customBuilder(
-              context,
-              error,
-              stackTrace,
-            );
+            return customBuilder(context, error, stackTrace);
           }
 
           return _buildDefaultError(context);
@@ -116,16 +111,12 @@ class WardrobeNetworkImage extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      color: Theme.of(context)
-          .colorScheme
-          .surfaceContainerHighest,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       alignment: Alignment.center,
       child: Icon(
         Icons.image_not_supported_outlined,
         size: 40,
-        color: Theme.of(context)
-            .colorScheme
-            .onSurfaceVariant,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
     );
   }
@@ -188,16 +179,12 @@ class WardrobeClothingImage extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      color: Theme.of(context)
-          .colorScheme
-          .surfaceContainerHighest,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       alignment: Alignment.center,
       child: Icon(
         Icons.image_not_supported_outlined,
         size: 40,
-        color: Theme.of(context)
-            .colorScheme
-            .onSurfaceVariant,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
     );
   }
@@ -267,17 +254,13 @@ class _AvatarFallback extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        color: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         alignment: Alignment.center,
         child: icon != null
             ? Icon(
                 icon,
                 size: size * 0.56,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               )
             : Text(
                 user.username.isEmpty
@@ -286,9 +269,7 @@ class _AvatarFallback extends StatelessWidget {
                 style: TextStyle(
                   fontSize: size * 0.38,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
       ),

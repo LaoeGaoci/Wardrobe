@@ -6,12 +6,11 @@ import 'package:flutter/material.dart';
 import '../../l10n/clothing_localizations.dart';
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
-import '../../models/clothing.dart';
-import '../../services/clothing_repository.dart';
+import '../../models/clothing/clothing.dart';
+import '../../services/clothing/clothing_repository.dart';
 import 'clothing_category_picker_page.dart';
 
-class AddClothingPage
-    extends StatefulWidget {
+class AddClothingPage extends StatefulWidget {
   /// Android 后置摄像头。
   ///
   /// 从相册添加时允许为 null，
@@ -37,56 +36,35 @@ class AddClothingPage
   });
 
   @override
-  State<AddClothingPage>
-  createState() =>
-      _AddClothingPageState();
+  State<AddClothingPage> createState() => _AddClothingPageState();
 }
 
-class _AddClothingPageState
-    extends State<AddClothingPage> {
-  CameraController?
-  _cameraController;
+class _AddClothingPageState extends State<AddClothingPage> {
+  CameraController? _cameraController;
 
-  Future<void>?
-  _cameraInitialization;
+  Future<void>? _cameraInitialization;
 
-  final _formKey =
-  GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
-  final _locationController =
-  TextEditingController();
+  final _locationController = TextEditingController();
 
-  final _brandController =
-  TextEditingController();
+  final _brandController = TextEditingController();
 
-  final _colorController =
-  TextEditingController();
+  final _colorController = TextEditingController();
 
-  final _priceController =
-  TextEditingController();
+  final _priceController = TextEditingController();
 
-  String _selectedCategory =
-      'tops.t-shirt';
+  String _selectedCategory = 'tops.t-shirt';
 
-  String _selectedSeason =
-      '春季';
+  String _selectedSeason = '春季';
 
-  ClothingVisibility _visibility =
-      ClothingVisibility.private;
+  ClothingVisibility _visibility = ClothingVisibility.private;
 
   XFile? _capturedImage;
 
   bool _saving = false;
 
-  final List<String> _seasons = [
-    '全季',
-    '春季',
-    '夏季',
-    '秋季',
-    '冬季',
-    '春秋',
-    '秋冬',
-  ];
+  final List<String> _seasons = ['全季', '春季', '夏季', '秋季', '冬季', '春秋', '秋冬'];
 
   @override
   void initState() {
@@ -98,8 +76,7 @@ class _AddClothingPageState
     // 不初始化相机、不申请相机权限。
     // ----------------------------------------------------------
 
-    _capturedImage =
-        widget.initialImage;
+    _capturedImage = widget.initialImage;
 
     // ----------------------------------------------------------
     // 只有选择“拍照”进入时才真正初始化摄像头。
@@ -112,20 +89,15 @@ class _AddClothingPageState
 
   @override
   void dispose() {
-    _cameraController
-        ?.dispose();
+    _cameraController?.dispose();
 
-    _locationController
-        .dispose();
+    _locationController.dispose();
 
-    _brandController
-        .dispose();
+    _brandController.dispose();
 
-    _colorController
-        .dispose();
+    _colorController.dispose();
 
-    _priceController
-        .dispose();
+    _priceController.dispose();
 
     super.dispose();
   }
@@ -134,33 +106,25 @@ class _AddClothingPageState
   // Category
   // ============================================================
 
-  Future<void>
-  _selectCategory() async {
+  Future<void> _selectCategory() async {
     if (_saving) {
       return;
     }
 
-    final selected =
-    await Navigator.push<
-        String>(
+    final selected = await Navigator.push<String>(
       context,
       MaterialPageRoute(
         builder: (_) =>
-            ClothingCategoryPickerPage(
-              currentCategory:
-              _selectedCategory,
-            ),
+            ClothingCategoryPickerPage(currentCategory: _selectedCategory),
       ),
     );
 
-    if (selected == null ||
-        !mounted) {
+    if (selected == null || !mounted) {
       return;
     }
 
     setState(() {
-      _selectedCategory =
-          selected;
+      _selectedCategory = selected;
     });
   }
 
@@ -170,57 +134,40 @@ class _AddClothingPageState
 
   void _initializeCamera() {
     // 已经初始化过，不重复创建 Controller。
-    if (_cameraController !=
-        null) {
+    if (_cameraController != null) {
       return;
     }
 
-    final camera =
-        widget.camera;
+    final camera = widget.camera;
 
     if (camera == null) {
       return;
     }
 
-    final controller =
-    CameraController(
+    final controller = CameraController(
       camera,
       ResolutionPreset.high,
       enableAudio: false,
     );
 
-    _cameraController =
-        controller;
+    _cameraController = controller;
 
-    _cameraInitialization =
-        controller.initialize();
+    _cameraInitialization = controller.initialize();
   }
 
-  Future<void>
-  _takePicture() async {
-    final controller =
-        _cameraController;
+  Future<void> _takePicture() async {
+    final controller = _cameraController;
 
-    final initialization =
-        _cameraInitialization;
+    final initialization = _cameraInitialization;
 
-    if (controller == null ||
-        initialization == null) {
+    if (controller == null || initialization == null) {
       if (!mounted) {
         return;
       }
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(
-        SnackBar(
-          content: Text(
-            context
-                .l10n
-                .rearCameraNotFound,
-          ),
-        ),
-      );
+      ).showSnackBar(SnackBar(content: Text(context.l10n.rearCameraNotFound)));
 
       return;
     }
@@ -228,40 +175,26 @@ class _AddClothingPageState
     try {
       await initialization;
 
-      if (controller
-          .value
-          .isTakingPicture) {
+      if (controller.value.isTakingPicture) {
         return;
       }
 
-      final image =
-      await controller
-          .takePicture();
+      final image = await controller.takePicture();
 
       if (!mounted) {
         return;
       }
 
       setState(() {
-        _capturedImage =
-            image;
+        _capturedImage = image;
       });
     } catch (e) {
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
-        SnackBar(
-          content: Text(
-            context.l10n
-                .takePhotoFailed(
-              e.toString(),
-            ),
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.takePhotoFailed(e.toString()))),
       );
     }
   }
@@ -270,25 +203,15 @@ class _AddClothingPageState
   ///
   /// 如果最开始是从相册进入，
   /// 相机此时才会真正初始化。
-  Future<void>
-  _retakePicture() async {
+  Future<void> _retakePicture() async {
     if (_saving) {
       return;
     }
 
-    if (widget.camera ==
-        null) {
+    if (widget.camera == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(
-        SnackBar(
-          content: Text(
-            context
-                .l10n
-                .rearCameraNotFound,
-          ),
-        ),
-      );
+      ).showSnackBar(SnackBar(content: Text(context.l10n.rearCameraNotFound)));
 
       return;
     }
@@ -296,8 +219,7 @@ class _AddClothingPageState
     _initializeCamera();
 
     setState(() {
-      _capturedImage =
-      null;
+      _capturedImage = null;
     });
   }
 
@@ -305,96 +227,59 @@ class _AddClothingPageState
   // Save
   // ============================================================
 
-  Future<void>
-  _saveClothing() async {
-    final capturedImage =
-        _capturedImage;
+  Future<void> _saveClothing() async {
+    final capturedImage = _capturedImage;
 
     if (capturedImage == null) {
       return;
     }
 
-    if (!_formKey
-        .currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    FocusScope.of(
-      context,
-    ).unfocus();
+    FocusScope.of(context).unfocus();
 
     setState(() {
       _saving = true;
     });
 
-    final repository =
-        ClothingRepository
-            .instance;
+    final repository = ClothingRepository.instance;
 
     Clothing? created;
 
     try {
-      final now =
-      DateTime.now();
+      final now = DateTime.now();
 
-      final rawPrice =
-      _priceController
-          .text
-          .trim();
+      final rawPrice = _priceController.text.trim();
 
-      final price =
-      rawPrice.isEmpty
-          ? null
-          : double.parse(
-        rawPrice,
-      );
+      final price = rawPrice.isEmpty ? null : double.parse(rawPrice);
 
-      final draft =
-      Clothing(
+      final draft = Clothing(
         id: '',
 
-        ownerId:
-        widget.ownerId,
+        ownerId: widget.ownerId,
 
         // 存放位置
-        location:
-        _locationController
-            .text
-            .trim(),
+        location: _locationController.text.trim(),
 
-        brand:
-        _brandController
-            .text
-            .trim()
-            .isEmpty
+        brand: _brandController.text.trim().isEmpty
             ? null
-            : _brandController
-            .text
-            .trim(),
+            : _brandController.text.trim(),
 
-        imagePath:
-        capturedImage.path,
+        imagePath: capturedImage.path,
 
-        imageType:
-        ClothingImageType
-            .local,
+        imageType: ClothingImageType.local,
 
-        category:
-        _selectedCategory,
+        category: _selectedCategory,
 
-        color:
-        _colorController
-            .text
-            .trim(),
+        color: _colorController.text.trim(),
 
-        season:
-        _selectedSeason,
+        season: _selectedSeason,
 
         price: price,
 
-        visibility:
-        _visibility,
+        visibility: _visibility,
 
         createdAt: now,
         updatedAt: now,
@@ -404,11 +289,7 @@ class _AddClothingPageState
       // 1. 先创建衣物记录
       // --------------------------------------------------------
 
-      created =
-      await repository
-          .addClothing(
-        draft,
-      );
+      created = await repository.addClothing(draft);
 
       // --------------------------------------------------------
       // 2. 上传图片到后端 / R2
@@ -422,23 +303,16 @@ class _AddClothingPageState
       // 所以后端完全不需要修改。
       // --------------------------------------------------------
 
-      final completed =
-      await repository
-          .uploadClothingImage(
-        clothingId:
-        created.id,
-        imagePath:
-        capturedImage.path,
+      final completed = await repository.uploadClothingImage(
+        clothingId: created.id,
+        imagePath: capturedImage.path,
       );
 
       if (!mounted) {
         return;
       }
 
-      Navigator.pop(
-        context,
-        completed,
-      );
+      Navigator.pop(context, completed);
     } catch (e) {
       // --------------------------------------------------------
       // 图片上传失败时，
@@ -448,10 +322,7 @@ class _AddClothingPageState
 
       if (created != null) {
         try {
-          await repository
-              .deleteClothing(
-            created.id,
-          );
+          await repository.deleteClothing(created.id);
         } catch (_) {
           // 回滚失败不覆盖原始异常。
         }
@@ -465,24 +336,11 @@ class _AddClothingPageState
         _saving = false;
       });
 
-      final reason =
-      localizedErrorMessage(
-        context,
-        e.toString(),
-      );
+      final reason = localizedErrorMessage(context, e.toString());
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(
-        SnackBar(
-          content: Text(
-            context.l10n
-                .saveFailed(
-              reason,
-            ),
-          ),
-        ),
-      );
+      ).showSnackBar(SnackBar(content: Text(context.l10n.saveFailed(reason))));
     }
   }
 
@@ -491,9 +349,7 @@ class _AddClothingPageState
   // ============================================================
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
+  Widget build(BuildContext context) {
     // ----------------------------------------------------------
     // 没有图片：
     // 显示相机页面。
@@ -502,8 +358,7 @@ class _AddClothingPageState
     // 显示填写衣物信息页面。
     // ----------------------------------------------------------
 
-    if (_capturedImage ==
-        null) {
+    if (_capturedImage == null) {
       return _buildCameraPage();
     }
 
@@ -515,59 +370,32 @@ class _AddClothingPageState
   // ============================================================
 
   Widget _buildCameraPage() {
-    final l10n =
-        context.l10n;
+    final l10n = context.l10n;
 
-    final controller =
-        _cameraController;
+    final controller = _cameraController;
 
-    final initialization =
-        _cameraInitialization;
+    final initialization = _cameraInitialization;
 
-    if (controller == null ||
-        initialization == null) {
+    if (controller == null || initialization == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            l10n.captureClothing,
-          ),
-        ),
-        body: Center(
-          child: Text(
-            l10n.rearCameraNotFound,
-          ),
-        ),
+        appBar: AppBar(title: Text(l10n.captureClothing)),
+        body: Center(child: Text(l10n.rearCameraNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l10n.captureClothing,
-        ),
-      ),
+      appBar: AppBar(title: Text(l10n.captureClothing)),
 
-      body:
-      FutureBuilder<void>(
-        future:
-        initialization,
+      body: FutureBuilder<void>(
+        future: initialization,
 
-        builder: (
-            context,
-            snapshot,
-            ) {
-          if (snapshot
-              .connectionState ==
-              ConnectionState
-                  .done) {
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
             return Stack(
-              fit:
-              StackFit.expand,
+              fit: StackFit.expand,
 
               children: [
-                CameraPreview(
-                  controller,
-                ),
+                CameraPreview(controller),
 
                 Positioned(
                   left: 0,
@@ -575,70 +403,38 @@ class _AddClothingPageState
                   bottom: 0,
 
                   child: SafeArea(
-                    minimum:
-                    const EdgeInsets
-                        .only(
-                      bottom: 24,
-                    ),
+                    minimum: const EdgeInsets.only(bottom: 24),
 
                     child: Center(
-                      child:
-                      GestureDetector(
-                        onTap:
-                        _takePicture,
+                      child: GestureDetector(
+                        onTap: _takePicture,
 
-                        child:
-                        Container(
-                          width:
-                          72,
-                          height:
-                          72,
+                        child: Container(
+                          width: 72,
+                          height: 72,
 
-                          decoration:
-                          BoxDecoration(
-                            shape:
-                            BoxShape
-                                .circle,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
 
-                            color:
-                            Colors
-                                .white,
+                            color: Colors.white,
 
-                            border:
-                            Border.all(
-                              width:
-                              5,
-                              color:
-                              Colors
-                                  .grey
-                                  .shade300,
+                            border: Border.all(
+                              width: 5,
+                              color: Colors.grey.shade300,
                             ),
 
-                            boxShadow:
-                            [
+                            boxShadow: [
                               BoxShadow(
-                                blurRadius:
-                                12,
-                                color:
-                                Colors
-                                    .black
-                                    .withValues(
-                                  alpha:
-                                  0.18,
-                                ),
+                                blurRadius: 12,
+                                color: Colors.black.withValues(alpha: 0.18),
                               ),
                             ],
                           ),
 
-                          child:
-                          const Icon(
-                            Icons
-                                .camera_alt_rounded,
-                            size:
-                            32,
-                            color:
-                            Colors
-                                .black,
+                          child: const Icon(
+                            Icons.camera_alt_rounded,
+                            size: 32,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -649,21 +445,13 @@ class _AddClothingPageState
             );
           }
 
-          if (snapshot
-              .hasError) {
+          if (snapshot.hasError) {
             return Center(
-              child: Text(
-                l10n.cameraOpenFailed(
-                  '${snapshot.error}',
-                ),
-              ),
+              child: Text(l10n.cameraOpenFailed('${snapshot.error}')),
             );
           }
 
-          return const Center(
-            child:
-            CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         },
       ),
     );
@@ -674,88 +462,49 @@ class _AddClothingPageState
   // ============================================================
 
   Widget _buildFormPage() {
-    final l10n =
-        context.l10n;
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l10n.addClothing,
-        ),
-        actions:
-        const [],
-      ),
+      appBar: AppBar(title: Text(l10n.addClothing), actions: const []),
 
       body: Form(
-        key:
-        _formKey,
+        key: _formKey,
 
         child: ListView(
-          keyboardDismissBehavior:
-          ScrollViewKeyboardDismissBehavior
-              .onDrag,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
 
-          padding:
-          const EdgeInsets
-              .fromLTRB(
-            16,
-            12,
-            16,
-            14,
-          ),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
 
           children: [
             // ==================================================
             // Image
             // ==================================================
-
             _buildImagePreview(),
 
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
 
             // ==================================================
             // Brand + Color
             // ==================================================
-
             Row(
-              crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
                 Expanded(
-                  child:
-                  TextFormField(
-                    controller:
-                    _brandController,
+                  child: TextFormField(
+                    controller: _brandController,
 
-                    textInputAction:
-                    TextInputAction
-                        .next,
+                    textInputAction: TextInputAction.next,
 
-                    decoration:
-                    _buildInputDecoration(
-                      label:
-                      l10n.brand,
-                      hint:
-                      l10n.optional,
-                      icon:
-                      Icons
-                          .sell_outlined,
+                    decoration: _buildInputDecoration(
+                      label: l10n.brand,
+                      hint: l10n.optional,
+                      icon: Icons.sell_outlined,
                     ),
 
-                    validator:
-                        (value) {
-                      if (value !=
-                          null &&
-                          value
-                              .trim()
-                              .length >
-                              100) {
-                        return l10n
-                            .brandMax100;
+                    validator: (value) {
+                      if (value != null && value.trim().length > 100) {
+                        return l10n.brandMax100;
                       }
 
                       return null;
@@ -763,43 +512,25 @@ class _AddClothingPageState
                   ),
                 ),
 
-                const SizedBox(
-                  width: 12,
-                ),
+                const SizedBox(width: 12),
 
                 Expanded(
-                  child:
-                  TextFormField(
-                    controller:
-                    _colorController,
+                  child: TextFormField(
+                    controller: _colorController,
 
-                    textInputAction:
-                    TextInputAction
-                        .next,
+                    textInputAction: TextInputAction.next,
 
-                    decoration:
-                    _buildInputDecoration(
-                      label:
-                      l10n.color,
+                    decoration: _buildInputDecoration(
+                      label: l10n.color,
 
-                      hint:
-                      l10n
-                          .colorExample,
+                      hint: l10n.colorExample,
 
-                      icon:
-                      Icons
-                          .palette_outlined,
+                      icon: Icons.palette_outlined,
                     ),
 
-                    validator:
-                        (value) {
-                      if (value ==
-                          null ||
-                          value
-                              .trim()
-                              .isEmpty) {
-                        return l10n
-                            .colorRequired;
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return l10n.colorRequired;
                       }
 
                       return null;
@@ -809,92 +540,53 @@ class _AddClothingPageState
               ],
             ),
 
-            const SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
 
             // ==================================================
             // Category + Season
             // ==================================================
-
             Row(
-              crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
-                Expanded(
-                  child:
-                  _buildCategorySelector(),
-                ),
+                Expanded(child: _buildCategorySelector()),
 
-                const SizedBox(
-                  width: 12,
-                ),
+                const SizedBox(width: 12),
 
                 Expanded(
-                  child:
-                  DropdownButtonFormField<
-                      String>(
-                    initialValue:
-                    _selectedSeason,
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _selectedSeason,
 
-                    isExpanded:
-                    true,
+                    isExpanded: true,
 
-                    decoration:
-                    _buildInputDecoration(
-                      label:
-                      l10n.season,
+                    decoration: _buildInputDecoration(
+                      label: l10n.season,
 
-                      icon:
-                      Icons
-                          .calendar_month_outlined,
+                      icon: Icons.calendar_month_outlined,
                     ),
 
-                    items:
-                    _seasons
-                        .map(
-                          (
-                          season,
-                          ) {
-                        return DropdownMenuItem<
-                            String>(
-                          value:
-                          season,
+                    items: _seasons.map((season) {
+                      return DropdownMenuItem<String>(
+                        value: season,
 
-                          child:
-                          Text(
-                            localizedSeason(
-                              context,
-                              season,
-                            ),
-                            overflow:
-                            TextOverflow
-                                .ellipsis,
-                          ),
-                        );
-                      },
-                    ).toList(),
-
-                    onChanged:
-                    _saving
-                        ? null
-                        : (
-                        value,
-                        ) {
-                      if (value ==
-                          null) {
-                        return;
-                      }
-
-                      setState(
-                            () {
-                          _selectedSeason =
-                              value;
-                        },
+                        child: Text(
+                          localizedSeason(context, season),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       );
-                    },
+                    }).toList(),
+
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                            if (value == null) {
+                              return;
+                            }
+
+                            setState(() {
+                              _selectedSeason = value;
+                            });
+                          },
                   ),
                 ),
               ],
@@ -903,51 +595,28 @@ class _AddClothingPageState
             // ==================================================
             // Storage location
             // ==================================================
-
-            const SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
 
             TextFormField(
-              controller:
-              _locationController,
+              controller: _locationController,
 
-              textInputAction:
-              TextInputAction
-                  .next,
+              textInputAction: TextInputAction.next,
 
-              decoration:
-              _buildInputDecoration(
-                label:
-                l10n
-                    .storageLocation,
+              decoration: _buildInputDecoration(
+                label: l10n.storageLocation,
 
-                hint:
-                l10n
-                    .storageLocationExample,
+                hint: l10n.storageLocationExample,
 
-                icon:
-                Icons
-                    .inventory_2_outlined,
+                icon: Icons.inventory_2_outlined,
               ),
 
-              validator:
-                  (value) {
-                if (value ==
-                    null ||
-                    value
-                        .trim()
-                        .isEmpty) {
-                  return l10n
-                      .storageLocationRequired;
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return l10n.storageLocationRequired;
                 }
 
-                if (value
-                    .trim()
-                    .length >
-                    100) {
-                  return l10n
-                      .storageLocationMax100;
+                if (value.trim().length > 100) {
+                  return l10n.storageLocationMax100;
                 }
 
                 return null;
@@ -957,79 +626,52 @@ class _AddClothingPageState
             // ==================================================
             // Price
             // ==================================================
-
-            const SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
 
             TextFormField(
-              controller:
-              _priceController,
+              controller: _priceController,
 
-              keyboardType:
-              const TextInputType
-                  .numberWithOptions(
+              keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
 
-              textInputAction:
-              TextInputAction
-                  .done,
+              textInputAction: TextInputAction.done,
 
-              decoration:
-              _buildInputDecoration(
-                label:
-                l10n.price,
+              decoration: _buildInputDecoration(
+                label: l10n.price,
 
-                hint:
-                l10n.optional,
+                hint: l10n.optional,
 
-                icon:
-                Icons
-                    .payments_outlined,
+                icon: Icons.payments_outlined,
 
-                prefixText:
-                '¥ ',
+                prefixText: '¥ ',
               ),
 
-              validator:
-                  (value) {
-                final text =
-                    value?.trim() ??
-                        '';
+              validator: (value) {
+                final text = value?.trim() ?? '';
 
                 if (text.isEmpty) {
                   return null;
                 }
 
-                final price =
-                double.tryParse(
-                  text,
-                );
+                final price = double.tryParse(text);
 
-                if (price == null ||
-                    price < 0) {
-                  return l10n
-                      .validPrice;
+                if (price == null || price < 0) {
+                  return l10n.validPrice;
                 }
 
                 return null;
               },
             ),
 
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
 
             // ==================================================
             // Visibility
             // ==================================================
-
             _buildVisibilitySelector(),
 
-            const SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
           ],
         ),
       ),
@@ -1037,69 +679,36 @@ class _AddClothingPageState
       // ========================================================
       // Create button
       // ========================================================
-
-      bottomNavigationBar:
-      SafeArea(
+      bottomNavigationBar: SafeArea(
         top: false,
 
-        minimum:
-        const EdgeInsets
-            .fromLTRB(
-          16,
-          8,
-          16,
-          28,
-        ),
+        minimum: const EdgeInsets.fromLTRB(16, 8, 16, 28),
 
-        child:
-        SizedBox(
+        child: SizedBox(
           height: 52,
 
-          child:
-          FilledButton(
-            onPressed:
-            _saving
-                ? null
-                : _saveClothing,
+          child: FilledButton(
+            onPressed: _saving ? null : _saveClothing,
 
-            style:
-            FilledButton
-                .styleFrom(
-              shape:
-              RoundedRectangleBorder(
-                borderRadius:
-                BorderRadius
-                    .circular(
-                  16,
-                ),
+            style: FilledButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
 
-            child:
-            _saving
+            child: _saving
                 ? const SizedBox(
-              width:
-              22,
-              height:
-              22,
-              child:
-              CircularProgressIndicator(
-                strokeWidth:
-                2.5,
-              ),
-            )
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
+                  )
                 : Text(
-              l10n
-                  .createClothing,
-              style:
-              const TextStyle(
-                fontSize:
-                16,
-                fontWeight:
-                FontWeight
-                    .w600,
-              ),
-            ),
+                    l10n.createClothing,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
           ),
         ),
       ),
@@ -1110,62 +719,34 @@ class _AddClothingPageState
   // Category
   // ============================================================
 
-  Widget
-  _buildCategorySelector() {
-    final l10n =
-        context.l10n;
+  Widget _buildCategorySelector() {
+    final l10n = context.l10n;
 
     return InkWell(
-      onTap:
-      _saving
-          ? null
-          : _selectCategory,
+      onTap: _saving ? null : _selectCategory,
 
-      borderRadius:
-      BorderRadius.circular(
-        14,
-      ),
+      borderRadius: BorderRadius.circular(14),
 
-      child:
-      InputDecorator(
-        decoration:
-        _buildInputDecoration(
-          label:
-          l10n.category,
+      child: InputDecorator(
+        decoration: _buildInputDecoration(
+          label: l10n.category,
 
-          icon:
-          Icons
-              .category_outlined,
+          icon: Icons.category_outlined,
         ),
 
-        child:
-        Row(
+        child: Row(
           children: [
             Expanded(
-              child:
-              Text(
-                localizedCategoryPath(
-                  context,
-                  _selectedCategory,
-                ),
-                maxLines:
-                1,
-                overflow:
-                TextOverflow
-                    .ellipsis,
+              child: Text(
+                localizedCategoryPath(context, _selectedCategory),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
 
-            const SizedBox(
-              width: 4,
-            ),
+            const SizedBox(width: 4),
 
-            const Icon(
-              Icons
-                  .chevron_right_rounded,
-              size:
-              20,
-            ),
+            const Icon(Icons.chevron_right_rounded, size: 20),
           ],
         ),
       ),
@@ -1177,59 +758,32 @@ class _AddClothingPageState
   // ============================================================
 
   Widget _buildImagePreview() {
-    final capturedImage =
-    _capturedImage!;
+    final capturedImage = _capturedImage!;
 
     return ClipRRect(
-      borderRadius:
-      BorderRadius.circular(
-        20,
-      ),
+      borderRadius: BorderRadius.circular(20),
 
-      child:
-      SizedBox(
-        height:
-        300,
+      child: SizedBox(
+        height: 300,
 
-        child:
-        Stack(
-          fit:
-          StackFit.expand,
+        child: Stack(
+          fit: StackFit.expand,
 
           children: [
-            Image.file(
-              File(
-                capturedImage.path,
-              ),
-              fit:
-              BoxFit.cover,
-            ),
+            Image.file(File(capturedImage.path), fit: BoxFit.cover),
 
             Positioned.fill(
-              child:
-              DecoratedBox(
-                decoration:
-                BoxDecoration(
-                  gradient:
-                  LinearGradient(
-                    begin:
-                    Alignment
-                        .center,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.center,
 
-                    end:
-                    Alignment
-                        .bottomCenter,
+                    end: Alignment.bottomCenter,
 
-                    colors:
-                    [
-                      Colors
-                          .transparent,
+                    colors: [
+                      Colors.transparent,
 
-                      Colors.black
-                          .withValues(
-                        alpha:
-                        0.22,
-                      ),
+                      Colors.black.withValues(alpha: 0.22),
                     ],
                   ),
                 ),
@@ -1239,35 +793,16 @@ class _AddClothingPageState
             // ==================================================
             // Retake
             // ==================================================
-
             Positioned(
-              right:
-              12,
-              bottom:
-              12,
+              right: 12,
+              bottom: 12,
 
-              child:
-              FilledButton
-                  .tonalIcon(
-                onPressed:
-                _saving
-                    ? null
-                    : _retakePicture,
+              child: FilledButton.tonalIcon(
+                onPressed: _saving ? null : _retakePicture,
 
-                icon:
-                const Icon(
-                  Icons
-                      .camera_alt_outlined,
-                  size:
-                  18,
-                ),
+                icon: const Icon(Icons.camera_alt_outlined, size: 18),
 
-                label:
-                Text(
-                  context
-                      .l10n
-                      .retakePhoto,
-                ),
+                label: Text(context.l10n.retakePhoto),
               ),
             ),
           ],
@@ -1280,156 +815,79 @@ class _AddClothingPageState
   // Visibility
   // ============================================================
 
-  Widget
-  _buildVisibilitySelector() {
-    final l10n =
-        context.l10n;
+  Widget _buildVisibilitySelector() {
+    final l10n = context.l10n;
 
-    final subtitle =
-    _visibility ==
-        ClothingVisibility
-            .private
-        ? l10n
-        .privateSubtitle
-        : l10n
-        .publicSubtitle;
+    final subtitle = _visibility == ClothingVisibility.private
+        ? l10n.privateSubtitle
+        : l10n.publicSubtitle;
 
     return Column(
-      crossAxisAlignment:
-      CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
 
       children: [
         Text(
           l10n.visibility,
 
-          style:
-          Theme.of(
+          style: Theme.of(
             context,
-          )
-              .textTheme
-              .labelLarge
-              ?.copyWith(
-            fontWeight:
-            FontWeight
-                .w600,
-          ),
+          ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
 
-        const SizedBox(
-          height:
-          10,
-        ),
+        const SizedBox(height: 10),
 
         SizedBox(
-          width:
-          double.infinity,
+          width: double.infinity,
 
-          child:
-          SegmentedButton<
-              ClothingVisibility>(
-            segments:
-            [
+          child: SegmentedButton<ClothingVisibility>(
+            segments: [
               ButtonSegment(
-                value:
-                ClothingVisibility
-                    .private,
+                value: ClothingVisibility.private,
 
-                icon:
-                const Icon(
-                  Icons
-                      .lock_outline,
-                ),
+                icon: const Icon(Icons.lock_outline),
 
-                label:
-                Text(
-                  l10n
-                      .privateLabel,
-                ),
+                label: Text(l10n.privateLabel),
               ),
 
               ButtonSegment(
-                value:
-                ClothingVisibility
-                    .public,
+                value: ClothingVisibility.public,
 
-                icon:
-                const Icon(
-                  Icons
-                      .people_outline,
-                ),
+                icon: const Icon(Icons.people_outline),
 
-                label:
-                Text(
-                  l10n
-                      .publicLabel,
-                ),
+                label: Text(l10n.publicLabel),
               ),
             ],
 
-            selected:
-            {
-              _visibility,
-            },
+            selected: {_visibility},
 
-            showSelectedIcon:
-            false,
+            showSelectedIcon: false,
 
-            onSelectionChanged:
-            _saving
+            onSelectionChanged: _saving
                 ? null
-                : (
-                values,
-                ) {
-              if (values
-                  .isEmpty) {
-                return;
-              }
+                : (values) {
+                    if (values.isEmpty) {
+                      return;
+                    }
 
-              setState(
-                    () {
-                  _visibility =
-                      values
-                          .first;
-                },
-              );
-            },
+                    setState(() {
+                      _visibility = values.first;
+                    });
+                  },
           ),
         ),
 
-        const SizedBox(
-          height:
-          8,
-        ),
+        const SizedBox(height: 8),
 
         AnimatedSwitcher(
-          duration:
-          const Duration(
-            milliseconds:
-            180,
-          ),
+          duration: const Duration(milliseconds: 180),
 
-          child:
-          Text(
+          child: Text(
             subtitle,
 
-            key:
-            ValueKey(
-              _visibility,
-            ),
+            key: ValueKey(_visibility),
 
-            style:
-            Theme.of(
-              context,
-            )
-                .textTheme
-                .bodySmall
-                ?.copyWith(
-              color:
-              Theme.of(
-                context,
-              )
-                  .colorScheme
-                  .onSurfaceVariant,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -1441,128 +899,54 @@ class _AddClothingPageState
   // Input Style
   // ============================================================
 
-  InputDecoration
-  _buildInputDecoration({
+  InputDecoration _buildInputDecoration({
     required String label,
     String? hint,
     IconData? icon,
     String? prefixText,
   }) {
-    final theme =
-    Theme.of(context);
+    final theme = Theme.of(context);
 
     return InputDecoration(
-      labelText:
-      label,
+      labelText: label,
 
-      hintText:
-      hint,
+      hintText: hint,
 
-      prefixIcon:
-      icon == null
-          ? null
-          : Icon(
-        icon,
-        size:
-        20,
+      prefixIcon: icon == null ? null : Icon(icon, size: 20),
+
+      prefixText: prefixText,
+
+      filled: true,
+
+      fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
+        alpha: 0.45,
       ),
 
-      prefixText:
-      prefixText,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
 
-      filled:
-      true,
-
-      fillColor:
-      theme
-          .colorScheme
-          .surfaceContainerHighest
-          .withValues(
-        alpha:
-        0.45,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
       ),
 
-      contentPadding:
-      const EdgeInsets
-          .symmetric(
-        horizontal:
-        14,
-        vertical:
-        14,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
       ),
 
-      border:
-      OutlineInputBorder(
-        borderRadius:
-        BorderRadius
-            .circular(
-          14,
-        ),
-        borderSide:
-        BorderSide.none,
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.4),
       ),
 
-      enabledBorder:
-      OutlineInputBorder(
-        borderRadius:
-        BorderRadius
-            .circular(
-          14,
-        ),
-        borderSide:
-        BorderSide.none,
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: theme.colorScheme.error),
       ),
 
-      focusedBorder:
-      OutlineInputBorder(
-        borderRadius:
-        BorderRadius
-            .circular(
-          14,
-        ),
-        borderSide:
-        BorderSide(
-          color:
-          theme
-              .colorScheme
-              .primary,
-          width:
-          1.4,
-        ),
-      ),
-
-      errorBorder:
-      OutlineInputBorder(
-        borderRadius:
-        BorderRadius
-            .circular(
-          14,
-        ),
-        borderSide:
-        BorderSide(
-          color:
-          theme
-              .colorScheme
-              .error,
-        ),
-      ),
-
-      focusedErrorBorder:
-      OutlineInputBorder(
-        borderRadius:
-        BorderRadius
-            .circular(
-          14,
-        ),
-        borderSide:
-        BorderSide(
-          color:
-          theme
-              .colorScheme
-              .error,
-          width:
-          1.4,
-        ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: theme.colorScheme.error, width: 1.4),
       ),
     );
   }

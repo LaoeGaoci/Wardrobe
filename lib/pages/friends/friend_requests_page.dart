@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
-import '../../models/app_user.dart';
-import '../../services/friend_service.dart';
+import '../../models/user/app_user.dart';
+import '../../services/friends/friend_service.dart';
 import '../../widgets/wardrobe_image.dart';
 import 'user_profile_page.dart';
 
@@ -70,7 +70,9 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(context.l10n.becameFriends(request.fromUser.username)),
+            content: Text(
+              context.l10n.becameFriends(request.fromUser.username),
+            ),
           ),
         );
     } on FriendException catch (e) {
@@ -90,9 +92,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
 
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(content: Text(context.l10n.requestRejected)),
-        );
+        ..showSnackBar(SnackBar(content: Text(context.l10n.requestRejected)));
     } on FriendException catch (e) {
       _showError(e.message);
     } finally {
@@ -114,9 +114,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(localizedErrorMessage(context, message)),
-        ),
+        SnackBar(content: Text(localizedErrorMessage(context, message))),
       );
   }
 
@@ -195,10 +193,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               onTap: processing ? null : () => _openUserProfile(user),
               child: Row(
                 children: [
-                  WardrobeAvatar(
-                    user: user,
-                    radius: 28,
-                  ),
+                  WardrobeAvatar(user: user, radius: 28),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
