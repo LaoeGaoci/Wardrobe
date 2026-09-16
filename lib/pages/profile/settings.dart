@@ -3,25 +3,23 @@ import 'package:flutter/material.dart';
 import '../../l10n/error_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../services/auth_service.dart';
+import '../../services/notification_service.dart';
 
 class SettingsPage extends StatefulWidget {
+  // Kept for compatibility with the existing ProfilePage.
+  // NotificationService is the real source of truth.
   final bool notificationsEnabled;
 
-  /// 当前主题模式。
-  ///
-  /// ThemeMode.system -> 跟随系统
-  /// ThemeMode.light  -> 浅色
-  /// ThemeMode.dark   -> 深色
   final ThemeMode themeMode;
 
   final ValueChanged<bool>
-  onNotificationsChanged;
+      onNotificationsChanged;
 
   final ValueChanged<ThemeMode>
-  onThemeModeChanged;
+      onThemeModeChanged;
 
   final ValueChanged<Locale>
-  onLocaleChanged;
+      onLocaleChanged;
 
   const SettingsPage({
     super.key,
@@ -39,35 +37,214 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState
     extends State<SettingsPage> {
+  final NotificationService
+      _notificationService =
+      NotificationService.instance;
+
   late bool
-  notificationsEnabled;
+      notificationsEnabled;
 
   late ThemeMode
-  themeMode;
+      themeMode;
+
+  bool _changingNotification =
+      false;
 
   bool _isDeletingAccount =
-  false;
+      false;
 
   @override
   void initState() {
     super.initState();
 
     notificationsEnabled =
-        widget.notificationsEnabled;
+        _notificationService
+            .enabled;
 
     themeMode =
         widget.themeMode;
+
+    _notificationService
+        .addListener(
+      _onNotificationChanged,
+    );
   }
 
-  // ============================================================
+  @override
+  void dispose() {
+    _notificationService
+        .removeListener(
+      _onNotificationChanged,
+    );
+
+    super.dispose();
+  }
+
+  void _onNotificationChanged() {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      notificationsEnabled =
+          _notificationService
+              .enabled;
+    });
+  }
+
+  // ==========================================================
+  // Notification
+  // ==========================================================
+
+  Future<void>
+      _changeNotificationSetting(
+    bool value,
+  ) async {
+    if (_changingNotification) {
+      return;
+    }
+
+    setState(() {
+      _changingNotification =
+          true;
+    });
+
+    final success =
+        await _notificationService
+            .setEnabled(
+      value,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _changingNotification =
+          false;
+
+      notificationsEnabled =
+          _notificationService
+              .enabled;
+    });
+
+    // Keep the old callback alive for compatibility.
+    widget
+        .onNotificationsChanged(
+      notificationsEnabled,
+    );
+
+    if (
+      value &&
+      !success
+    ) {
+      await _showPermissionDialog();
+    }
+  }
+
+  Future<void>
+      _showPermissionDialog() async {
+    final locale =
+        _normalizedLocale(
+      Localizations.localeOf(
+        context,
+      ),
+    );
+
+    final isEnglish =
+        locale.languageCode ==
+            'en';
+
+    final isTraditional =
+        locale.scriptCode ==
+            'Hant';
+
+    final message =
+        isEnglish
+            ? 'Notification permission is required to receive friend requests, clothing recommendations and system notifications.'
+            : isTraditional
+                ? '需要允許系統通知權限，才能接收好友請求、衣物推薦和系統通知。'
+                : '需要允许系统通知权限，才能接收好友请求、衣物推荐和系统通知。';
+
+    final settingsText =
+        isEnglish
+            ? 'Open system settings'
+            : isTraditional
+                ? '前往系統設定'
+                : '前往系统设置';
+
+    final open =
+        await showDialog<bool>(
+      context:
+          context,
+
+      builder:
+          (dialogContext) {
+        return AlertDialog(
+          title:
+              Text(
+            context
+                .l10n
+                .notifications,
+          ),
+
+          content:
+              Text(
+            message,
+          ),
+
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(
+                  dialogContext,
+                  false,
+                );
+              },
+              child:
+                  Text(
+                context
+                    .l10n
+                    .cancel,
+              ),
+            ),
+
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(
+                  dialogContext,
+                  true,
+                );
+              },
+              child:
+                  Text(
+                settingsText,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (
+      open == true
+    ) {
+      await _notificationService
+          .openSystemNotificationSettings();
+    }
+  }
+
+  // ==========================================================
   // Locale
-  // ============================================================
+  // ==========================================================
 
   Locale _normalizedLocale(
-      Locale locale,
-      ) {
-    if (locale.languageCode ==
-        'en') {
+    Locale locale,
+  ) {
+    if (
+      locale.languageCode ==
+      'en'
+    ) {
       return const Locale(
         'en',
       );
@@ -76,124 +253,165 @@ class _SettingsPageState
     final countryCode =
         locale.countryCode;
 
-    if (locale.scriptCode ==
-        'Hant' ||
-        countryCode ==
-            'TW' ||
-        countryCode ==
-            'HK' ||
-        countryCode ==
-            'MO') {
+    if (
+      locale.scriptCode ==
+          'Hant' ||
+      countryCode ==
+          'TW' ||
+      countryCode ==
+          'HK' ||
+      countryCode ==
+          'MO'
+    ) {
       return const Locale
           .fromSubtags(
-        languageCode: 'zh',
-        scriptCode: 'Hant',
+        languageCode:
+            'zh',
+        scriptCode:
+            'Hant',
       );
     }
 
     return const Locale
         .fromSubtags(
-      languageCode: 'zh',
-      scriptCode: 'Hans',
+      languageCode:
+          'zh',
+      scriptCode:
+          'Hans',
     );
   }
 
   String _languageName(
-      Locale locale,
-      ) {
+    Locale locale,
+  ) {
     final normalized =
-    _normalizedLocale(
+        _normalizedLocale(
       locale,
     );
 
-    if (normalized.languageCode ==
-        'en') {
+    if (
+      normalized.languageCode ==
+      'en'
+    ) {
       return 'English';
     }
 
-    if (normalized.scriptCode ==
-        'Hant') {
+    if (
+      normalized.scriptCode ==
+      'Hant'
+    ) {
       return '繁體中文';
     }
 
     return '简体中文';
   }
 
+  String _notificationSubtitle(
+    Locale locale,
+  ) {
+    final normalized =
+        _normalizedLocale(
+      locale,
+    );
+
+    if (
+      normalized.languageCode ==
+      'en'
+    ) {
+      return 'Receive friend requests, clothing recommendations and system notifications';
+    }
+
+    if (
+      normalized.scriptCode ==
+      'Hant'
+    ) {
+      return '接收好友請求、衣物推薦和系統通知';
+    }
+
+    return '接收好友请求、衣物推荐和系统通知';
+  }
+
   Future<void>
-  _showLanguagePicker() async {
+      _showLanguagePicker() async {
     final currentLocale =
-    _normalizedLocale(
+        _normalizedLocale(
       Localizations.localeOf(
         context,
       ),
     );
 
     final selected =
-    await showModalBottomSheet<
-        Locale>(
-      context: context,
-      builder: (
-          bottomSheetContext,
-          ) {
+        await showModalBottomSheet<
+            Locale>(
+      context:
+          context,
+
+      builder:
+          (
+        bottomSheetContext,
+      ) {
         return SafeArea(
           child:
-          RadioGroup<Locale>(
+              RadioGroup<Locale>(
             groupValue:
-            currentLocale,
-            onChanged: (
-                value,
-                ) {
-              if (value !=
-                  null) {
+                currentLocale,
+
+            onChanged:
+                (
+              value,
+            ) {
+              if (
+                value != null
+              ) {
                 Navigator.pop(
                   bottomSheetContext,
                   value,
                 );
               }
             },
+
             child:
-            const Column(
+                const Column(
               mainAxisSize:
-              MainAxisSize.min,
+                  MainAxisSize.min,
+
               children: [
                 RadioListTile<
                     Locale>(
                   value:
-                  Locale
-                      .fromSubtags(
+                      Locale.fromSubtags(
                     languageCode:
-                    'zh',
+                        'zh',
                     scriptCode:
-                    'Hans',
+                        'Hans',
                   ),
                   title:
-                  Text(
+                      Text(
                     '简体中文',
                   ),
                 ),
                 RadioListTile<
                     Locale>(
                   value:
-                  Locale
-                      .fromSubtags(
+                      Locale.fromSubtags(
                     languageCode:
-                    'zh',
+                        'zh',
                     scriptCode:
-                    'Hant',
+                        'Hant',
                   ),
                   title:
-                  Text(
+                      Text(
                     '繁體中文',
                   ),
                 ),
                 RadioListTile<
                     Locale>(
                   value:
-                  Locale(
+                      Locale(
                     'en',
                   ),
                   title:
-                  Text(
+                      Text(
                     'English',
                   ),
                 ),
@@ -204,8 +422,10 @@ class _SettingsPageState
       },
     );
 
-    if (selected == null ||
-        !mounted) {
+    if (
+      selected == null ||
+      !mounted
+    ) {
       return;
     }
 
@@ -214,29 +434,29 @@ class _SettingsPageState
     );
   }
 
-  // ============================================================
+  // ==========================================================
   // Theme
-  // ============================================================
+  // ==========================================================
 
-  /// 当前语言使用的主题标题。
-  ///
-  /// 暂时放在这里，这样不修改 ARB
-  /// 也可以直接编译运行。
   String _themeTitle(
-      Locale locale,
-      ) {
+    Locale locale,
+  ) {
     final normalized =
-    _normalizedLocale(
+        _normalizedLocale(
       locale,
     );
 
-    if (normalized.languageCode ==
-        'en') {
+    if (
+      normalized.languageCode ==
+      'en'
+    ) {
       return 'Theme';
     }
 
-    if (normalized.scriptCode ==
-        'Hant') {
+    if (
+      normalized.scriptCode ==
+      'Hant'
+    ) {
       return '主題';
     }
 
@@ -244,20 +464,24 @@ class _SettingsPageState
   }
 
   String _themeSubtitle(
-      Locale locale,
-      ) {
+    Locale locale,
+  ) {
     final normalized =
-    _normalizedLocale(
+        _normalizedLocale(
       locale,
     );
 
-    if (normalized.languageCode ==
-        'en') {
+    if (
+      normalized.languageCode ==
+      'en'
+    ) {
       return 'Choose app appearance';
     }
 
-    if (normalized.scriptCode ==
-        'Hant') {
+    if (
+      normalized.scriptCode ==
+      'Hant'
+    ) {
       return '選擇應用程式外觀';
     }
 
@@ -265,52 +489,48 @@ class _SettingsPageState
   }
 
   String _themeModeName(
-      Locale locale,
-      ThemeMode mode,
-      ) {
+    Locale locale,
+    ThemeMode mode,
+  ) {
     final normalized =
-    _normalizedLocale(
+        _normalizedLocale(
       locale,
     );
 
-    final isEnglish =
+    final english =
         normalized.languageCode ==
             'en';
 
-    final isTraditional =
+    final traditional =
         normalized.scriptCode ==
             'Hant';
 
     switch (mode) {
       case ThemeMode.system:
-        if (isEnglish) {
+        if (english) {
           return 'Follow system';
         }
 
-        if (isTraditional) {
+        if (traditional) {
           return '跟隨系統';
         }
 
         return '跟随系统';
 
       case ThemeMode.light:
-        if (isEnglish) {
+        if (english) {
           return 'Light';
         }
 
-        if (isTraditional) {
+        if (traditional) {
           return '淺色';
         }
 
         return '浅色';
 
       case ThemeMode.dark:
-        if (isEnglish) {
+        if (english) {
           return 'Dark';
-        }
-
-        if (isTraditional) {
-          return '深色';
         }
 
         return '深色';
@@ -318,8 +538,8 @@ class _SettingsPageState
   }
 
   IconData _themeModeIcon(
-      ThemeMode mode,
-      ) {
+    ThemeMode mode,
+  ) {
     switch (mode) {
       case ThemeMode.system:
         return Icons
@@ -336,93 +556,72 @@ class _SettingsPageState
   }
 
   Future<void>
-  _showThemePicker() async {
+      _showThemePicker() async {
     final locale =
-    Localizations.localeOf(
+        Localizations.localeOf(
       context,
     );
 
     final selected =
-    await showModalBottomSheet<
-        ThemeMode>(
-      context: context,
-      builder: (
-          bottomSheetContext,
-          ) {
+        await showModalBottomSheet<
+            ThemeMode>(
+      context:
+          context,
+
+      builder:
+          (
+        bottomSheetContext,
+      ) {
         return SafeArea(
           child:
-          RadioGroup<ThemeMode>(
+              RadioGroup<ThemeMode>(
             groupValue:
-            themeMode,
-            onChanged: (
-                value,
-                ) {
-              if (value !=
-                  null) {
+                themeMode,
+
+            onChanged:
+                (
+              value,
+            ) {
+              if (
+                value != null
+              ) {
                 Navigator.pop(
                   bottomSheetContext,
                   value,
                 );
               }
             },
-            child: Column(
+
+            child:
+                Column(
               mainAxisSize:
-              MainAxisSize.min,
+                  MainAxisSize.min,
+
               children: [
-                RadioListTile<
-                    ThemeMode>(
-                  value:
-                  ThemeMode
-                      .system,
-                  secondary:
-                  const Icon(
-                    Icons
-                        .brightness_auto_outlined,
-                  ),
-                  title: Text(
-                    _themeModeName(
-                      locale,
-                      ThemeMode
-                          .system,
+                for (
+                  final mode
+                  in ThemeMode.values
+                )
+                  RadioListTile<
+                      ThemeMode>(
+                    value:
+                        mode,
+
+                    secondary:
+                        Icon(
+                      _themeModeIcon(
+                        mode,
+                      ),
+                    ),
+
+                    title:
+                        Text(
+                      _themeModeName(
+                        locale,
+                        mode,
+                      ),
                     ),
                   ),
-                ),
-                RadioListTile<
-                    ThemeMode>(
-                  value:
-                  ThemeMode
-                      .light,
-                  secondary:
-                  const Icon(
-                    Icons
-                        .light_mode_outlined,
-                  ),
-                  title: Text(
-                    _themeModeName(
-                      locale,
-                      ThemeMode
-                          .light,
-                    ),
-                  ),
-                ),
-                RadioListTile<
-                    ThemeMode>(
-                  value:
-                  ThemeMode
-                      .dark,
-                  secondary:
-                  const Icon(
-                    Icons
-                        .dark_mode_outlined,
-                  ),
-                  title: Text(
-                    _themeModeName(
-                      locale,
-                      ThemeMode
-                          .dark,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -430,13 +629,12 @@ class _SettingsPageState
       },
     );
 
-    if (selected == null ||
-        !mounted) {
-      return;
-    }
-
-    if (selected ==
-        themeMode) {
+    if (
+      selected == null ||
+      !mounted ||
+      selected ==
+          themeMode
+    ) {
       return;
     }
 
@@ -445,17 +643,18 @@ class _SettingsPageState
           selected;
     });
 
-    widget.onThemeModeChanged(
+    widget
+        .onThemeModeChanged(
       selected,
     );
   }
 
-  // ============================================================
+  // ==========================================================
   // Delete account
-  // ============================================================
+  // ==========================================================
 
   Future<void>
-  _showDeleteAccountDialog() async {
+      _showDeleteAccountDialog() async {
     final user =
         AuthService
             .instance
@@ -466,19 +665,26 @@ class _SettingsPageState
     }
 
     final confirmed =
-    await showDialog<bool>(
-      context: context,
+        await showDialog<bool>(
+      context:
+          context,
+
       barrierDismissible:
-      false,
-      builder: (_) {
+          false,
+
+      builder:
+          (_) {
         return _DeleteAccountDialog(
-          email: user.email,
+          email:
+              user.email,
         );
       },
     );
 
-    if (confirmed != true ||
-        !mounted) {
+    if (
+      confirmed != true ||
+      !mounted
+    ) {
       return;
     }
 
@@ -486,14 +692,14 @@ class _SettingsPageState
   }
 
   Future<void>
-  _deleteAccount() async {
+      _deleteAccount() async {
     if (_isDeletingAccount) {
       return;
     }
 
     setState(() {
       _isDeletingAccount =
-      true;
+          true;
     });
 
     try {
@@ -505,14 +711,9 @@ class _SettingsPageState
         return;
       }
 
-      // 删除账号后 AuthService 会：
-      //
-      // currentUser = null
-      // notifyListeners()
-      //
-      // AuthGate 会自动切换回登录页面。
-      Navigator.of(context)
-          .pop();
+      Navigator.of(
+        context,
+      ).pop();
     } on AuthException catch (e) {
       if (!mounted) {
         return;
@@ -520,7 +721,7 @@ class _SettingsPageState
 
       setState(() {
         _isDeletingAccount =
-        false;
+            false;
       });
 
       ScaffoldMessenger.of(
@@ -529,15 +730,16 @@ class _SettingsPageState
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(
+            content:
+                Text(
               localizedErrorMessage(
                 context,
                 e.message,
               ),
             ),
             behavior:
-            SnackBarBehavior
-                .floating,
+                SnackBarBehavior
+                    .floating,
           ),
         );
     } catch (_) {
@@ -547,7 +749,7 @@ class _SettingsPageState
 
       setState(() {
         _isDeletingAccount =
-        false;
+            false;
       });
 
       ScaffoldMessenger.of(
@@ -556,346 +758,365 @@ class _SettingsPageState
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(
+            content:
+                Text(
               context
                   .l10n
                   .operationFailed,
             ),
             behavior:
-            SnackBarBehavior
-                .floating,
+                SnackBarBehavior
+                    .floating,
           ),
         );
     }
   }
 
-  // ============================================================
+  // ==========================================================
   // UI
-  // ============================================================
+  // ==========================================================
 
   @override
   Widget build(
-      BuildContext context,
-      ) {
+    BuildContext context,
+  ) {
     final l10n =
         context.l10n;
 
     final locale =
-    Localizations.localeOf(
+        Localizations.localeOf(
       context,
     );
 
     final colorScheme =
-        Theme.of(context)
-            .colorScheme;
+        Theme.of(
+      context,
+    ).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
+      appBar:
+          AppBar(
+        title:
+            Text(
           l10n.settings,
           style:
-          const TextStyle(
+              const TextStyle(
             fontWeight:
-            FontWeight.w600,
+                FontWeight.w600,
           ),
         ),
-        centerTitle: true,
+        centerTitle:
+            true,
       ),
-      body: ListView(
+
+      body:
+          ListView(
         padding:
-        const EdgeInsets.all(
+            const EdgeInsets.all(
           20,
         ),
-        children: [
-          // ====================================================
-          // Preferences
-          // ====================================================
 
+        children: [
           Text(
             l10n.preferences,
             style:
-            const TextStyle(
-              fontSize: 14,
+                const TextStyle(
+              fontSize:
+                  14,
               fontWeight:
-              FontWeight.w600,
+                  FontWeight.w600,
               color:
-              Colors.grey,
+                  Colors.grey,
             ),
           ),
 
           const SizedBox(
-            height: 12,
+            height:
+                12,
           ),
 
-          // ====================================================
-          // Notifications
-          // ====================================================
-
           Card(
-            elevation: 0,
+            elevation:
+                0,
             child:
-            SwitchListTile(
+                SwitchListTile(
               contentPadding:
-              const EdgeInsets
-                  .symmetric(
-                horizontal: 16,
+                  const EdgeInsets.symmetric(
+                horizontal:
+                    16,
               ),
+
               secondary:
-              const Icon(
-                Icons
-                    .notifications_outlined,
-              ),
-              title: Text(
+                  _changingNotification
+                      ? const SizedBox(
+                          width:
+                              24,
+                          height:
+                              24,
+                          child:
+                              CircularProgressIndicator(
+                            strokeWidth:
+                                2.2,
+                          ),
+                        )
+                      : const Icon(
+                          Icons.notifications_outlined,
+                        ),
+
+              title:
+                  Text(
                 l10n.notifications,
                 style:
-                const TextStyle(
+                    const TextStyle(
                   fontWeight:
-                  FontWeight
-                      .w500,
+                      FontWeight.w500,
                 ),
               ),
-              subtitle: Text(
-                l10n
-                    .notificationsSubtitle,
-              ),
-              value:
-              notificationsEnabled,
-              onChanged: (
-                  value,
-                  ) {
-                setState(() {
-                  notificationsEnabled =
-                      value;
-                });
 
-                widget
-                    .onNotificationsChanged(
-                  value,
-                );
-              },
+              subtitle:
+                  Text(
+                _notificationSubtitle(
+                  locale,
+                ),
+              ),
+
+              value:
+                  notificationsEnabled,
+
+              onChanged:
+                  _changingNotification
+                      ? null
+                      : _changeNotificationSetting,
             ),
           ),
 
           const SizedBox(
-            height: 12,
+            height:
+                12,
           ),
 
-          // ====================================================
-          // Theme
-          // ====================================================
-
           Card(
-            elevation: 0,
-            child: ListTile(
+            elevation:
+                0,
+            child:
+                ListTile(
               contentPadding:
-              const EdgeInsets
-                  .symmetric(
-                horizontal: 16,
+                  const EdgeInsets.symmetric(
+                horizontal:
+                    16,
               ),
-              leading: Icon(
+
+              leading:
+                  Icon(
                 _themeModeIcon(
                   themeMode,
                 ),
               ),
-              title: Text(
+
+              title:
+                  Text(
                 _themeTitle(
                   locale,
                 ),
                 style:
-                const TextStyle(
+                    const TextStyle(
                   fontWeight:
-                  FontWeight
-                      .w500,
+                      FontWeight.w500,
                 ),
               ),
-              subtitle: Text(
+
+              subtitle:
+                  Text(
                 _themeSubtitle(
                   locale,
                 ),
               ),
-              trailing: Row(
+
+              trailing:
+                  Row(
                 mainAxisSize:
-                MainAxisSize.min,
+                    MainAxisSize.min,
                 children: [
                   Text(
                     _themeModeName(
                       locale,
                       themeMode,
                     ),
-                    style: TextStyle(
+                    style:
+                        TextStyle(
                       color:
-                      colorScheme
-                          .onSurfaceVariant,
+                          colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(
-                    width: 4,
+                    width:
+                        4,
                   ),
                   Icon(
-                    Icons
-                        .chevron_right,
+                    Icons.chevron_right,
                     color:
-                    colorScheme
-                        .onSurfaceVariant,
+                        colorScheme.onSurfaceVariant,
                   ),
                 ],
               ),
+
               onTap:
-              _showThemePicker,
+                  _showThemePicker,
             ),
           ),
 
           const SizedBox(
-            height: 32,
+            height:
+                32,
           ),
-
-          // ====================================================
-          // App
-          // ====================================================
 
           Text(
             l10n.appSection,
             style:
-            const TextStyle(
-              fontSize: 14,
+                const TextStyle(
+              fontSize:
+                  14,
               fontWeight:
-              FontWeight.w600,
+                  FontWeight.w600,
               color:
-              Colors.grey,
+                  Colors.grey,
             ),
           ),
 
           const SizedBox(
-            height: 12,
+            height:
+                12,
           ),
 
-          // ====================================================
-          // Language
-          // ====================================================
-
           Card(
-            elevation: 0,
-            child: ListTile(
+            elevation:
+                0,
+            child:
+                ListTile(
               leading:
-              const Icon(
-                Icons
-                    .language_outlined,
+                  const Icon(
+                Icons.language_outlined,
               ),
-              title: Text(
+
+              title:
+                  Text(
                 l10n.language,
                 style:
-                const TextStyle(
+                    const TextStyle(
                   fontWeight:
-                  FontWeight
-                      .w500,
+                      FontWeight.w500,
                 ),
               ),
-              trailing: Row(
+
+              trailing:
+                  Row(
                 mainAxisSize:
-                MainAxisSize.min,
+                    MainAxisSize.min,
                 children: [
                   Text(
                     _languageName(
                       locale,
                     ),
-                    style: TextStyle(
+                    style:
+                        TextStyle(
                       color:
-                      colorScheme
-                          .onSurfaceVariant,
+                          colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(
-                    width: 4,
+                    width:
+                        4,
                   ),
                   Icon(
-                    Icons
-                        .chevron_right,
+                    Icons.chevron_right,
                     color:
-                    colorScheme
-                        .onSurfaceVariant,
+                        colorScheme.onSurfaceVariant,
                   ),
                 ],
               ),
+
               onTap:
-              _showLanguagePicker,
+                  _showLanguagePicker,
             ),
           ),
 
           const SizedBox(
-            height: 32,
+            height:
+                32,
           ),
-
-          // ====================================================
-          // Account
-          // ====================================================
 
           Text(
             l10n.accountSection,
             style:
-            const TextStyle(
-              fontSize: 14,
+                const TextStyle(
+              fontSize:
+                  14,
               fontWeight:
-              FontWeight.w600,
+                  FontWeight.w600,
               color:
-              Colors.grey,
+                  Colors.grey,
             ),
           ),
 
           const SizedBox(
-            height: 12,
+            height:
+                12,
           ),
 
           Card(
-            elevation: 0,
-            child: ListTile(
+            elevation:
+                0,
+            child:
+                ListTile(
               leading:
-              _isDeletingAccount
-                  ? SizedBox(
-                width: 24,
-                height: 24,
-                child:
-                CircularProgressIndicator(
-                  strokeWidth:
-                  2.2,
+                  _isDeletingAccount
+                      ? SizedBox(
+                          width:
+                              24,
+                          height:
+                              24,
+                          child:
+                              CircularProgressIndicator(
+                            strokeWidth:
+                                2.2,
+                            color:
+                                colorScheme.error,
+                          ),
+                        )
+                      : Icon(
+                          Icons.delete_forever_outlined,
+                          color:
+                              colorScheme.error,
+                        ),
+
+              title:
+                  Text(
+                l10n.deleteAccount,
+                style:
+                    TextStyle(
                   color:
-                  colorScheme
-                      .error,
-                ),
-              )
-                  : Icon(
-                Icons
-                    .delete_forever_outlined,
-                color:
-                colorScheme
-                    .error,
-              ),
-              title: Text(
-                l10n
-                    .deleteAccount,
-                style: TextStyle(
-                  color:
-                  colorScheme
-                      .error,
+                      colorScheme.error,
                   fontWeight:
-                  FontWeight
-                      .w600,
+                      FontWeight.w600,
                 ),
               ),
-              subtitle: Text(
-                l10n
-                    .deleteAccountSubtitle,
+
+              subtitle:
+                  Text(
+                l10n.deleteAccountSubtitle,
               ),
-              trailing: Icon(
-                Icons
-                    .chevron_right,
+
+              trailing:
+                  Icon(
+                Icons.chevron_right,
                 color:
-                colorScheme
-                    .error,
+                    colorScheme.error,
               ),
+
               onTap:
-              _isDeletingAccount
-                  ? null
-                  : _showDeleteAccountDialog,
+                  _isDeletingAccount
+                      ? null
+                      : _showDeleteAccountDialog,
             ),
           ),
         ],
@@ -903,10 +1124,6 @@ class _SettingsPageState
     );
   }
 }
-
-// ============================================================
-// Delete Account Dialog
-// ============================================================
 
 class _DeleteAccountDialog
     extends StatefulWidget {
@@ -918,7 +1135,7 @@ class _DeleteAccountDialog
 
   @override
   State<_DeleteAccountDialog>
-  createState() =>
+      createState() =>
       _DeleteAccountDialogState();
 }
 
@@ -926,10 +1143,10 @@ class _DeleteAccountDialogState
     extends State<
         _DeleteAccountDialog> {
   late final TextEditingController
-  _controller;
+      _controller;
 
   bool _emailMatches =
-  false;
+      false;
 
   @override
   void initState() {
@@ -947,18 +1164,20 @@ class _DeleteAccountDialogState
   }
 
   void _onEmailChanged(
-      String value,
-      ) {
+    String value,
+  ) {
     final matches =
         value
             .trim()
             .toLowerCase() ==
-            widget.email
-                .trim()
-                .toLowerCase();
+        widget.email
+            .trim()
+            .toLowerCase();
 
-    if (matches ==
-        _emailMatches) {
+    if (
+      matches ==
+      _emailMatches
+    ) {
       return;
     }
 
@@ -973,144 +1192,168 @@ class _DeleteAccountDialogState
       return;
     }
 
-    FocusScope.of(context)
-        .unfocus();
+    FocusScope.of(
+      context,
+    ).unfocus();
 
-    Navigator.of(context)
-        .pop(true);
+    Navigator.of(
+      context,
+    ).pop(
+      true,
+    );
   }
 
   @override
   Widget build(
-      BuildContext context,
-      ) {
+    BuildContext context,
+  ) {
     final l10n =
         context.l10n;
 
     final colorScheme =
-        Theme.of(context)
-            .colorScheme;
+        Theme.of(
+      context,
+    ).colorScheme;
 
     return AlertDialog(
-      scrollable: true,
-      title: Row(
+      scrollable:
+          true,
+
+      title:
+          Row(
         children: [
           Icon(
-            Icons
-                .warning_amber_rounded,
+            Icons.warning_amber_rounded,
             color:
-            colorScheme.error,
+                colorScheme.error,
           ),
-
           const SizedBox(
-            width: 10,
+            width:
+                10,
           ),
-
           Expanded(
-            child: Text(
-              l10n
-                  .deleteAccount,
+            child:
+                Text(
+              l10n.deleteAccount,
             ),
           ),
         ],
       ),
-      content: Column(
+
+      content:
+          Column(
         mainAxisSize:
-        MainAxisSize.min,
+            MainAxisSize.min,
+
         crossAxisAlignment:
-        CrossAxisAlignment.start,
+            CrossAxisAlignment.start,
+
         children: [
           Text(
-            l10n
-                .deleteAccountDescription,
+            l10n.deleteAccountDescription,
           ),
 
           const SizedBox(
-            height: 20,
+            height:
+                20,
           ),
 
           Text(
-            l10n
-                .deleteAccountEmailPrompt(
+            l10n.deleteAccountEmailPrompt(
               widget.email,
             ),
             style:
-            const TextStyle(
+                const TextStyle(
               fontWeight:
-              FontWeight.w500,
+                  FontWeight.w500,
             ),
           ),
 
           const SizedBox(
-            height: 12,
+            height:
+                12,
           ),
 
           TextField(
             controller:
-            _controller,
-            autofocus: false,
+                _controller,
+
             keyboardType:
-            TextInputType
-                .emailAddress,
-            autocorrect: false,
+                TextInputType.emailAddress,
+
+            autocorrect:
+                false,
+
             enableSuggestions:
-            false,
+                false,
+
             textInputAction:
-            TextInputAction.done,
+                TextInputAction.done,
+
             onChanged:
-            _onEmailChanged,
-            onSubmitted: (_) {
+                _onEmailChanged,
+
+            onSubmitted:
+                (_) {
               if (_emailMatches) {
                 _confirm();
               }
             },
+
             decoration:
-            InputDecoration(
+                InputDecoration(
               hintText:
-              l10n
-                  .deleteAccountEmailHint,
+                  l10n.deleteAccountEmailHint,
+
               prefixIcon:
-              const Icon(
-                Icons
-                    .email_outlined,
+                  const Icon(
+                Icons.email_outlined,
               ),
+
               border:
-              const OutlineInputBorder(),
+                  const OutlineInputBorder(),
             ),
           ),
         ],
       ),
+
       actions: [
         TextButton(
-          onPressed: () {
+          onPressed:
+              () {
             FocusScope.of(
               context,
             ).unfocus();
 
             Navigator.of(
               context,
-            ).pop(false);
+            ).pop(
+              false,
+            );
           },
           child:
-          Text(
+              Text(
             l10n.cancel,
           ),
         ),
+
         FilledButton(
           onPressed:
-          _emailMatches
-              ? _confirm
-              : null,
+              _emailMatches
+                  ? _confirm
+                  : null,
+
           style:
-          FilledButton
-              .styleFrom(
+              FilledButton.styleFrom(
             backgroundColor:
-            colorScheme.error,
+                colorScheme.error,
+
             foregroundColor:
-            colorScheme.onError,
+                colorScheme.onError,
           ),
+
           child:
-          Text(
+              Text(
             l10n.deleteAccount,
           ),
         ),
